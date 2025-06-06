@@ -1,6 +1,3 @@
 ---@meta
 ---@class onPlayTimerData
----@field public translation tes3vector3
----@field public direction tes3vector3
----@field public targetDistance number
 ---@field public mesh niNode

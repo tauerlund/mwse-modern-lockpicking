@@ -1,6 +1,4 @@
-local KnifeAnimator = require("tauer.modern-lockpicking.services.knives.KnifeAnimator")
 local zBufferIndex = require("tauer.modern-lockpicking.shared.enums.zBufferIndex")
-
 local objectNames = require("tauer.modern-lockpicking.shared.enums.objectNames")
 local paths = require("tauer.modern-lockpicking.shared.enums.paths")
 local events = require("tauer.modern-lockpicking.shared.enums.event")
@@ -8,18 +6,17 @@ local events = require("tauer.modern-lockpicking.shared.enums.event")
 ---@class KnifeSpawner
 local this = {}
 
--- TODO Remove when debugging is not needed anymore
----@private
----@type niNode
-this.knife = nil
-
----@private
----@type tes3vector3
-this.knifeRotation = tes3vector3.new(-1.07, -1.23, 1.04)
-
 ---@public
 ---@param lock lock
 function this.Spawn(lock)
+	lock.knife = this.spawn(lock)
+	this.registerEvents()
+end
+
+---@private
+---@param lock lock
+---@return niNode
+function this.spawn(lock)
 	local knife = this.getMesh()
 	local helper = lock.mesh:getObjectByName(objectNames.knifeHelper) --[[@as niNode]]
 
@@ -31,11 +28,7 @@ function this.Spawn(lock)
 
 	helper:update()
 
-	KnifeAnimator.Play(knife)
-
-	lock.knife = knife
-
-	this.registerEvents()
+	return knife
 end
 
 ---@public
@@ -44,20 +37,9 @@ function this.getMesh()
 	local mesh = tes3.loadMesh(paths.daggerMesh, true):clone() --[[@as niNode]]
 
 	mesh.name = objectNames.knife
-	mesh.rotation = this.getRotation(mesh)
-	-- mesh.translation = this.getTranslation(mesh)
 	mesh:attachProperty(this.getZBufferProperty())
 
 	return mesh
-end
-
----@private
----@param mesh niNode
----@return tes3matrix33
-function this.getRotation(mesh)
-	local rotation = tes3matrix33.new()
-	rotation:fromEulerXYZ(this.knifeRotation.x, this.knifeRotation.y, this.knifeRotation.z)
-	return rotation
 end
 
 ---@private

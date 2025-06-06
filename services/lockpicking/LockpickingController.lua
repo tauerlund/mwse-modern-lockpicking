@@ -1,6 +1,7 @@
 local LockSpawner = require("tauer.modern-lockpicking.services.locks.LockSpawner")
 local LockAnimator = require("tauer.modern-lockpicking.services.locks.LockAnimator")
 local KnifeSpawner = require("tauer.modern-lockpicking.services.knives.KnifeSpawner")
+local KnifeAnimator = require("tauer.modern-lockpicking.services.knives.KnifeAnimator")
 
 local events = require("tauer.modern-lockpicking.shared.enums.event")
 
@@ -25,6 +26,8 @@ function this.Start(container)
 	this.lock = LockSpawner.Spawn(container)
 
 	KnifeSpawner.Spawn(this.lock)
+
+	KnifeAnimator.Play(this.lock.knife)
 	LockAnimator.Play(this.lock)
 
 	this.registerEvents()

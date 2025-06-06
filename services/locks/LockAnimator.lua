@@ -19,21 +19,41 @@ this.rotateSpeed = 1.5
 ---@type number
 this.resetSpeed = 1.8
 
+---@private
+---@type number
+this.iterationTime = 0.005
+
+---@private
+---@type number
+this.totalDurationInSeconds = 0.8
+
+---@private
+---@type number
+this.iterations = math.floor(this.totalDurationInSeconds / this.iterationTime)
+
+---@private
+---@type tes3vector3
+this.initialTranslation = nil
+
+---@private
+---@type tes3vector3
+this.targetTranslation = nil
+
 ---@public
 ---@param lock lock
 function this.Play(lock)
 	this.lock = lock
 
+	this.initialTranslation = lock.mesh.translation:copy()
+	this.targetTranslation = this.getTargetTranslation(lock)
+
 	timer.start({
 		type = timer.real,
-		duration = 0.005,
-		iterations = 80,
+		duration = this.iterationTime,
+		iterations = this.iterations,
 		callback = this.onPlayTimer,
 		---@type onPlayTimerData
 		data = {
-			translation = tes3.getCameraPosition():copy(),
-			direction = tes3.getCameraVector():copy(),
-			targetDistance = 75,
 			mesh = lock.mesh,
 		},
 	})
@@ -42,17 +62,33 @@ function this.Play(lock)
 end
 
 ---@private
+---@param lock lock
+---@return tes3vector3
+function this.getTargetTranslation(lock)
+	local direction = tes3.getCameraVector()
+	local distance = 75
+
+	local forward = direction:normalized() * distance
+
+	return lock.mesh.translation + forward
+end
+
+---@private
 ---@param callback mwseTimerCallbackData
 function this.onPlayTimer(callback)
 	local data = callback.timer.data --[[@as onPlayTimerData]]
+	local lock = data.mesh
 
-	local distance = data.targetDistance - callback.timer.iterations
-	local forward = data.direction:normalized() * distance
+	lock.translation = this.getUpdatedTranslation(callback.timer.iterations)
+	lock:update()
+end
 
-	local mesh = this.lock.mesh
-
-	mesh.translation = data.translation + forward
-	mesh:update()
+function this.getUpdatedTranslation(iterations)
+	return tes3vector3.new(
+		math.remap(iterations, 0, this.iterations, this.targetTranslation.x, this.initialTranslation.x),
+		math.remap(iterations, 0, this.iterations, this.targetTranslation.y, this.initialTranslation.y),
+		math.remap(iterations, 0, this.iterations, this.targetTranslation.z, this.initialTranslation.z)
+	)
 end
 
 function this.registerEvents()
