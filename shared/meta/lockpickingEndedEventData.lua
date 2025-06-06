@@ -1,0 +1,4 @@
+---@meta
+---@class lockpickingEndedEventData
+---@field public lock lock
+---@field public success boolean

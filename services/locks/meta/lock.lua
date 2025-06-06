@@ -1,0 +1,9 @@
+---@meta
+---@class lock
+---@field public mesh niNode
+---@field public cylinder niNode
+---@field public blocked boolean
+---@field public rotatingLeft boolean
+---@field public rotatingRight boolean
+---@field public container tes3containerInstance
+---@field public knife niNode?
