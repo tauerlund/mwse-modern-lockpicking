@@ -1,6 +1,7 @@
 local LockMeshResolver = require("tauer.modern-lockpicking.services.locks.LockMeshResolver")
 local zBufferIndex = require("tauer.modern-lockpicking.shared.enums.zBufferIndex")
 
+local objectNames = require("tauer.modern-lockpicking.shared.enums.objectNames")
 local events = require("tauer.modern-lockpicking.shared.enums.event")
 
 ---@class LockSpawner
@@ -25,7 +26,7 @@ function this.Spawn(container)
 
 	return {
 		mesh = mesh,
-		cylinder = mesh:getObjectByName("ModernLockpicking:CylinderHelper"),
+		cylinder = mesh:getObjectByName(objectNames.cylinderHelper),
 		container = container,
 	}
 end
