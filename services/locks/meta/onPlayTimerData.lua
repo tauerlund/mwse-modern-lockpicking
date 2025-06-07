@@ -1,3 +1,0 @@
----@meta
----@class onPlayTimerData
----@field public mesh niNode

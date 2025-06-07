@@ -1,0 +1,3 @@
+---@meta
+---@class onStartKnifeAnimationData : timerData
+---@field public knife knife

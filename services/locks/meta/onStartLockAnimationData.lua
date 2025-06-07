@@ -1,0 +1,5 @@
+---@meta
+---@class onStartLockAnimationData : timerData
+---@field public mesh niNode
+---@field public initialTranslation tes3vector3
+---@field public targetTranslation tes3vector3

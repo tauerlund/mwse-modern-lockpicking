@@ -1,6 +1,6 @@
 local LockpickingController = require("tauer.modern-lockpicking.services.lockpicking.LockpickingController")
 
-local events = require("tauer.modern-lockpicking.shared.enums.event")
+local events = require("tauer.modern-lockpicking.shared.enums.events")
 
 ---@class LockpickingStarter
 local this = {}
@@ -25,16 +25,19 @@ function this.onActivate(e)
 		return
 	end
 
-	if e.target.object.objectType ~= tes3.objectType.container then
+	if
+		not e.target.object.objectType == tes3.objectType.container
+		and not e.target.objectType == tes3.objectType.door
+	then
 		return
 	end
 
-	local container = e.target --[[@as tes3reference]]
-	if not tes3.getLocked({ reference = container }) then
+	local target = e.target --[[@as tes3reference]]
+	if not tes3.getLocked({ reference = target }) then
 		return
 	end
 
-	this.activateLockpickMode(container --[[@as tes3containerInstance]])
+	this.activateLockpickMode(target --[[@as tes3containerInstance]])
 end
 
 ---@private

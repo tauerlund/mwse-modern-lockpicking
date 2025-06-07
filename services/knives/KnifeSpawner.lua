@@ -1,7 +1,9 @@
-local zBufferIndex = require("tauer.modern-lockpicking.shared.enums.zBufferIndex")
-local objectNames = require("tauer.modern-lockpicking.shared.enums.objectNames")
-local paths = require("tauer.modern-lockpicking.shared.enums.paths")
-local events = require("tauer.modern-lockpicking.shared.enums.event")
+--- ENUMS
+local Z_BUFFER_INDEX = require("tauer.modern-lockpicking.shared.enums.zBufferIndex")
+local OBJECT_NAMES = require("tauer.modern-lockpicking.shared.enums.objectNames")
+local PATHS = require("tauer.modern-lockpicking.shared.enums.paths")
+local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
+---
 
 ---@class KnifeSpawner
 local this = {}
@@ -15,10 +17,10 @@ end
 
 ---@private
 ---@param lock lock
----@return niNode
+---@return knife
 function this.spawn(lock)
 	local knife = this.getMesh()
-	local helper = lock.mesh:getObjectByName(objectNames.knifeHelper) --[[@as niNode]]
+	local helper = lock.mesh:getObjectByName(OBJECT_NAMES.knifeHelper) --[[@as niNode]]
 
 	helper:attachChild(knife)
 
@@ -34,23 +36,12 @@ end
 ---@public
 ---@return niNode
 function this.getMesh()
-	local mesh = tes3.loadMesh(paths.daggerMesh, true):clone() --[[@as niNode]]
+	local mesh = tes3.loadMesh(PATHS.daggerMesh, true):clone() --[[@as niNode]]
 
-	mesh.name = objectNames.knife
+	mesh.name = OBJECT_NAMES.knife
 	mesh:attachProperty(this.getZBufferProperty())
 
 	return mesh
-end
-
----@private
----@param mesh niNode
-function this.getTranslation(mesh)
-	local translation = mesh.translation:copy()
-
-	local distance = -16
-	local forward = mesh.rotation:getForwardVector() * distance
-
-	return translation + forward
 end
 
 ---@private
@@ -58,22 +49,10 @@ end
 function this.getZBufferProperty()
 	local property = niZBufferProperty.new()
 
-	property:setFlag(true, zBufferIndex.test)
-	property:setFlag(true, zBufferIndex.write)
+	property:setFlag(true, Z_BUFFER_INDEX.test)
+	property:setFlag(true, Z_BUFFER_INDEX.write)
 
 	return property
-end
-
----@private
-function this.registerEvents()
-	event.register(events.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
-end
-
----@private
-function this.unregisterEvents()
-	if event.isRegistered(events.lockpickingEnded, this.onLockpickingEnded) then
-		event.unregister(events.lockpickingEnded, this.onLockpickingEnded)
-	end
 end
 
 ---@private
@@ -81,10 +60,22 @@ end
 function this.onLockpickingEnded(e)
 	local lock = e.lock
 
-	local knifeHelper = lock.mesh:getObjectByName(objectNames.knifeHelper) --[[@as niNode]]
+	local knifeHelper = lock.mesh:getObjectByName(OBJECT_NAMES.knifeHelper) --[[@as niNode]]
 	knifeHelper:detachChild(lock.knife)
 
 	this.unregisterEvents()
+end
+
+---@private
+function this.registerEvents()
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
+end
+
+---@private
+function this.unregisterEvents()
+	if event.isRegistered(EVENTS.lockpickingEnded, this.onLockpickingEnded) then
+		event.unregister(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+	end
 end
 
 return this

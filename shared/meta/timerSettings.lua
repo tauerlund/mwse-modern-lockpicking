@@ -1,0 +1,5 @@
+---@meta
+---@class timerSettings
+---@field public iterationTime number
+---@field public totalDurationInSeconds number
+---@field public iterations number
