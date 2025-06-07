@@ -1,5 +1,5 @@
 --- SERVICES
-local TimerHelper = require("tauer.modern-lockpicking.services.timers.TimerHelper")
+local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerManager")
 ---
 
 --- ENUMS
@@ -14,7 +14,7 @@ local this = {}
 function this.Start(knife)
 	this.initializeTransforms(knife)
 
-	TimerHelper.Start({
+	TimerManager.Start({
 		durationInSeconds = 1,
 		callback = this.onStartTimer,
 		---@type onStartKnifeAnimationData

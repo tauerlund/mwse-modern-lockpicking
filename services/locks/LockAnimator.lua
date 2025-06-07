@@ -1,5 +1,5 @@
 --- SERVICES
-local TimerHelper = require("tauer.modern-lockpicking.services.timers.TimerHelper")
+local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerManager")
 ---
 
 --- ENUMS
@@ -12,7 +12,7 @@ local this = {}
 ---@public
 ---@param lock lock
 function this.Start(lock)
-	TimerHelper.Start({
+	TimerManager.Start({
 		durationInSeconds = 0.8,
 		callback = this.onStartTimer,
 		---@type onStartLockAnimationData
