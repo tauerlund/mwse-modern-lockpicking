@@ -1,6 +1,6 @@
 local events = require("tauer.modern-lockpicking.shared.enums.events")
 
----@class SoundController : InitializedService
+---@class SoundController : IInitializedService
 local this = {}
 
 ---@public

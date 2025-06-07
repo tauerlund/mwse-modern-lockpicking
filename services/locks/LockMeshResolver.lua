@@ -1,6 +1,6 @@
 local paths = require("tauer.modern-lockpicking.shared.enums.paths")
 
----@class LockMeshResolver : InitializedService
+---@class LockMeshResolver : IInitializedService
 local this = {}
 
 ---@private

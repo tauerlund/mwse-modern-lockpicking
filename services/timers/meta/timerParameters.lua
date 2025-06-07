@@ -1,6 +1,6 @@
 ---@meta
 ---@class timerParameters
 ---@field public durationInSeconds number
----@field public callback fun(callback:mwseTimerCallbackData)
+---@field public callback fun(callback:mwseTimerCallbackData)?
 ---@field public finishedCallback fun(configuration:timerData)?
 ---@field public data? timerData

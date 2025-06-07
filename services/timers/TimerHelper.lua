@@ -7,7 +7,7 @@ local this = {}
 
 ---@package
 ---@class timerDataInner : timerData
----@field package callback fun(callbackData:mwseTimerCallbackData)
+---@field package callback fun(callbackData:mwseTimerCallbackData)?
 ---@field package finishedCallback fun(configuration:timerData)?
 
 ---@public
@@ -36,7 +36,9 @@ end
 function this.callbackInner(callback)
 	local data = callback.timer.data --[[@as timerDataInner]]
 
-	data.callback(callback)
+	if data.callback then
+		data.callback(callback)
+	end
 
 	if callback.timer.iterations == 1 and data.finishedCallback then
 		data.finishedCallback(data)

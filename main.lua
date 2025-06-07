@@ -15,7 +15,7 @@ end
 function this.initializeMod()
 	Logger:info("Initializing...")
 
-	---@type InitializedService[]
+	---@type IInitializedService[]
 	local services = {
 		LockMeshResolver,
 		SoundController,

@@ -4,6 +4,7 @@ local LockAnimator = require("tauer.modern-lockpicking.services.locks.LockAnimat
 local KnifeSpawner = require("tauer.modern-lockpicking.services.knives.KnifeSpawner")
 local KnifeAnimator = require("tauer.modern-lockpicking.services.knives.KnifeAnimator")
 local CylinderAnimator = require("tauer.modern-lockpicking.services.cylinders.CylinderAnimator")
+local TimerHelper = require("tauer.modern-lockpicking.services.timers.TimerHelper")
 ---
 
 --- ENUMS
@@ -37,7 +38,10 @@ function this.Start(container)
 	KnifeAnimator.Start(this.lock.knife)
 	CylinderAnimator.Start(this.lock.cylinder)
 
-	this.registerEvents()
+	TimerHelper.Start({
+		durationInSeconds = 1,
+		finishedCallback = this.registerEvents,
+	})
 end
 
 ---@public
