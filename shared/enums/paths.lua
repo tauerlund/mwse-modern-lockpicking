@@ -1,4 +1,4 @@
----@enum paths
+---@enum PATHS
 local enum = {
 	defaultLockMesh = "tauer\\lock.nif",
 	daggerMesh = "w\\W_iron_dagger.nif",
