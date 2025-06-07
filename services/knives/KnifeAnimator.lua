@@ -1,76 +1,83 @@
-local constants = require("tauer.modern-lockpicking.services.knives.enums.constants")
+--- SERVICES
+local TimerHelper = require("tauer.modern-lockpicking.services.timers.TimerHelper")
+---
+
+--- ENUMS
+local CONSTANTS = require("tauer.modern-lockpicking.services.knives.enums.constants")
+---
 
 ---@class KnifeAnimator
 local this = {}
 
----@private
----@type number
-this.iterationTime = 0.005
-
----@private
----@type number
-this.totalDurationInSeconds = 1
-
----@private
----@type number
-this.iterations = math.floor(this.totalDurationInSeconds / this.iterationTime)
-
 ---@public
 ---@param knife niNode
-function this.Play(knife)
+function this.Start(knife)
 	this.initializeTransforms(knife)
-	timer.start({
-		type = timer.real,
-		duration = this.iterationTime,
-		iterations = this.iterations,
-		callback = this.onPlayTimer,
-		---@type onPlayTimerData
+
+	TimerHelper.Start({
+		durationInSeconds = 1,
+		callback = this.onStartTimer,
+		---@type onStartKnifeAnimationData
 		data = {
-			mesh = knife,
+			knife = knife,
 		},
 	})
 end
 
 function this.initializeTransforms(knife)
-	knife.translation = constants.initialTranslation
+	knife.translation = CONSTANTS.initialTranslation
 
 	local rotation = tes3matrix33.new()
-	rotation:fromEulerXYZ(constants.initialRotation.x, constants.initialRotation.y, constants.initialRotation.z)
+	rotation:fromEulerXYZ(CONSTANTS.initialRotation.x, CONSTANTS.initialRotation.y, CONSTANTS.initialRotation.z)
+
 	knife.rotation = rotation
 end
 
 ---@private
 ---@param callback mwseTimerCallbackData
-function this.onPlayTimer(callback)
-	local data = callback.timer.data --[[@as onPlayTimerData]]
-	local knife = data.mesh
+function this.onStartTimer(callback)
+	local data = callback.timer.data --[[@as onStartKnifeAnimationData]]
+	local knife = data.knife
 
-	knife.translation = this.getUpdatedTranslation(callback.timer.iterations)
-	knife.rotation = this.getUpdatedRotation(callback.timer.iterations)
+	local currentPhase = callback.timer.iterations
+	local targetPhase = data.totalIterations --[[@as integer]]
+
+	knife.translation = this.getUpdatedTranslation(currentPhase, targetPhase)
+	knife.rotation = this.getUpdatedRotation(currentPhase, targetPhase)
+
 	knife:update()
 end
 
 ---@private
----@param iterations number
+---@param currentPhase integer
+---@param targetPhase integer
 ---@return tes3vector3
-function this.getUpdatedTranslation(iterations)
+function this.getUpdatedTranslation(currentPhase, targetPhase)
+	local initial = CONSTANTS.initialTranslation
+	local target = CONSTANTS.targetTranslation
+
 	local translation = tes3vector3.new(
-		math.remap(iterations, 0, this.iterations, constants.targetTranslation.x, constants.initialTranslation.x),
-		math.remap(iterations, 0, this.iterations, constants.targetTranslation.y, constants.initialTranslation.y),
-		math.remap(iterations, 0, this.iterations, constants.targetTranslation.z, constants.initialTranslation.z)
+		math.remap(currentPhase, 0, targetPhase, target.x, initial.x),
+		math.remap(currentPhase, 0, targetPhase, target.y, initial.y),
+		math.remap(currentPhase, 0, targetPhase, target.z, initial.z)
 	)
+
 	return translation
 end
 
 ---@private
----@param iteration number
+---@param currentPhase integer
+---@param targetPhase integer
 ---@return tes3matrix33
-function this.getUpdatedRotation(iteration)
+function this.getUpdatedRotation(currentPhase, targetPhase)
+	local initial = CONSTANTS.initialRotation
+	local target = CONSTANTS.targetRotation
+
 	local rotation = tes3matrix33.new()
 	rotation:fromEulerXYZ(
-		math.remap(iteration, 0, this.iterations, constants.targetRotation.x, constants.initialRotation.x),
-		math.remap(iteration, 0, this.iterations, constants.targetRotation.y, constants.initialRotation.y),
-		math.remap(iteration, 0, this.iterations, constants.targetRotation.z, constants.initialRotation.z)
+		math.remap(currentPhase, 0, targetPhase, target.x, initial.x),
+		math.remap(currentPhase, 0, targetPhase, target.y, initial.y),
+		math.remap(currentPhase, 0, targetPhase, target.z, initial.z)
 	)
 
 	return rotation

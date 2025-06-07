@@ -2,7 +2,7 @@ local LockMeshResolver = require("tauer.modern-lockpicking.services.locks.LockMe
 local zBufferIndex = require("tauer.modern-lockpicking.shared.enums.zBufferIndex")
 
 local objectNames = require("tauer.modern-lockpicking.shared.enums.objectNames")
-local events = require("tauer.modern-lockpicking.shared.enums.event")
+local events = require("tauer.modern-lockpicking.shared.enums.events")
 
 ---@class LockSpawner
 local this = {}
@@ -11,6 +11,21 @@ local this = {}
 ---@param container tes3containerInstance
 ---@return lock
 function this.Spawn(container)
+	local mesh = this.spawn(container)
+
+	event.register(events.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
+
+	return {
+		mesh = mesh,
+		cylinder = mesh:getObjectByName(objectNames.cylinderHelper),
+		container = container,
+	}
+end
+
+---@private
+---@param container tes3containerInstance
+---@return niNode
+function this.spawn(container)
 	local mesh = this.getMesh(container)
 	local root = this.getRootNode()
 
@@ -22,13 +37,7 @@ function this.Spawn(container)
 
 	root:update()
 
-	event.register(events.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
-
-	return {
-		mesh = mesh,
-		cylinder = mesh:getObjectByName(objectNames.cylinderHelper),
-		container = container,
-	}
+	return mesh
 end
 
 ---@private

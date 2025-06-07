@@ -1,0 +1,1 @@
+---@alias knife niNode

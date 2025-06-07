@@ -1,0 +1,3 @@
+---@meta
+---@class timerData
+---@field public totalIterations integer?
