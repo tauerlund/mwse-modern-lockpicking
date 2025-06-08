@@ -64,7 +64,7 @@ function this.rotateCylinder()
 end
 
 ---@private
----@param e rotationStartedEventData
+---@param e rotationEventData
 function this.onRotationStarted(e)
 	this.rotationDirection = e.direction
 end
@@ -82,6 +82,7 @@ function this.onLockpickingEnded(_)
 	this.unregisterEvents()
 end
 
+---@private
 function this.registerEvents()
 	event.register(tes3.event.enterFrame, this.onEnterFrame)
 	event.register(EVENTS.rotationStarted, this.onRotationStarted)
@@ -89,6 +90,7 @@ function this.registerEvents()
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
 end
 
+---@private
 function this.unregisterEvents()
 	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
 		event.unregister(tes3.event.enterFrame, this.onEnterFrame)

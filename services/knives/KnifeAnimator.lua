@@ -3,16 +3,54 @@ local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerMana
 ---
 
 --- ENUMS
+local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
+local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirection")
 local CONSTANTS = require("tauer.modern-lockpicking.services.knives.enums.constants")
 ---
 
 ---@class KnifeAnimator
 local this = {}
 
+---@private
+---@type knife
+this.knife = nil
+
+---@private
+---@type number
+this.phase = 0
+
+---@private
+---@type number
+this.phaseSpeed = CONSTANTS.phase.speed
+
+---@private
+---@type tes3matrix33|nil
+this.lastRotation = nil
+
+---@private
+---@type number
+this.targetAngle = 0
+
+---@private
+---@type number
+this.sourceAngle = 0
+
+---@private
+---@type number
+this.currentAngle = 0
+
+---@private
+---@type { [DIRECTION]: number }
+this.angles = {
+	[DIRECTION.clockwise] = CONSTANTS.angles.clockwise,
+	[DIRECTION.counterClockwise] = CONSTANTS.angles.counterClockwise,
+}
+
 ---@public
 ---@param knife niNode
 function this.Start(knife)
-	this.initializeTransforms(knife)
+	this.knife = knife
+	this.initializeTransforms()
 
 	TimerManager.Start({
 		durationInSeconds = 1,
@@ -22,15 +60,16 @@ function this.Start(knife)
 			knife = knife,
 		},
 	})
+	this.registerEvents()
 end
 
-function this.initializeTransforms(knife)
-	knife.translation = CONSTANTS.initialTranslation
+function this.initializeTransforms()
+	this.knife.translation = CONSTANTS.translation.initial
 
 	local rotation = tes3matrix33.new()
-	rotation:fromEulerXYZ(CONSTANTS.initialRotation.x, CONSTANTS.initialRotation.y, CONSTANTS.initialRotation.z)
+	rotation:fromEulerXYZ(CONSTANTS.rotation.initial.x, CONSTANTS.rotation.initial.y, CONSTANTS.rotation.initial.z)
 
-	knife.rotation = rotation
+	this.knife.rotation = rotation
 end
 
 ---@private
@@ -53,8 +92,8 @@ end
 ---@param targetPhase integer
 ---@return tes3vector3
 function this.getUpdatedTranslation(currentPhase, targetPhase)
-	local initial = CONSTANTS.initialTranslation
-	local target = CONSTANTS.targetTranslation
+	local initial = CONSTANTS.translation.initial
+	local target = CONSTANTS.translation.target
 
 	local translation = tes3vector3.new(
 		math.remap(currentPhase, 0, targetPhase, target.x, initial.x),
@@ -70,8 +109,8 @@ end
 ---@param targetPhase integer
 ---@return tes3matrix33
 function this.getUpdatedRotation(currentPhase, targetPhase)
-	local initial = CONSTANTS.initialRotation
-	local target = CONSTANTS.targetRotation
+	local initial = CONSTANTS.rotation.initial
+	local target = CONSTANTS.rotation.target
 
 	local rotation = tes3matrix33.new()
 	rotation:fromEulerXYZ(
@@ -81,6 +120,94 @@ function this.getUpdatedRotation(currentPhase, targetPhase)
 	)
 
 	return rotation
+end
+
+---@private
+---@param e enterFrameEventData
+function this.onEnterFrame(e)
+	if not this.lastRotation then
+		return
+	end
+
+	this.rotate()
+	this.increasePhase(e.delta)
+end
+
+---@private
+function this.rotate()
+	this.currentAngle = math.lerp(this.sourceAngle, this.targetAngle, this.phase)
+
+	local rotation = tes3matrix33.new()
+	rotation:toRotationY(this.currentAngle)
+
+	this.knife.rotation = this.lastRotation * rotation
+	this.knife:update()
+end
+
+---@private
+---@param delta number
+function this.increasePhase(delta)
+	this.phase = math.min(this.phase + this.phaseSpeed * delta, 1)
+end
+
+---@private
+---@param e rotationEventData
+function this.onRotationStarted(e)
+	this.targetAngle = this.angles[e.direction]
+	this.sourceAngle = this.currentAngle
+	this.phaseSpeed = CONSTANTS.phase.speed
+	this.phase = 0
+
+	if not this.lastRotation then
+		this.lastRotation = this.knife.rotation:copy()
+	end
+end
+
+---@private
+---@param _ rotationEventData
+function this.onRotationEnded(_)
+	this.targetAngle = 0
+	this.sourceAngle = this.currentAngle
+	this.phaseSpeed = this.getRelativePhaseSpeed()
+	this.phase = 0
+end
+
+---@private
+---@param _ lockpickingEndedEventData
+function this.onLockpickingEnded(_)
+	this.phase = 0
+	this.rotationDirection = nil
+	this.lastRotation = nil
+	this.unregisterEvents()
+end
+
+---@private
+function this.getRelativePhaseSpeed()
+	if this.phase == 0 then
+		return CONSTANTS.phase.speed
+	end
+	return CONSTANTS.phase.speed / this.phase
+end
+
+---@private
+function this.registerEvents()
+	event.register(tes3.event.enterFrame, this.onEnterFrame)
+	event.register(EVENTS.rotationStarted, this.onRotationStarted)
+	event.register(EVENTS.rotationEnded, this.onRotationEnded)
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
+end
+
+---@private
+function this.unregisterEvents()
+	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
+		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
+	end
+	if event.isRegistered(EVENTS.rotationStarted, this.onRotationStarted) then
+		event.unregister(EVENTS.rotationStarted, this.onRotationStarted)
+	end
+	if event.isRegistered(EVENTS.rotationEnded, this.onRotationEnded) then
+		event.unregister(EVENTS.rotationEnded, this.onRotationEnded)
+	end
 end
 
 return this

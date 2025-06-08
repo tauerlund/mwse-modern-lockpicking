@@ -1,3 +1,3 @@
 ---@meta
----@class rotationStartedEventData
+---@class rotationEventData
 ---@field direction DIRECTION
