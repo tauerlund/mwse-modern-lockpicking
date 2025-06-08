@@ -25,7 +25,7 @@ this.phaseSpeed = CONSTANTS.phase.speed
 
 ---@private
 ---@type tes3matrix33|nil
-this.lastRotation = nil
+this.baseRotation = nil
 
 ---@private
 ---@type number
@@ -55,6 +55,7 @@ function this.Start(knife)
 	TimerManager.Start({
 		durationInSeconds = 1,
 		callback = this.onStartTimer,
+		finishedCallback = this.onStartTimerFinished,
 		---@type onStartKnifeAnimationData
 		data = {
 			knife = knife,
@@ -85,6 +86,11 @@ function this.onStartTimer(callback)
 	knife.rotation = this.getUpdatedRotation(currentPhase, targetPhase)
 
 	knife:update()
+end
+
+---@private
+function this.onStartTimerFinished()
+	this.baseRotation = this.knife.rotation:copy()
 end
 
 ---@private
@@ -125,7 +131,7 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
-	if not this.lastRotation then
+	if not this.baseRotation then
 		return
 	end
 
@@ -140,7 +146,7 @@ function this.rotate()
 	local rotation = tes3matrix33.new()
 	rotation:toRotationY(this.currentAngle)
 
-	this.knife.rotation = this.lastRotation * rotation
+	this.knife.rotation = this.baseRotation * rotation
 	this.knife:update()
 end
 
@@ -157,10 +163,6 @@ function this.onRotationStarted(e)
 	this.sourceAngle = this.currentAngle
 	this.phaseSpeed = CONSTANTS.phase.speed
 	this.phase = 0
-
-	if not this.lastRotation then
-		this.lastRotation = this.knife.rotation:copy()
-	end
 end
 
 ---@private
@@ -176,8 +178,9 @@ end
 ---@param _ lockpickingEndedEventData
 function this.onLockpickingEnded(_)
 	this.phase = 0
-	this.rotationDirection = nil
-	this.lastRotation = nil
+	this.targetAngle = 0
+	this.sourceAngle = 0
+	this.baseRotation = nil
 	this.unregisterEvents()
 end
 
