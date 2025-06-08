@@ -21,6 +21,10 @@ local this = {}
 this.lock = nil
 
 ---@private
+---@type tes3.scanCode
+this.currentKey = nil
+
+---@private
 ---@type { [tes3.scanCode]: DIRECTION }
 this.directions = {
 	[tes3.scanCode.d] = DIRECTION.clockwise,
@@ -52,17 +56,38 @@ end
 ---@private
 ---@param e keyDownEventData
 function this.onKeyDown(e)
-	---@type rotationStartedEventData
+	if this.keyIsBlocked(e.keyCode) then
+		return
+	end
+
+	---@type rotationEventData
 	local data = {
 		direction = this.directions[e.keyCode],
 	}
 	event.trigger(EVENTS.rotationStarted, data)
+	this.currentKey = e.keyCode
 end
 
 ---@private
----@param _ keyUpEventData
-function this.onKeyUp(_)
-	event.trigger(EVENTS.rotationEnded)
+---@param e keyUpEventData
+function this.onKeyUp(e)
+	if this.keyIsBlocked(e.keyCode) then
+		return
+	end
+
+	---@type rotationEventData
+	local data = {
+		direction = this.directions[e.keyCode],
+	}
+	event.trigger(EVENTS.rotationEnded, data)
+	this.currentKey = nil
+end
+
+---@private
+---@param keyCode tes3.scanCode
+---@return boolean
+function this.keyIsBlocked(keyCode)
+	return this.currentKey and this.currentKey ~= keyCode
 end
 
 ---@private
