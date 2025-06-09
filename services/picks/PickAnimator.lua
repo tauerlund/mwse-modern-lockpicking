@@ -86,11 +86,11 @@ function this.onEnterFrame(e)
 end
 
 ---@private
----@param angle number
+---@param target number
 ---@param delta number
-function this.updateAngle(angle, delta)
-	local updated = (angle - this.currentHelperAngle) * math.min(CONSTANTS.animation.lerpSpeed * delta, 1)
-	this.currentHelperAngle = this.currentHelperAngle + updated
+function this.updateAngle(target, delta)
+	local transition = math.min(CONSTANTS.animation.lerpSpeed * delta, 1)
+	this.currentHelperAngle = math.lerp(this.currentHelperAngle, target, transition)
 end
 
 ---@private
