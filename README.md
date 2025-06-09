@@ -8,7 +8,7 @@ MWSE Lua mod that introduces a Skyrim-like lockpicking system in The Elder Scrol
 
 ## :white_check_mark: Features:
 
-### Visuals
+#### Visuals
 
 - [x] Render lock mesh
 - [x] Render knife mesh
@@ -17,8 +17,8 @@ MWSE Lua mod that introduces a Skyrim-like lockpicking system in The Elder Scrol
 - [x] Animate knife when rotating
 - [ ] Animate lockpick to look at mouse position
 
-### Gameplay
+#### Gameplay
 
-### Configuration
+#### Configuration
 
 ## :beetle: Bugs:
