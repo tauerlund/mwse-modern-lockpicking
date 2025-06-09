@@ -12,7 +12,6 @@ function this.Start(parameters)
 	TimerManager.Start({
 		durationInSeconds = parameters.durationInSeconds,
 		callback = this.onStartTimer,
-		finishedCallback = parameters.finishedCallback or nil,
 		cancelOn = parameters.cancelOn or nil,
 		---@type onMeshAnimatorTimerData
 		data = {

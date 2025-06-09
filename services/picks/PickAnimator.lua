@@ -20,7 +20,7 @@ function this.Start(pick)
 
 	MeshAnimator.Start({
 		mesh = pick,
-		durationInSeconds = 1.2,
+		durationInSeconds = CONSTANTS.animation.startAnimationDuration,
 		originalRotation = CONSTANTS.rotation.original,
 		targetRotation = CONSTANTS.rotation.target,
 		originalTranslation = CONSTANTS.translation.original,

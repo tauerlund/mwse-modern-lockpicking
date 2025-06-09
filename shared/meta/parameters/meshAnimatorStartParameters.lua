@@ -7,4 +7,3 @@
 ---@field public targetTranslation tes3vector3
 ---@field public targetRotation tes3vector3
 ---@field public cancelOn string|string[]?
----@field public finishedCallback fun(data:timerData)?
