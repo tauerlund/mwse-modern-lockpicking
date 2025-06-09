@@ -40,6 +40,10 @@ this.sourceAngle = 0
 this.currentAngle = 0
 
 ---@private
+---@type boolean
+this.blocked = false
+
+---@private
 ---@type { [DIRECTION]: number }
 this.angles = {
 	[DIRECTION.clockwise] = CONSTANTS.angles.clockwise,
@@ -50,17 +54,20 @@ this.angles = {
 ---@param knife niNode
 function this.Start(knife)
 	this.knife = knife
+	this.blocked = true
 	this.initializeTransforms()
 
 	TimerManager.Start({
 		durationInSeconds = 1,
 		callback = this.onStartTimer,
 		finishedCallback = this.onStartTimerFinished,
+		cancelOn = EVENTS.lockpickingEnded,
 		---@type onStartKnifeAnimationData
 		data = {
 			knife = knife,
 		},
 	})
+
 	this.registerEvents()
 end
 
@@ -91,6 +98,7 @@ end
 ---@private
 function this.onStartTimerFinished()
 	this.baseRotation = this.knife.rotation:copy()
+	this.blocked = false
 end
 
 ---@private
@@ -131,12 +139,12 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
-	if not this.baseRotation then
+	if this.blocked then
 		return
 	end
 
+	this.updatePhase(e.delta)
 	this.rotate()
-	this.increasePhase(e.delta)
 end
 
 ---@private
@@ -152,7 +160,7 @@ end
 
 ---@private
 ---@param delta number
-function this.increasePhase(delta)
+function this.updatePhase(delta)
 	this.phase = math.min(this.phase + this.phaseSpeed * delta, 1)
 end
 
@@ -176,11 +184,18 @@ end
 
 ---@private
 ---@param _ lockpickingEndedEventData
+function this.onLockpickingEnd(_)
+	this.blocked = true
+end
+
+---@private
+---@param _ lockpickingEndedEventData
 function this.onLockpickingEnded(_)
 	this.phase = 0
 	this.targetAngle = 0
 	this.sourceAngle = 0
 	this.baseRotation = nil
+
 	this.unregisterEvents()
 end
 
@@ -195,9 +210,10 @@ end
 ---@private
 function this.registerEvents()
 	event.register(tes3.event.enterFrame, this.onEnterFrame)
+	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd, { doOnce = true })
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
 	event.register(EVENTS.rotationStarted, this.onRotationStarted)
 	event.register(EVENTS.rotationEnded, this.onRotationEnded)
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
 end
 
 ---@private

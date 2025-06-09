@@ -19,6 +19,10 @@ this.phase = 0
 ---@type DIRECTION|nil
 this.rotationDirection = nil
 
+---@private
+---@type boolean
+this.blocked = false
+
 ---@public
 ---@param cylinder cylinder
 function this.Start(cylinder)
@@ -29,6 +33,10 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
+	if this.blocked then
+		return
+	end
+
 	if not this.rotationDirection then
 		local rotation = this.cylinder.rotation:toEulerXYZ().y
 		if math.isclose(rotation, 0, 0.04) then
@@ -41,7 +49,7 @@ function this.onEnterFrame(e)
 		this.updatePhase(multiplier, CONSTANTS.rotateSpeed, e.delta)
 	end
 
-	this.rotateCylinder()
+	this.rotate()
 end
 
 ---@private
@@ -53,7 +61,7 @@ function this.updatePhase(multiplier, speed, delta)
 end
 
 ---@private
-function this.rotateCylinder()
+function this.rotate()
 	local cylinder = this.cylinder
 
 	local rotation = cylinder.rotation:copy()
@@ -75,9 +83,16 @@ function this.onRotationEnded()
 end
 
 ---@private
+---@param _ lockpickingEndEventData
+function this.onLockpickingEnd(_)
+	this.blocked = true
+end
+
+---@private
 ---@param _ lockpickingEndedEventData
 function this.onLockpickingEnded(_)
 	this.phase = 0
+	this.blocked = false
 	this.rotationDirection = nil
 	this.unregisterEvents()
 end
@@ -87,6 +102,7 @@ function this.registerEvents()
 	event.register(tes3.event.enterFrame, this.onEnterFrame)
 	event.register(EVENTS.rotationStarted, this.onRotationStarted)
 	event.register(EVENTS.rotationEnded, this.onRotationEnded)
+	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd, { doOnce = true })
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
 end
 

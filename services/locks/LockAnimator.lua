@@ -3,6 +3,7 @@ local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerMana
 ---
 
 --- ENUMS
+local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 local CONSTANTS = require("tauer.modern-lockpicking.services.locks.enums.constants")
 ---
 
@@ -15,6 +16,7 @@ function this.Start(lock)
 	TimerManager.Start({
 		durationInSeconds = 0.8,
 		callback = this.onStartTimer,
+		cancelOn = EVENTS.lockpickingEnded,
 		---@type onStartLockAnimationData
 		data = {
 			mesh = lock.mesh,

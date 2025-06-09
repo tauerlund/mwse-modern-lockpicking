@@ -45,6 +45,7 @@ function this.Start(container)
 	TimerManager.Start({
 		durationInSeconds = 1,
 		finishedCallback = this.registerEvents,
+		cancelOn = EVENTS.lockpickingEnded,
 	})
 end
 
@@ -56,10 +57,6 @@ end
 ---@private
 ---@param e keyDownEventData
 function this.onKeyDown(e)
-	if this.keyIsBlocked(e.keyCode) then
-		return
-	end
-
 	---@type rotationEventData
 	local data = {
 		direction = this.directions[e.keyCode],
@@ -105,22 +102,42 @@ function this.unlock()
 	tes3.unlock({
 		reference = this.lock.container --[[@as tes3reference]],
 	})
-	this.stop(true)
+
+	---@type lockpickingEndEventData
+	local data = {
+		lock = this.lock,
+		success = true,
+	}
+	event.trigger(EVENTS.lockpickingEnd, data)
+
+	TimerManager.Start({
+		durationInSeconds = 1,
+		finishedCallback = this.onEndTimerFinished,
+		data = data --[[@as timerData]],
+	})
+end
+
+---@private
+---@param data timerData
+function this.onEndTimerFinished(data)
+	---@cast data +lockpickingEndedEventData, -timerData
+	this.stop(data.success)
 end
 
 ---@private
 ---@param success boolean
 function this.stop(success)
-	this.unregisterEvents()
-
 	---@type lockpickingEndedEventData
 	local data = {
 		lock = this.lock,
 		success = success,
 	}
 	event.trigger(EVENTS.lockpickingEnded, data)
+
+	this.unregisterEvents()
 end
 
+---@private
 function this.registerEvents()
 	event.register(tes3.event.keyDown, this.onKeyDown, { filter = tes3.scanCode.a })
 	event.register(tes3.event.keyDown, this.onKeyDown, { filter = tes3.scanCode.d })
@@ -129,6 +146,7 @@ function this.registerEvents()
 	event.register(tes3.event.enterFrame, this.onEnterFrame)
 end
 
+---@private
 function this.unregisterEvents()
 	if event.isRegistered(tes3.event.keyDown, this.onKeyDown, { filter = tes3.scanCode.a }) then
 		event.unregister(tes3.event.keyDown, this.onKeyDown, { filter = tes3.scanCode.a })

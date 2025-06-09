@@ -12,6 +12,7 @@ local this = {}
 
 ---@public
 ---@param parameters timerParameters
+---@return mwseTimer
 function this.Start(parameters)
 	local data = parameters.data or {}
 
@@ -21,7 +22,7 @@ function this.Start(parameters)
 	data.callback = parameters.callback
 	data.finishedCallback = parameters.finishedCallback
 
-	timer.start({
+	local timer = timer.start({
 		type = timer.real,
 		iterations = data.totalIterations,
 		duration = CONSTANTS.tick,
@@ -29,6 +30,12 @@ function this.Start(parameters)
 		---@type timerDataInner
 		data = data,
 	})
+
+	if parameters.cancelOn then
+		this.registerCancellationEvents(parameters.cancelOn, timer)
+	end
+
+	return timer
 end
 
 ---@private
@@ -43,6 +50,32 @@ function this.callbackInner(callback)
 	if callback.timer.iterations == 1 and data.finishedCallback then
 		data.finishedCallback(data)
 	end
+end
+
+---@private
+---@param events string|string[]
+---@param timer mwseTimer
+function this.registerCancellationEvents(events, timer)
+	if type(events) == "string" then
+		this.registerCancellationEvent(events, timer)
+		return
+	end
+
+	for _, event in pairs(events) do
+		this.registerCancellationEvent(event, timer)
+	end
+end
+
+---@private
+---@param evt string
+---@param timer mwseTimer
+function this.registerCancellationEvent(evt, timer)
+	event.register(evt, function()
+		if not timer then
+			return
+		end
+		timer:cancel()
+	end, { doOnce = true })
 end
 
 return this
