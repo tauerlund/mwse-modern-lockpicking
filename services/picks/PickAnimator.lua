@@ -35,6 +35,10 @@ this.originalPickRotation = nil
 ---@type number
 this.currentHelperAngle = 0
 
+---@private
+---@type number
+this.targetHelperAngle = 0
+
 ---@public
 ---@param pick pick
 ---@param helper niNode
@@ -66,8 +70,13 @@ function this.onStartTimerFinished(_)
 	this.blocked = false
 	this.originalPickRotation = this.pick.rotation:copy()
 	this.currentHelperAngle = 0
+	this.targetHelperAngle = 0
 	this.registerEvents()
 end
+
+---@private
+---@type number
+this.targetHelperAngle = 0
 
 ---@private
 ---@param e enterFrameEventData
@@ -76,21 +85,36 @@ function this.onEnterFrame(e)
 		return
 	end
 
-	local cursor = tes3.getCursorPosition():normalized()
-	local angle = -cursor.x * math.rad(90)
+	local cursor = tes3.getCursorPosition()
 
-	this.updateAngle(angle, e.delta)
+	if this.curserIsAboveHelper(cursor) then
+		cursor:normalize()
+		this.targetHelperAngle = -cursor.x * math.rad(90)
+	end
+
+	this.updateAngle(e.delta)
 
 	this.rotateHelper()
-	this.rotatePick(angle)
+	this.rotatePick()
 end
 
 ---@private
----@param target number
+---@param cursor tes3vector2
+---@return boolean
+function this.curserIsAboveHelper(cursor)
+	local screenPoint = tes3.getCamera():worldPointToScreenPoint(this.helper.worldTransform.translation)
+	if not screenPoint then
+		return false
+	end
+
+	return cursor.y > screenPoint.y
+end
+
+---@private
 ---@param delta number
-function this.updateAngle(target, delta)
+function this.updateAngle(delta)
 	local transition = math.min(CONSTANTS.animation.lerpSpeed * delta, 1)
-	this.currentHelperAngle = math.lerp(this.currentHelperAngle, target, transition)
+	this.currentHelperAngle = math.lerp(this.currentHelperAngle, this.targetHelperAngle, transition)
 end
 
 ---@private
@@ -103,10 +127,9 @@ function this.rotateHelper()
 end
 
 ---@private
----@param angle number
-function this.rotatePick(angle)
+function this.rotatePick()
 	local rotation = this.pick.rotation:copy()
-	rotation:toRotationY(angle)
+	rotation:toRotationY(this.currentHelperAngle)
 
 	this.pick.rotation = this.originalPickRotation * rotation
 	this.pick:update()
@@ -131,6 +154,7 @@ function this.onLockpickingEnded(_)
 	this.originalHelperRotation = nil
 	this.originalPickRotation = nil
 	this.currentHelperAngle = 0
+	this.targetHelperAngle = 0
 end
 
 ---@private
