@@ -15,6 +15,7 @@ local PickAnimator = require("tauer.modern-lockpicking.services.picks.PickAnimat
 local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.constants")
 local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirection")
+local OBJECT_NAMES = require("tauer.modern-lockpicking.shared.enums.objectNames")
 ---
 
 ---@class LockpickingController
@@ -60,13 +61,12 @@ function this.Start(container)
 	local lock = LockSpawner.Spawn(container)
 	local knife = KnifeSpawner.Spawn(lock)
 	local pick = PickSpawner.Spawn(lock, picks)
-
-	require("tauer.modern-lockpicking.DebuggingAnimator").Start(pick)
+	local pickHelper = lock.mesh:getObjectByName(OBJECT_NAMES.pickHelper) --[[@as niNode]]
 
 	LockAnimator.Start(lock)
 	KnifeAnimator.Start(knife)
 	CylinderAnimator.Start(lock.cylinder)
-	PickAnimator.Start(pick)
+	PickAnimator.Start(pick, pickHelper)
 
 	this.picks = picks
 	this.lock = lock
@@ -145,6 +145,7 @@ function this.onEnterFrame(_)
 
 	if rotation <= CONSTANTS.targetRotationLeft or rotation >= CONSTANTS.targetRotationRight then
 		this.unlock()
+		return
 	end
 end
 
