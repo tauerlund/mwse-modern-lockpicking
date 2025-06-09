@@ -40,48 +40,36 @@ function this.onStartTimer(callback)
 	local data = callback.timer.data --[[@as onMeshAnimatorTimerData]]
 	local mesh = data.mesh
 
-	local currentPhase = callback.timer.iterations
-	local targetPhase = data.totalIterations --[[@as integer]]
+	local total = data.totalIterations --[[@as integer]]
+	local iteration = (total - callback.timer.iterations)
 
-	mesh.translation = this.getUpdatedTranslation(currentPhase, targetPhase, data)
-	mesh.rotation = this.getUpdatedRotation(currentPhase, targetPhase, data)
+	local transition = math.remap(iteration, 0, total, 0, 1)
+
+	mesh.translation = this.getUpdatedTranslation(data.originalTranslation, data.targetTranslation, transition)
+	mesh.rotation = this.getUpdatedRotation(data.originalRotation, data.targetRotation, transition)
 
 	mesh:update()
 end
 
 ---@private
----@param currentPhase integer
----@param targetPhase integer
----@param data onMeshAnimatorTimerData
+---@param original tes3vector3
+---@param target tes3vector3
+---@param transition number
 ---@return tes3vector3
-function this.getUpdatedTranslation(currentPhase, targetPhase, data)
-	local original = data.originalTranslation
-	local target = data.targetTranslation
-
-	local translation = tes3vector3.new(
-		math.remap(currentPhase, 0, targetPhase, target.x, original.x),
-		math.remap(currentPhase, 0, targetPhase, target.y, original.y),
-		math.remap(currentPhase, 0, targetPhase, target.z, original.z)
-	)
-
-	return translation
+function this.getUpdatedTranslation(original, target, transition)
+	return original:lerp(target, transition)
 end
 
 ---@private
----@param currentPhase integer
----@param targetPhase integer
----@param data onMeshAnimatorTimerData
+---@param original tes3vector3
+---@param target tes3vector3
+---@param transition number
 ---@return tes3matrix33
-function this.getUpdatedRotation(currentPhase, targetPhase, data)
-	local initial = data.originalRotation
-	local target = data.targetRotation
+function this.getUpdatedRotation(original, target, transition)
+	local euler = original:lerp(target, transition)
 
 	local rotation = tes3matrix33.new()
-	rotation:fromEulerXYZ(
-		math.remap(currentPhase, 0, targetPhase, target.x, initial.x),
-		math.remap(currentPhase, 0, targetPhase, target.y, initial.y),
-		math.remap(currentPhase, 0, targetPhase, target.z, initial.z)
-	)
+	rotation:fromEulerXYZ(euler.x, euler.y, euler.z)
 
 	return rotation
 end
