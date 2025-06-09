@@ -87,7 +87,7 @@ function this.onEnterFrame(e)
 
 	local cursor = tes3.getCursorPosition()
 
-	if this.curserIsAboveHelper(cursor) then
+	if this.cursorIsAboveHelper(cursor) then
 		cursor:normalize()
 		this.targetHelperAngle = -cursor.x * math.rad(90)
 	end
@@ -101,7 +101,7 @@ end
 ---@private
 ---@param cursor tes3vector2
 ---@return boolean
-function this.curserIsAboveHelper(cursor)
+function this.cursorIsAboveHelper(cursor)
 	local screenPoint = tes3.getCamera():worldPointToScreenPoint(this.helper.worldTransform.translation)
 	if not screenPoint then
 		return false
