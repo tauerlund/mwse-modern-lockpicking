@@ -8,7 +8,7 @@ local this = {}
 ---@package
 ---@class timerDataInner : timerData
 ---@field package callback fun(callbackData:mwseTimerCallbackData)?
----@field package finishedCallback fun(configuration:timerData)?
+---@field package finishedCallback fun(data:timerData)?
 
 ---@public
 ---@param parameters timerParameters

@@ -5,6 +5,10 @@ local KnifeSpawner = require("tauer.modern-lockpicking.services.knives.KnifeSpaw
 local KnifeAnimator = require("tauer.modern-lockpicking.services.knives.KnifeAnimator")
 local CylinderAnimator = require("tauer.modern-lockpicking.services.cylinders.CylinderAnimator")
 local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerManager")
+local InventoryManager = require("tauer.modern-lockpicking.services.inventory.InventoryManager")
+local Translations = require("tauer.modern-lockpicking.shared.Translations")
+local PickSpawner = require("tauer.modern-lockpicking.services.picks.PickSpawner")
+local PickAnimator = require("tauer.modern-lockpicking.services.picks.PickAnimator")
 ---
 
 --- ENUMS
@@ -17,12 +21,24 @@ local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirecti
 local this = {}
 
 ---@private
+---@type tes3itemStack[]
+this.picks = nil
+
+---@private
 ---@type lock
 this.lock = nil
 
 ---@private
+---@type knife
+this.knife = nil
+
+---@private
+---@type pick
+this.pick = nil
+
+---@private
 ---@type tes3.scanCode
-this.currentKey = nil
+this.currentDirectionKey = nil
 
 ---@private
 ---@type { [tes3.scanCode]: DIRECTION }
@@ -33,20 +49,37 @@ this.directions = {
 
 ---@public
 ---@param container tes3containerInstance
+---@return boolean
 function this.Start(container)
-	this.lock = LockSpawner.Spawn(container)
+	local picks = InventoryManager.GetLockpicks()
+	if not picks then
+		tes3.messageBox(Translations.Get("messageBox.noLockpicks"))
+		return false
+	end
 
-	KnifeSpawner.Spawn(this.lock)
+	local lock = LockSpawner.Spawn(container)
+	local knife = KnifeSpawner.Spawn(lock)
+	local pick = PickSpawner.Spawn(lock, picks)
 
-	LockAnimator.Start(this.lock)
-	KnifeAnimator.Start(this.lock.knife)
-	CylinderAnimator.Start(this.lock.cylinder)
+	require("tauer.modern-lockpicking.DebuggingAnimator").Start(pick)
+
+	LockAnimator.Start(lock)
+	KnifeAnimator.Start(knife)
+	CylinderAnimator.Start(lock.cylinder)
+	PickAnimator.Start(pick)
+
+	this.picks = picks
+	this.lock = lock
+	this.knife = knife
+	this.pick = pick
 
 	TimerManager.Start({
-		durationInSeconds = 1,
+		durationInSeconds = 1.3,
 		finishedCallback = this.registerEvents,
 		cancelOn = EVENTS.lockpickingEnded,
 	})
+
+	return true
 end
 
 ---@public
@@ -57,18 +90,36 @@ end
 ---@private
 ---@param e keyDownEventData
 function this.onKeyDown(e)
-	---@type rotationEventData
-	local data = {
-		direction = this.directions[e.keyCode],
-	}
-	event.trigger(EVENTS.rotationStarted, data)
-	this.currentKey = e.keyCode
+	if this.directions[e.keyCode] then
+		this.onDirectionKeyDown(e)
+		return
+	end
 end
 
 ---@private
 ---@param e keyUpEventData
 function this.onKeyUp(e)
-	if this.keyIsBlocked(e.keyCode) then
+	if this.directions[e.keyCode] then
+		this.onDirectionKeyUp(e)
+		return
+	end
+end
+
+---@private
+---@param e keyDownEventData
+function this.onDirectionKeyDown(e)
+	---@type rotationEventData
+	local data = {
+		direction = this.directions[e.keyCode],
+	}
+	event.trigger(EVENTS.rotationStarted, data)
+	this.currentDirectionKey = e.keyCode
+end
+
+---@private
+---@param e keyUpEventData
+function this.onDirectionKeyUp(e)
+	if this.directionKeyIsBlocked(e.keyCode) then
 		return
 	end
 
@@ -77,14 +128,14 @@ function this.onKeyUp(e)
 		direction = this.directions[e.keyCode],
 	}
 	event.trigger(EVENTS.rotationEnded, data)
-	this.currentKey = nil
+	this.currentDirectionKey = nil
 end
 
 ---@private
 ---@param keyCode tes3.scanCode
 ---@return boolean
-function this.keyIsBlocked(keyCode)
-	return this.currentKey and this.currentKey ~= keyCode
+function this.directionKeyIsBlocked(keyCode)
+	return this.currentDirectionKey and this.currentDirectionKey ~= keyCode
 end
 
 ---@private
@@ -106,6 +157,8 @@ function this.unlock()
 	---@type lockpickingEndEventData
 	local data = {
 		lock = this.lock,
+		knife = this.knife,
+		pick = this.pick,
 		success = true,
 	}
 	event.trigger(EVENTS.lockpickingEnd, data)
@@ -130,6 +183,8 @@ function this.stop(success)
 	---@type lockpickingEndedEventData
 	local data = {
 		lock = this.lock,
+		knife = this.knife,
+		pick = this.pick,
 		success = success,
 	}
 	event.trigger(EVENTS.lockpickingEnded, data)
@@ -139,26 +194,18 @@ end
 
 ---@private
 function this.registerEvents()
-	event.register(tes3.event.keyDown, this.onKeyDown, { filter = tes3.scanCode.a })
-	event.register(tes3.event.keyDown, this.onKeyDown, { filter = tes3.scanCode.d })
-	event.register(tes3.event.keyUp, this.onKeyUp, { filter = tes3.scanCode.a })
-	event.register(tes3.event.keyUp, this.onKeyUp, { filter = tes3.scanCode.d })
+	event.register(tes3.event.keyDown, this.onKeyDown)
+	event.register(tes3.event.keyUp, this.onKeyUp)
 	event.register(tes3.event.enterFrame, this.onEnterFrame)
 end
 
 ---@private
 function this.unregisterEvents()
-	if event.isRegistered(tes3.event.keyDown, this.onKeyDown, { filter = tes3.scanCode.a }) then
-		event.unregister(tes3.event.keyDown, this.onKeyDown, { filter = tes3.scanCode.a })
+	if event.isRegistered(tes3.event.keyDown, this.onKeyDown) then
+		event.unregister(tes3.event.keyDown, this.onKeyDown)
 	end
-	if event.isRegistered(tes3.event.keyDown, this.onKeyDown, { filter = tes3.scanCode.d }) then
-		event.unregister(tes3.event.keyDown, this.onKeyDown, { filter = tes3.scanCode.d })
-	end
-	if event.isRegistered(tes3.event.keyUp, this.onKeyUp, { filter = tes3.scanCode.a }) then
-		event.unregister(tes3.event.keyUp, this.onKeyUp, { filter = tes3.scanCode.a })
-	end
-	if event.isRegistered(tes3.event.keyUp, this.onKeyUp, { filter = tes3.scanCode.d }) then
-		event.unregister(tes3.event.keyUp, this.onKeyUp, { filter = tes3.scanCode.d })
+	if event.isRegistered(tes3.event.keyUp, this.onKeyUp) then
+		event.unregister(tes3.event.keyUp, this.onKeyUp)
 	end
 	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
 		event.unregister(tes3.event.enterFrame, this.onEnterFrame)

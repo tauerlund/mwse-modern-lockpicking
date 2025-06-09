@@ -1,4 +1,69 @@
+--- ENUMS
+local Z_BUFFER_INDEX = require("tauer.modern-lockpicking.shared.enums.zBufferIndex")
+local OBJECT_NAMES = require("tauer.modern-lockpicking.shared.enums.objectNames")
+local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
+---
+
 ---@class PickSpawner
 local this = {}
+
+---@public
+---@param lock lock
+---@param picks tes3itemStack[]
+---@return pick
+function this.Spawn(lock, picks)
+	this.registerEvents()
+
+	local pick = this.getMesh(picks[1].object --[[@as tes3lockpick]])
+	local helper = lock.mesh:getObjectByName(OBJECT_NAMES.pickHelper) --[[@as niNode]]
+
+	helper:attachChild(pick)
+
+	pick:updateProperties()
+	pick:updateEffects()
+	pick:update()
+
+	helper:update()
+
+	return pick
+end
+
+---@public
+---@param pick tes3lockpick
+---@return niNode
+function this.getMesh(pick)
+	local mesh = tes3.loadMesh(pick.mesh, true):clone() --[[@as niNode]]
+
+	mesh.name = OBJECT_NAMES.pick
+	mesh:attachProperty(this.getZBufferProperty())
+
+	return mesh
+end
+
+---@private
+---@return niZBufferProperty
+function this.getZBufferProperty()
+	local property = niZBufferProperty.new()
+
+	property:setFlag(true, Z_BUFFER_INDEX.test)
+	property:setFlag(true, Z_BUFFER_INDEX.write)
+
+	return property
+end
+
+---@private
+---@param e lockpickingEndedEventData
+function this.onLockpickingEnded(e)
+	local lock = e.lock
+	local pick = e.pick
+
+	local pickHelper = lock.mesh:getObjectByName(OBJECT_NAMES.pickHelper) --[[@as niNode]]
+	pickHelper:detachChild(pick)
+end
+
+---@private
+function this.registerEvents()
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
+end
 
 return this

@@ -6,4 +6,3 @@
 ---@field public rotatingLeft boolean
 ---@field public rotatingRight boolean
 ---@field public container tes3containerInstance
----@field public knife knife?

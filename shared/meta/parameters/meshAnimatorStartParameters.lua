@@ -1,0 +1,10 @@
+---@meta
+---@class meshAnimatorStartParameters
+---@field public mesh niNode
+---@field public durationInSeconds number
+---@field public originalTranslation tes3vector3
+---@field public originalRotation tes3vector3
+---@field public targetTranslation tes3vector3
+---@field public targetRotation tes3vector3
+---@field public cancelOn string|string[]?
+---@field public finishedCallback fun(data:timerData)?

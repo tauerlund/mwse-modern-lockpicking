@@ -54,7 +54,10 @@ end
 ---@private
 ---@param container tes3containerInstance
 function this.activateLockpickMode(container)
-	LockpickingController.Start(container)
+	local started = LockpickingController.Start(container)
+	if not started then
+		return
+	end
 
 	this.lockpickModeActive = true
 

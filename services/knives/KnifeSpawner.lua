@@ -10,15 +10,10 @@ local this = {}
 
 ---@public
 ---@param lock lock
-function this.Spawn(lock)
-	lock.knife = this.spawn(lock)
-	this.registerEvents()
-end
-
----@private
----@param lock lock
 ---@return knife
-function this.spawn(lock)
+function this.Spawn(lock)
+	this.registerEvents()
+
 	local knife = this.getMesh()
 	local helper = lock.mesh:getObjectByName(OBJECT_NAMES.knifeHelper) --[[@as niNode]]
 
@@ -59,23 +54,15 @@ end
 ---@param e lockpickingEndedEventData
 function this.onLockpickingEnded(e)
 	local lock = e.lock
+	local knife = e.knife
 
 	local knifeHelper = lock.mesh:getObjectByName(OBJECT_NAMES.knifeHelper) --[[@as niNode]]
-	knifeHelper:detachChild(lock.knife)
-
-	this.unregisterEvents()
+	knifeHelper:detachChild(knife)
 end
 
 ---@private
 function this.registerEvents()
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
-end
-
----@private
-function this.unregisterEvents()
-	if event.isRegistered(EVENTS.lockpickingEnded, this.onLockpickingEnded) then
-		event.unregister(EVENTS.lockpickingEnded, this.onLockpickingEnded)
-	end
 end
 
 return this

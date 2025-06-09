@@ -1,4 +1,6 @@
 ---@meta
 ---@class lockpickingEndEventData
 ---@field public lock lock
+---@field public knife knife
+---@field public pick pick
 ---@field public success boolean
