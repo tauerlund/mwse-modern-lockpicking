@@ -80,6 +80,12 @@ end
 ---@private
 function this.onRotationEnded()
 	this.rotationDirection = nil
+	this.blocked = false
+end
+
+---@private
+function this.onLockpickingBlocked()
+	this.blocked = true
 end
 
 ---@private
@@ -102,6 +108,7 @@ function this.registerEvents()
 	event.register(tes3.event.enterFrame, this.onEnterFrame)
 	event.register(EVENTS.rotationStarted, this.onRotationStarted)
 	event.register(EVENTS.rotationEnded, this.onRotationEnded)
+	event.register(EVENTS.lockpickingBlocked, this.onLockpickingBlocked)
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd, { doOnce = true })
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
 end

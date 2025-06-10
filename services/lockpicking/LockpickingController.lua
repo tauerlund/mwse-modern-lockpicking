@@ -7,6 +7,7 @@ local CylinderAnimator = require("tauer.modern-lockpicking.services.cylinders.Cy
 local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerManager")
 local PickSpawner = require("tauer.modern-lockpicking.services.picks.PickSpawner")
 local PickAnimator = require("tauer.modern-lockpicking.services.picks.PickAnimator")
+local DebuggingLineDrawer = require("tauer.modern-lockpicking.debugging.DebuggingLineDrawer")
 ---
 
 --- ENUMS
@@ -40,6 +41,14 @@ this.knife = nil
 this.pick = nil
 
 ---@private
+---@type niNode
+this.pickHelper = nil
+
+---@private
+---@type number
+this.targetPoint = 0
+
+---@private
 ---@type tes3.scanCode
 this.currentDirectionKey = nil
 
@@ -70,6 +79,10 @@ function this.Start(activator, picks)
 	this.lock = lock
 	this.knife = knife
 	this.pick = pick
+	this.pickHelper = pickHelper
+	this.targetPoint = this.createTargetPoint()
+
+	DebuggingLineDrawer.Draw(this.lock.mesh, this.targetPoint, 0.6)
 
 	TimerManager.Start({
 		durationInSeconds = 1.3,
@@ -83,6 +96,12 @@ end
 ---@public
 function this.Stop()
 	this.stop(false)
+end
+
+---@private
+---@return number
+function this.createTargetPoint()
+	return math.random(CONSTANTS.targetRotationLeft, CONSTANTS.targetRotationRight)
 end
 
 ---@private
@@ -129,6 +148,11 @@ function this.onDirectionKeyUp(e)
 	this.currentDirectionKey = nil
 end
 
+function this.isOnTargetPoint()
+	local angle = this.pickHelper.rotation:toEulerXYZ().y
+	return math.isclose(angle, this.targetPoint, CONSTANTS.targetPointTolerance)
+end
+
 ---@private
 ---@param keyCode tes3.scanCode
 ---@return boolean
@@ -139,12 +163,47 @@ end
 ---@private
 ---@param _ enterFrameEventData
 function this.onEnterFrame(_)
-	local rotation = this.lock.cylinder.rotation:toEulerXYZ().y
-
-	if rotation <= CONSTANTS.targetRotationLeft or rotation >= CONSTANTS.targetRotationRight then
+	if this.targetRotationReached() then
 		this.unlock()
 		return
 	end
+
+	if this.blockageReached() then
+		this.block()
+		return
+	end
+end
+
+---@private
+---@return boolean
+function this.targetRotationReached()
+	local rotation = this.lock.cylinder.rotation:toEulerXYZ().y
+	return rotation <= CONSTANTS.targetRotationLeft or rotation >= CONSTANTS.targetRotationRight
+end
+
+---@private
+---@return boolean
+function this.blockageReached()
+	local pickHelperRotation = this.pickHelper.rotation:toEulerXYZ().y
+	local cylinderRotation = this.lock.cylinder.rotation:toEulerXYZ().y
+
+	local distanceToTarget = math.abs(pickHelperRotation - this.targetPoint)
+
+	local sweetSpotThreshold = 0.05
+	if distanceToTarget <= sweetSpotThreshold then
+		return false
+	end
+
+	local blockStrictness = 0.5 -- placeholder, higher = stricter, lower = more forgiving
+
+	local maxAllowedRotation = (math.pi / 2) * (1 - (distanceToTarget / math.pi) ^ blockStrictness)
+
+	return math.abs(cylinderRotation) > math.clamp(maxAllowedRotation, 0.1, math.pi / 2)
+end
+
+---@private
+function this.block()
+	event.trigger(EVENTS.lockpickingBlocked)
 end
 
 ---@private

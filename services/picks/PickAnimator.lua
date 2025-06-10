@@ -24,6 +24,10 @@ this.helper = nil
 this.blocked = false
 
 ---@private
+---@type boolean
+this.paused = false
+
+---@private
 ---@type tes3matrix33
 this.originalHelperRotation = nil
 
@@ -39,6 +43,19 @@ this.currentHelperAngle = 0
 ---@type number
 this.targetHelperAngle = 0
 
+---@private
+---@type number
+this.noiseStrength = CONSTANTS.noise.min
+
+---@private
+this.noisePhaseX = 0
+
+---@private
+this.noisePhaseY = 0
+
+---@private
+this.noisePhaseZ = 0
+
 ---@public
 ---@param pick pick
 ---@param helper niNode
@@ -46,7 +63,7 @@ function this.Start(pick, helper)
 	this.pick = pick
 	this.helper = helper
 	this.originalHelperRotation = helper.rotation:copy()
-	this.blocked = true
+	this.paused = true
 
 	MeshAnimator.Start({
 		mesh = pick,
@@ -67,7 +84,7 @@ end
 ---@private
 ---@param _ mwseTimerCallbackData
 function this.onStartTimerFinished(_)
-	this.blocked = false
+	this.paused = false
 	this.originalPickRotation = this.pick.rotation:copy()
 	this.currentHelperAngle = 0
 	this.targetHelperAngle = 0
@@ -81,7 +98,7 @@ this.targetHelperAngle = 0
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
-	if this.blocked then
+	if this.paused then
 		return
 	end
 
@@ -95,7 +112,7 @@ function this.onEnterFrame(e)
 	this.updateAngle(e.delta)
 
 	this.rotateHelper()
-	this.rotatePick()
+	this.rotatePick(e.delta)
 end
 
 ---@private
@@ -127,18 +144,43 @@ function this.rotateHelper()
 end
 
 ---@private
-function this.rotatePick()
-	local rotation = this.pick.rotation:copy()
-	rotation:toRotationY(this.currentHelperAngle)
+function this.rotatePick(delta)
+	local noiseX, noiseZ = 0, 0
+
+	if this.blocked then
+		noiseX, noiseZ = this.getSmoothNoise(delta)
+	end
+
+	local rotation = tes3matrix33.new()
+	rotation:fromEulerXYZ(noiseX, this.currentHelperAngle, noiseZ)
 
 	this.pick.rotation = this.originalPickRotation * rotation
 	this.pick:update()
+
+	this.noiseStrength = math.min(this.noiseStrength + CONSTANTS.noise.increase * delta, CONSTANTS.noise.max)
+end
+
+---@private
+---@param delta number
+---@return number, number
+function this.getSmoothNoise(delta)
+	local speedX, speedZ = math.random(20, 40), math.random(20, 40)
+	this.noisePhaseX = (this.noisePhaseX or 0) + delta * speedX
+	this.noisePhaseZ = (this.noisePhaseZ or 0) + delta * speedZ
+
+	local x = math.sin(this.noisePhaseX) * this.noiseStrength
+	local z = math.sin(this.noisePhaseZ) * this.noiseStrength
+	return x, z
+end
+
+function this.onLockpickingBlocked()
+	this.blocked = true
 end
 
 ---@private
 ---@param _ lockpickingEndEventData
 function this.onLockpickingEnd(_)
-	this.blocked = true
+	this.paused = true
 end
 
 ---@private
@@ -155,11 +197,14 @@ function this.onLockpickingEnded(_)
 	this.originalPickRotation = nil
 	this.currentHelperAngle = 0
 	this.targetHelperAngle = 0
+	this.blocked = false
+	this.noiseStrength = CONSTANTS.noise.min
 end
 
 ---@private
 function this.registerEvents()
 	event.register(tes3.event.enterFrame, this.onEnterFrame)
+	event.register(EVENTS.lockpickingBlocked, this.onLockpickingBlocked)
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd, { doOnce = true })
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
 end

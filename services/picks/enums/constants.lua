@@ -14,6 +14,12 @@ local enum = {
 		startAnimationDuration = 1.2,
 		lerpSpeed = 9,
 	},
+
+	noise = {
+		min = 0.001,
+		max = 0.05,
+		increase = 0.001,
+	},
 }
 
 return enum
