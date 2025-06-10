@@ -68,13 +68,13 @@ end
 
 ---@private
 ---@param evt string
----@param timer mwseTimer
-function this.registerCancellationEvent(evt, timer)
+---@param t mwseTimer
+function this.registerCancellationEvent(evt, t)
 	event.register(evt, function()
-		if not timer then
+		if not t or not t.state == timer.active then
 			return
 		end
-		timer:cancel()
+		t:cancel()
 	end, { doOnce = true })
 end
 
