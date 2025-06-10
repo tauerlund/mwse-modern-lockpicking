@@ -1,5 +1,8 @@
 --- SERVICES
+local InventoryManager = require("tauer.modern-lockpicking.services.inventory.InventoryManager")
 local LockpickingController = require("tauer.modern-lockpicking.services.lockpicking.LockpickingController")
+local Translations = require("tauer.modern-lockpicking.shared.Translations")
+local Logger = require("tauer.modern-lockpicking.shared.Logger")
 ---
 
 --- ENUMS
@@ -17,6 +20,11 @@ end
 ---@private
 ---@param e activateEventData
 function this.onActivate(e)
+	local actions = tes3.getSkill(tes3.skill.security).actions
+	for i = 1, #actions do
+		Logger:debug("%s", actions[i])
+	end
+
 	if e.activator ~= tes3.player then
 		return
 	end
@@ -56,10 +64,13 @@ end
 ---@private
 ---@param activator tes3containerInstance|tes3door
 function this.startLockpicking(activator)
-	local started = LockpickingController.Start(activator)
-	if not started then
+	local picks = InventoryManager.GetLockpicks()
+	if not picks then
+		tes3.messageBox(Translations.Get("messageBox.noLockpicks"))
 		return
 	end
+
+	LockpickingController.Start(activator, picks)
 
 	tes3ui.enterMenuMode("ModernLockpicking")
 
@@ -78,10 +89,16 @@ end
 function this.onLockpickingEnded(e)
 	tes3ui.leaveMenuMode()
 	if e.success then
-		timer.delayOneFrame(function()
-			tes3.player:activate(e.activator --[[@as tes3reference]])
-		end)
+		this.activate(e.activator)
 	end
+end
+
+---@private
+---@param activator tes3containerInstance|tes3door
+function this.activate(activator)
+	timer.delayOneFrame(function()
+		tes3.player:activate(activator --[[@as tes3reference]])
+	end)
 end
 
 ---@private

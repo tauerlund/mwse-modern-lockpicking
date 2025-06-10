@@ -5,8 +5,6 @@ local KnifeSpawner = require("tauer.modern-lockpicking.services.knives.KnifeSpaw
 local KnifeAnimator = require("tauer.modern-lockpicking.services.knives.KnifeAnimator")
 local CylinderAnimator = require("tauer.modern-lockpicking.services.cylinders.CylinderAnimator")
 local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerManager")
-local InventoryManager = require("tauer.modern-lockpicking.services.inventory.InventoryManager")
-local Translations = require("tauer.modern-lockpicking.shared.Translations")
 local PickSpawner = require("tauer.modern-lockpicking.services.picks.PickSpawner")
 local PickAnimator = require("tauer.modern-lockpicking.services.picks.PickAnimator")
 ---
@@ -54,14 +52,9 @@ this.directions = {
 
 ---@public
 ---@param activator tes3containerInstance|tes3door
+---@param picks tes3itemStack[]
 ---@return boolean
-function this.Start(activator)
-	local picks = InventoryManager.GetLockpicks()
-	if not picks then
-		tes3.messageBox(Translations.Get("messageBox.noLockpicks"))
-		return false
-	end
-
+function this.Start(activator, picks)
 	local lock = LockSpawner.Spawn(activator)
 	local knife = KnifeSpawner.Spawn(lock)
 	local pick = PickSpawner.Spawn(lock, picks)
@@ -175,6 +168,8 @@ function this.unlock()
 		finishedCallback = this.onEndTimerFinished,
 		data = data --[[@as timerData]],
 	})
+
+	this.unregisterEvents()
 end
 
 ---@private
