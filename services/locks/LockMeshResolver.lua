@@ -18,10 +18,10 @@ function this.Initialize()
 end
 
 ---@public
----@param container tes3containerInstance
+---@param activator tes3containerInstance|tes3door
 ---@return niNode
-function this.Resolve(container)
-	return this.meshes[container.mesh] or this.defaultMesh
+function this.Resolve(activator)
+	return this.meshes[activator.mesh] or this.defaultMesh
 end
 
 return this

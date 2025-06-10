@@ -8,25 +8,25 @@ local events = require("tauer.modern-lockpicking.shared.enums.events")
 local this = {}
 
 ---@public
----@param container tes3containerInstance
+---@param activator tes3containerInstance|tes3door
 ---@return lock
-function this.Spawn(container)
-	local mesh = this.spawn(container)
+function this.Spawn(activator)
+	local mesh = this.spawn(activator)
 
 	event.register(events.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
 
 	return {
 		mesh = mesh,
 		cylinder = mesh:getObjectByName(objectNames.cylinderHelper),
-		container = container,
+		container = activator,
 	}
 end
 
 ---@private
----@param container tes3containerInstance
+---@param activator tes3containerInstance|tes3door
 ---@return niNode
-function this.spawn(container)
-	local mesh = this.getMesh(container)
+function this.spawn(activator)
+	local mesh = this.getMesh(activator)
 	local root = this.getRootNode()
 
 	root:attachChild(mesh)
@@ -41,10 +41,10 @@ function this.spawn(container)
 end
 
 ---@private
----@param container tes3containerInstance
+---@param activator tes3containerInstance|tes3door
 ---@return niNode
-function this.getMesh(container)
-	local mesh = LockMeshResolver.Resolve(container)
+function this.getMesh(activator)
+	local mesh = LockMeshResolver.Resolve(activator)
 
 	mesh.name = "ModernLockpicking:Root"
 	mesh.translation = tes3.getCameraPosition():copy()

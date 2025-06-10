@@ -2,6 +2,7 @@ local Logger = require("tauer.modern-lockpicking.shared.Logger")
 local LockpickingStarter = require("tauer.modern-lockpicking.services.lockpicking.LockpickingStarter")
 local LockMeshResolver = require("tauer.modern-lockpicking.services.locks.LockMeshResolver")
 local SoundController = require("tauer.modern-lockpicking.services.sounds.SoundController")
+local PlayerController = require("tauer.modern-lockpicking.services.player.PlayerController")
 
 ---@class ModernLockpicking
 local this = {}
@@ -38,7 +39,7 @@ end
 function this.stopMod() end
 
 function this.startMod()
-	LockpickingStarter.Start()
+	PlayerController.Start()
 end
 
 event.register(tes3.event.modConfigReady, this.initializeMcm)

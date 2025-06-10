@@ -22,6 +22,10 @@ local OBJECT_NAMES = require("tauer.modern-lockpicking.shared.enums.objectNames"
 local this = {}
 
 ---@private
+---@type tes3containerInstance|tes3door
+this.activator = nil
+
+---@private
 ---@type tes3itemStack[]
 this.picks = nil
 
@@ -49,16 +53,16 @@ this.directions = {
 }
 
 ---@public
----@param container tes3containerInstance
+---@param activator tes3containerInstance|tes3door
 ---@return boolean
-function this.Start(container)
+function this.Start(activator)
 	local picks = InventoryManager.GetLockpicks()
 	if not picks then
 		tes3.messageBox(Translations.Get("messageBox.noLockpicks"))
 		return false
 	end
 
-	local lock = LockSpawner.Spawn(container)
+	local lock = LockSpawner.Spawn(activator)
 	local knife = KnifeSpawner.Spawn(lock)
 	local pick = PickSpawner.Spawn(lock, picks)
 	local pickHelper = lock.mesh:getObjectByName(OBJECT_NAMES.pickHelper) --[[@as niNode]]
@@ -68,6 +72,7 @@ function this.Start(container)
 	CylinderAnimator.Start(lock.cylinder)
 	PickAnimator.Start(pick, pickHelper)
 
+	this.activator = activator
 	this.picks = picks
 	this.lock = lock
 	this.knife = knife
@@ -160,6 +165,7 @@ function this.unlock()
 		lock = this.lock,
 		knife = this.knife,
 		pick = this.pick,
+		activator = this.activator,
 		success = true,
 	}
 	event.trigger(EVENTS.lockpickingEnd, data)
@@ -186,6 +192,7 @@ function this.stop(success)
 		lock = this.lock,
 		knife = this.knife,
 		pick = this.pick,
+		activator = this.activator,
 		success = success,
 	}
 	event.trigger(EVENTS.lockpickingEnded, data)
