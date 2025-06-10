@@ -1,8 +1,8 @@
 --- ENUMS
 local Z_BUFFER_INDEX = require("tauer.modern-lockpicking.shared.enums.zBufferIndex")
 local OBJECT_NAMES = require("tauer.modern-lockpicking.shared.enums.objectNames")
-local PATHS = require("tauer.modern-lockpicking.shared.enums.paths")
 local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
+local COSNTANTS = require("tauer.modern-lockpicking.services.knives.enums.constants")
 ---
 
 ---@class KnifeSpawner
@@ -31,7 +31,7 @@ end
 ---@public
 ---@return niNode
 function this.getMesh()
-	local mesh = tes3.loadMesh(PATHS.daggerMesh, true):clone() --[[@as niNode]]
+	local mesh = tes3.loadMesh(COSNTANTS.paths.daggerMesh, true):clone() --[[@as niNode]]
 
 	mesh.name = OBJECT_NAMES.knife
 	mesh:attachProperty(this.getZBufferProperty())

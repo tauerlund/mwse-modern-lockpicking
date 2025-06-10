@@ -1,4 +1,4 @@
-local paths = require("tauer.modern-lockpicking.shared.enums.paths")
+local CONSTANTS = require("tauer.modern-lockpicking.services.locks.enums.constants")
 
 ---@class LockMeshResolver : IInitializedService
 local this = {}
@@ -13,7 +13,7 @@ this.meshes = {}
 
 ---@public
 function this.Initialize()
-	this.defaultMesh = tes3.loadMesh(paths.defaultLockMesh, true):clone() --[[@as niNode]]
+	this.defaultMesh = tes3.loadMesh(CONSTANTS.paths.defaultLockMesh, true):clone() --[[@as niNode]]
 	return true
 end
 

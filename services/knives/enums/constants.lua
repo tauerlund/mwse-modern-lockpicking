@@ -19,6 +19,10 @@ local enum = {
 		startAnimationDuration = 1,
 		phaseSpeed = 1.9,
 	},
+
+	paths = {
+		daggerMesh = "w\\W_iron_dagger.nif",
+	},
 }
 
 return enum
