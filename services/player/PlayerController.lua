@@ -20,11 +20,6 @@ end
 ---@private
 ---@param e activateEventData
 function this.onActivate(e)
-	local actions = tes3.getSkill(tes3.skill.security).actions
-	for i = 1, #actions do
-		Logger:debug("%s", actions[i])
-	end
-
 	if e.activator ~= tes3.player then
 		return
 	end
