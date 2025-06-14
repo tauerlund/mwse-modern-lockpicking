@@ -3,6 +3,8 @@ local CYCLE = require("tauer.modern-lockpicking.shared.enums.cycleDirection")
 ---@class PickSelector
 local this = {}
 
+---@private
+---@type integer
 this.currentIndex = 1
 
 ---@public
@@ -21,6 +23,9 @@ function this.Select(picks, direction)
     return picks[this.currentIndex]
 end
 
+---@private
+---@param picks tes3itemStack[]
+---@return integer
 function this.incrementIndex(picks)
     if this.currentIndex >= #picks then
         return 1
@@ -29,6 +34,9 @@ function this.incrementIndex(picks)
     end
 end
 
+---@private
+---@param picks tes3itemStack[]
+---@return integer
 function this.decrementIndex(picks)
     if this.currentIndex <= 1 then
         return #picks
@@ -37,6 +45,8 @@ function this.decrementIndex(picks)
     end
 end
 
+---@private
+---@return integer
 function this.getInitialIndex()
     return 1
 end
