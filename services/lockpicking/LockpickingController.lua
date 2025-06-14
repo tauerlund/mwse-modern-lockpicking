@@ -10,6 +10,7 @@ local Settings = require("tauer.modern-lockpicking.shared.Settings").Mcm
 local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.constants")
 local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirection")
+local CYCLE = require("tauer.modern-lockpicking.shared.enums.cycleDirection")
 local OBJECT_NAMES = require("tauer.modern-lockpicking.shared.enums.objectNames")
 ---
 
@@ -41,16 +42,19 @@ this.pick = nil
 this.currentDirectionKey = nil
 
 ---@private
----@type { [tes3.scanCode]: DIRECTION }
-this.directions = {
-	[Settings.keyBinds.rotateLockClockwise.keyCode] = DIRECTION.clockwise,
-	[Settings.keyBinds.rotateLockCounterclockwise.keyCode] = DIRECTION.counterClockwise,
-}
+---@type { [tes3.scanCode]: ROTATION_DIRECTION }
+this.rotationDirections = nil
+
+---@private
+---@type { [tes3.scanCode]: CYCLE_DIRECTION }
+this.pickCycleDirections = nil
 
 ---@public
 ---@return boolean
 function this.Initialize()
 	event.register(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
+	this.rotationDirections = this.getRotationDirections()
+	this.pickCycleDirections = this.getPickCycleDirections()
 	return true
 end
 
@@ -92,14 +96,27 @@ end
 
 ---@public
 function this.Stop()
-	this.stop(false)
+	this.stop({ success = false })
 end
 
 ---@private
 ---@param e keyDownEventData
 function this.onKeyDown(e)
-	if this.directions[e.keyCode] then
+	if this.rotationDirections[e.keyCode] then
 		this.onDirectionKeyDown(e)
+		return
+	end
+	if this.pickCycleDirections[e.keyCode] then
+		this.onPickSelectionKeyDown(e)
+		return
+	end
+end
+
+---@private
+---@param e keyUpEventData
+function this.onKeyUp(e)
+	if this.rotationDirections[e.keyCode] then
+		this.onDirectionKeyUp(e)
 		return
 	end
 	if e.keyCode == Settings.keyBinds.exit.keyCode then
@@ -109,23 +126,24 @@ function this.onKeyDown(e)
 end
 
 ---@private
----@param e keyUpEventData
-function this.onKeyUp(e)
-	if this.directions[e.keyCode] then
-		this.onDirectionKeyUp(e)
-		return
-	end
-end
-
----@private
 ---@param e keyDownEventData
 function this.onDirectionKeyDown(e)
 	---@type rotationEventData
 	local data = {
-		direction = this.directions[e.keyCode],
+		direction = this.rotationDirections[e.keyCode],
 	}
 	event.trigger(EVENTS.rotationStarted, data)
 	this.currentDirectionKey = e.keyCode
+end
+
+---@private
+---@param e keyDownEventData
+function this.onPickSelectionKeyDown(e)
+	---@type pickCycledEventData
+	local data = {
+		direction = this.pickCycleDirections[e.keyCode],
+	}
+	event.trigger(EVENTS.pickCycled, data)
 end
 
 ---@private
@@ -137,7 +155,7 @@ function this.onDirectionKeyUp(e)
 
 	---@type rotationEventData
 	local data = {
-		direction = this.directions[e.keyCode],
+		direction = this.rotationDirections[e.keyCode],
 	}
 	event.trigger(EVENTS.rotationEnded, data)
 	this.currentDirectionKey = nil
@@ -187,19 +205,19 @@ end
 ---@param data timerData
 function this.onEndTimerFinished(data)
 	---@cast data +lockpickingEndedEventData, -timerData
-	this.stop(data.success)
+	this.stop({ success = data.success })
 end
 
 ---@private
----@param success boolean
-function this.stop(success)
+---@param parameters stopLockpickingParameters
+function this.stop(parameters)
 	---@type lockpickingEndedEventData
 	local data = {
 		lock = this.lock,
 		knife = this.knife,
 		pick = this.pick,
 		activator = this.activator,
-		success = success,
+		success = parameters.success,
 	}
 	event.trigger(EVENTS.lockpickingEnded, data)
 
@@ -208,9 +226,26 @@ end
 
 ---@private
 function this.onKeyBindsUpdated()
-	this.directions = {}
-	this.directions[Settings.keyBinds.rotateLockClockwise.keyCode] = DIRECTION.clockwise
-	this.directions[Settings.keyBinds.rotateLockCounterclockwise.keyCode] = DIRECTION.counterClockwise
+	this.rotationDirections = this.getRotationDirections()
+	this.pickCycleDirections = this.getPickCycleDirections()
+end
+
+---@private
+---@return { [tes3.scanCode]: ROTATION_DIRECTION }
+function this.getRotationDirections()
+	return {
+		[Settings.keyBinds.rotateLockClockwise.keyCode] = DIRECTION.clockwise,
+		[Settings.keyBinds.rotateLockCounterclockwise.keyCode] = DIRECTION.counterClockwise,
+	}
+end
+
+---@private
+---@return { [tes3.scanCode]: CYCLE_DIRECTION }
+function this.getPickCycleDirections()
+	return {
+		[Settings.keyBinds.cycleNextPick.keyCode] = CYCLE.next,
+		[Settings.keyBinds.cyclePreviousPick.keyCode] = CYCLE.previous,
+	}
 end
 
 ---@private

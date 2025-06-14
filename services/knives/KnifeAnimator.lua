@@ -45,7 +45,7 @@ this.currentAngle = 0
 this.blocked = false
 
 ---@private
----@type { [DIRECTION]: number }
+---@type { [ROTATION_DIRECTION]: number }
 this.angles = {
 	[DIRECTION.clockwise] = CONSTANTS.angles.clockwise,
 	[DIRECTION.counterClockwise] = CONSTANTS.angles.counterClockwise,

@@ -16,7 +16,7 @@ this.cylinder = nil
 this.phase = 0
 
 ---@private
----@type DIRECTION|nil
+---@type ROTATION_DIRECTION|nil
 this.rotationDirection = nil
 
 ---@private
