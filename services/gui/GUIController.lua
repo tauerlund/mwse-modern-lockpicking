@@ -2,7 +2,6 @@
 local GUI = require("tauer.modern-lockpicking.services.gui.GUIBuilder")
 local Translations = require("tauer.modern-lockpicking.shared.Translations")
 local Settings = require("tauer.modern-lockpicking.shared.Settings").Mcm
-local Logger = require("tauer.modern-lockpicking.shared.Logger")
 ---
 
 --- ENUMS
