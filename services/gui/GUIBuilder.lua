@@ -1,7 +1,6 @@
-local Logger = require("tauer.modern-lockpicking.shared.Logger")
-
 ---@class GUIBuilder
 ---@field private element tes3uiElement
+---@field private callbacks { [string]: function }
 local GUIBuilder = {}
 GUIBuilder.__index = GUIBuilder
 
@@ -166,7 +165,6 @@ end
 ---@param parameters vector2Parameters
 ---@return GUIBuilder
 function GUIBuilder:WithChildAlignment(parameters)
-	Logger:info("WithChildAlignment called with parameters: %s", parameters)
 	if parameters.x then
 		self.element.childAlignX = parameters.x
 	end
