@@ -1,0 +1,7 @@
+---@meta
+---@class borderPaddingParameters
+---@field all number?
+---@field top number?
+---@field bottom number?
+---@ field left number?
+---@field right number?

@@ -96,7 +96,7 @@ end
 ---@private
 ---@param activator tes3containerInstance|tes3door
 function this.activate(activator)
-	timer.delayOneFrame(function()
+	timer.delayOneFrame(function ()
 		tes3.player:activate(activator --[[@as tes3reference]])
 	end)
 end

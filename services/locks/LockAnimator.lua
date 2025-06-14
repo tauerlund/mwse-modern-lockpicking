@@ -33,7 +33,9 @@ function this.getTargetTranslation(lock)
 	local direction = tes3.getCameraVector()
 	local forward = direction:normalized() * CONSTANTS.targetDistance
 
-	return lock.mesh.translation + forward
+	local translation = lock.mesh.translation + forward
+
+	return translation
 end
 
 ---@private

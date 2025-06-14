@@ -4,11 +4,12 @@ Logger = require("tauer.modern-lockpicking.shared.Logger")
 local this = {}
 
 ---@public
----@return tes3itemStack|nil
+---@return tes3itemStack[]|nil
 function this.GetLockpicks()
+	---@type tes3itemStack[]
 	local lockpicks = {}
 
-	for _, item in pairs(tes3.player.object.inventory) do
+	for _, item in pairs(tes3.player.object.inventory.items) do
 		if item.object.objectType == tes3.objectType.lockpick then
 			table.insert(lockpicks, item)
 		end

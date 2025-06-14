@@ -60,6 +60,18 @@ function this.Start(activator, picks)
 	local pick = PickSpawner.Spawn(lock, picks)
 	local pickHelper = lock.mesh:getObjectByName(OBJECT_NAMES.pickHelper) --[[@as niNode]]
 
+	---@type lockpickingStartEventData
+	local data = {
+		lock = lock,
+		knife = knife,
+		pick = pick,
+		picks = picks,
+		activator = activator,
+	}
+	event.trigger(EVENTS.lockpickingStart, data)
+
+	require("tauer.modern-lockpicking.debugging.DebuggingAnimator").Start(lock.mesh)
+
 	LockAnimator.Start(lock)
 	KnifeAnimator.Start(knife)
 	CylinderAnimator.Start(lock.cylinder)
