@@ -1,0 +1,4 @@
+---@meta
+---@class vector2Parameters
+---@field public x number?
+---@field public y number?
