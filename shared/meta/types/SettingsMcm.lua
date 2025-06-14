@@ -4,8 +4,8 @@
 ---@field public keyCode integer
 
 ---@class keybindSettings
----@field public rotateLockLeft keyBind
----@field public rotateLockRight keyBind
+---@field public rotateLockCounterclockwise keyBind
+---@field public rotateLockClockwise keyBind
 ---@field public cyclePreviousPick keyBind
 ---@field public cycleNextPick keyBind
 ---@field public exit keyBind

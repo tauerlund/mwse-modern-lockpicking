@@ -1,0 +1,3 @@
+---@meta
+---@class stopLockpickingParameters
+---@field success boolean

@@ -1,4 +1,5 @@
 local Logger = require("tauer.modern-lockpicking.shared.Logger")
+local LockpickingController = require("tauer.modern-lockpicking.services.lockpicking.LockpickingController")
 local LockMeshResolver = require("tauer.modern-lockpicking.services.locks.LockMeshResolver")
 local SoundController = require("tauer.modern-lockpicking.services.sounds.SoundController")
 local PlayerController = require("tauer.modern-lockpicking.services.player.PlayerController")
@@ -19,6 +20,7 @@ function this.initializeMod()
 
 	---@type IInitializedService[]
 	local services = {
+		LockpickingController,
 		LockMeshResolver,
 		SoundController,
 		GUIController,

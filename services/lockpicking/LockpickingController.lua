@@ -7,6 +7,7 @@ local CylinderAnimator = require("tauer.modern-lockpicking.services.cylinders.Cy
 local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerManager")
 local PickSpawner = require("tauer.modern-lockpicking.services.picks.PickSpawner")
 local PickAnimator = require("tauer.modern-lockpicking.services.picks.PickAnimator")
+local Settings = require("tauer.modern-lockpicking.shared.Settings").Mcm
 ---
 
 --- ENUMS
@@ -16,7 +17,7 @@ local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirecti
 local OBJECT_NAMES = require("tauer.modern-lockpicking.shared.enums.objectNames")
 ---
 
----@class LockpickingController
+---@class LockpickingController : IInitializedService
 local this = {}
 
 ---@private
@@ -46,9 +47,16 @@ this.currentDirectionKey = nil
 ---@private
 ---@type { [tes3.scanCode]: DIRECTION }
 this.directions = {
-	[tes3.scanCode.d] = DIRECTION.clockwise,
-	[tes3.scanCode.a] = DIRECTION.counterClockwise,
+	[Settings.keyBinds.rotateLockClockwise.keyCode] = DIRECTION.clockwise,
+	[Settings.keyBinds.rotateLockCounterclockwise.keyCode] = DIRECTION.counterClockwise,
 }
+
+---@public
+---@return boolean
+function this.Initialize()
+	event.register(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
+	return true
+end
 
 ---@public
 ---@param activator tes3containerInstance|tes3door
@@ -104,6 +112,10 @@ function this.onKeyDown(e)
 		this.onDirectionKeyDown(e)
 		return
 	end
+	if e.keyCode == Settings.keyBinds.exit.keyCode then
+		this.finish({ success = false })
+		return
+	end
 end
 
 ---@private
@@ -154,24 +166,21 @@ function this.onEnterFrame(_)
 	local rotation = this.lock.cylinder.rotation:toEulerXYZ().y
 
 	if rotation <= CONSTANTS.targetRotationLeft or rotation >= CONSTANTS.targetRotationRight then
-		this.unlock()
+		this.finish({ success = true })
 		return
 	end
 end
 
 ---@private
-function this.unlock()
-	tes3.unlock({
-		reference = this.lock.container --[[@as tes3reference]],
-	})
-
+---@param parameters stopLockpickingParameters
+function this.finish(parameters)
 	---@type lockpickingEndEventData
 	local data = {
 		lock = this.lock,
 		knife = this.knife,
 		pick = this.pick,
 		activator = this.activator,
-		success = true,
+		success = parameters.success,
 	}
 	event.trigger(EVENTS.lockpickingEnd, data)
 
@@ -205,6 +214,13 @@ function this.stop(success)
 	event.trigger(EVENTS.lockpickingEnded, data)
 
 	this.unregisterEvents()
+end
+
+---@private
+function this.onKeyBindsUpdated()
+	this.directions = {}
+	this.directions[Settings.keyBinds.rotateLockClockwise.keyCode] = DIRECTION.clockwise
+	this.directions[Settings.keyBinds.rotateLockCounterclockwise.keyCode] = DIRECTION.counterClockwise
 end
 
 ---@private

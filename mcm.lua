@@ -1,25 +1,32 @@
+--- SERVICES
 local Settings = require("tauer.modern-lockpicking.shared.Settings")
 local Translations = require("tauer.modern-lockpicking.shared.Translations")
+---
+
+--- ENUMS
+local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
+---
 
 local template = mwse.mcm.createTemplate { name = Translations.Get("modName"), headerImagePath = "textures\\tauer\\modern-lockpicking\\logo.tga" }
 template.onClose = function ()
     Settings:Save()
+    event.trigger(EVENTS.keyBindsUpdated)
 end
 template:register()
 
-local settingsPage = template:createPage { label = Translations.Get("mcm.labels.settings") }
+-- local settingsPage = template:createPage { label = Translations.Get("mcm.labels.settings") }
 
-settingsPage:createSlider({
-    label = Translations.Get("mcm.labels.lockpickDifficulty"),
-    description = Translations.Get("mcm.description.lockpickDifficulty"),
-    variable = mwse.mcm.createTableVariable({
-        id = "lockpickDifficulty",
-        table = Settings.Mcm,
-    }),
-    min = 0,
-    max = 100,
-    step = 1,
-})
+-- settingsPage:createSlider({
+--     label = Translations.Get("mcm.labels.lockpickDifficulty"),
+--     description = Translations.Get("mcm.description.lockpickDifficulty"),
+--     variable = mwse.mcm.createTableVariable({
+--         id = "lockpickDifficulty",
+--         table = Settings.Mcm,
+--     }),
+--     min = 0,
+--     max = 100,
+--     step = 1,
+-- })
 
 local controlsPage = template:createSideBarPage { label = Translations.Get("interface.controls.header") }
 
@@ -30,20 +37,20 @@ local rotateLockCategory = controlsPage:createCategory({
 
 rotateLockCategory:createKeyBinder({
     label = Translations.Get("mcm.labels.left"),
-    description = Translations.Get("mcm.description.rotateLockLeft"),
+    description = Translations.Get("mcm.description.rotateLockCounterclockwise"),
     allowCombinations = false,
     variable = mwse.mcm.createTableVariable({
-        id = "rotateLockLeft",
+        id = "rotateLockCounterclockwise",
         table = Settings.Mcm.keyBinds,
     }),
 })
 
 rotateLockCategory:createKeyBinder({
     label = Translations.Get("mcm.labels.right"),
-    description = Translations.Get("mcm.description.rotateLockRight"),
+    description = Translations.Get("mcm.description.rotateLockClockwise"),
     allowCombinations = false,
     variable = mwse.mcm.createTableVariable({
-        id = "rotateLockRight",
+        id = "rotateLockClockwise",
         table = Settings.Mcm.keyBinds,
     }),
 })

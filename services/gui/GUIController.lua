@@ -7,6 +7,7 @@ local Logger = require("tauer.modern-lockpicking.shared.Logger")
 
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
+local CONSTANTS = require("tauer.modern-lockpicking.services.gui.enums.constants")
 ---
 
 ---@class GUIController : IInitializedService
@@ -27,8 +28,7 @@ this.picks = nil
 ---@public
 ---@return boolean
 function this.Initialize()
-	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
-
+	this.registerEvents()
 	return true
 end
 
@@ -45,7 +45,7 @@ end
 ---@return tes3uiElement
 function this.createHeader(e)
 	local header = GUI.CreateMenu({
-			id = "tauer.modern-lockpicking.header",
+			id = CONSTANTS.headerId,
 			dragFrame = false,
 			fixedFrame = true,
 			modal = true
@@ -118,7 +118,7 @@ end
 ---@return tes3uiElement
 function this.createControls()
 	local controls = GUI.CreateMenu({
-			id = "tauer.modern-lockpicking.controls",
+			id = CONSTANTS.controlsId,
 			dragFrame = false,
 			fixedFrame = true,
 			modal = true
@@ -140,7 +140,7 @@ function this.createControls()
 		:WithColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:Build()
 
-	local innerBlock = GUI.CreateThinBorder({ parent = outerBlock })
+	local innerBlock = GUI.CreateThinBorder({ parent = outerBlock, id = CONSTANTS.controlsLabelContainerId })
 		:WithFlowDirection(tes3.flowDirection.leftToRight)
 		:WithAutoSize()
 		:WithPadding({
@@ -158,7 +158,7 @@ function this.createControls()
 	local controlTexts = this.getControlTexts()
 
 	for i, text in ipairs(controlTexts) do
-		GUI.CreateLabel({ parent = innerBlock })
+		GUI.CreateLabel({ parent = innerBlock, id = string.format(CONSTANTS.controlsLabelId, i) })
 			:WithText(text)
 			:WithColor(tes3ui.getPalette(tes3.palette.normalColor))
 			:Build()
@@ -182,8 +182,8 @@ end
 function this.getControlTexts()
 	local mouse = tes3.findGMST(tes3.gmst.sMouse).value
 
-	local rotateLockLeft = this.getKeyName(Settings.keyBinds.rotateLockLeft)
-	local rotateLockRight = this.getKeyName(Settings.keyBinds.rotateLockRight)
+	local rotateLockCounterclockwise = this.getKeyName(Settings.keyBinds.rotateLockCounterclockwise)
+	local rotateLockClockwise = this.getKeyName(Settings.keyBinds.rotateLockClockwise)
 
 	local cyclePreviousPick = this.getKeyName(Settings.keyBinds.cyclePreviousPick)
 	local cycleNextPick = this.getKeyName(Settings.keyBinds.cycleNextPick)
@@ -192,7 +192,8 @@ function this.getControlTexts()
 
 	return {
 		string.format("%s: %s", Translations.Get("interface.controls.rotatePick"), mouse),
-		string.format("%s: %s / %s", Translations.Get("interface.controls.rotateLock"), rotateLockLeft, rotateLockRight),
+		string.format("%s: %s / %s", Translations.Get("interface.controls.rotateLock"), rotateLockCounterclockwise,
+			rotateLockClockwise),
 		string.format("%s: %s / %s", Translations.Get("interface.controls.cyclePicks"), cyclePreviousPick, cycleNextPick),
 		string.format("%s: %s", Translations.Get("interface.controls.exit"), exit),
 	}
@@ -210,7 +211,7 @@ end
 ---@return tes3uiElement
 function this.createPicks(picks)
 	local picksMenu = GUI.CreateMenu({
-			id = "tauer.modern-lockpicking.picks",
+			id = CONSTANTS.picksId,
 			dragFrame = false,
 			fixedFrame = true,
 			modal = true
@@ -295,9 +296,20 @@ end
 
 ---@private
 function this.stop()
-	this.header:destroy()
-	this.controls:destroy()
-	this.picks:destroy()
+	if this.header then
+		this.header:destroy()
+		this.header = nil
+	end
+
+	if this.controls then
+		this.controls:destroy()
+		this.controls = nil
+	end
+
+	if this.picks then
+		this.picks:destroy()
+		this.picks = nil
+	end
 end
 
 ---@private
@@ -311,6 +323,40 @@ end
 ---@param _ lockpickingEndedEventData
 function this.onLockpickingEnded(_)
 	this.stop()
+end
+
+---@private
+---@param _ loadEventData
+function this.onLoad(_)
+	this.stop()
+end
+
+---@private
+function this.onKeyBindsUpdated()
+	if not this.controls then
+		return
+	end
+	local labels = this.controls:findChild(CONSTANTS.controlsLabelContainerId)
+	if not labels then
+		return
+	end
+	local texts = this.getControlTexts()
+	for i, text in ipairs(texts) do
+		local label = labels:findChild(string.format(CONSTANTS.controlsLabelId, i))
+		if not label then
+			return
+		else
+			label.text = text
+			label:updateLayout()
+		end
+	end
+end
+
+---@private
+function this.registerEvents()
+	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
+	event.register(tes3.event.load, this.onLoad)
+	event.register(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
 end
 
 return this

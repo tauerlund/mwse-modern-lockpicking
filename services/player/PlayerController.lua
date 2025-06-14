@@ -89,6 +89,9 @@ end
 function this.onLockpickingEnded(e)
 	tes3ui.leaveMenuMode()
 	if e.success then
+		tes3.unlock({
+			reference = e.activator --[[@as tes3reference]],
+		})
 		this.activate(e.activator)
 	end
 end
