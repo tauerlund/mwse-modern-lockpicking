@@ -1,12 +1,8 @@
 --- SERVICES
 local LockSpawner = require("tauer.modern-lockpicking.services.locks.LockSpawner")
-local LockAnimator = require("tauer.modern-lockpicking.services.locks.LockAnimator")
 local KnifeSpawner = require("tauer.modern-lockpicking.services.knives.KnifeSpawner")
-local KnifeAnimator = require("tauer.modern-lockpicking.services.knives.KnifeAnimator")
-local CylinderAnimator = require("tauer.modern-lockpicking.services.cylinders.CylinderAnimator")
-local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerManager")
 local PickSpawner = require("tauer.modern-lockpicking.services.picks.PickSpawner")
-local PickAnimator = require("tauer.modern-lockpicking.services.picks.PickAnimator")
+local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerManager")
 local Settings = require("tauer.modern-lockpicking.shared.Settings").Mcm
 ---
 
@@ -73,17 +69,11 @@ function this.Start(activator, picks)
 		lock = lock,
 		knife = knife,
 		pick = pick,
+		pickHelper = pickHelper,
 		picks = picks,
 		activator = activator,
 	}
 	event.trigger(EVENTS.lockpickingStart, data)
-
-	require("tauer.modern-lockpicking.debugging.DebuggingAnimator").Start(lock.mesh)
-
-	LockAnimator.Start(lock)
-	KnifeAnimator.Start(knife)
-	CylinderAnimator.Start(lock.cylinder)
-	PickAnimator.Start(pick, pickHelper)
 
 	this.activator = activator
 	this.picks = picks

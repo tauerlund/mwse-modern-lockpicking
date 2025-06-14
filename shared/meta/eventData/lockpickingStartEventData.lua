@@ -3,5 +3,6 @@
 ---@field public lock lock
 ---@field public knife knife
 ---@field public pick pick
+---@field public pickHelper niNode
 ---@field public picks tes3itemStack[]
 ---@field public activator tes3containerInstance|tes3door

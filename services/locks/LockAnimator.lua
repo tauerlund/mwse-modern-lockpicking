@@ -7,12 +7,19 @@ local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 local CONSTANTS = require("tauer.modern-lockpicking.services.locks.enums.constants")
 ---
 
----@class LockAnimator
+---@class LockAnimator : IInitializedService
 local this = {}
 
 ---@public
+---@return boolean
+function this.Initialize()
+	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
+	return true
+end
+
+---@private
 ---@param lock lock
-function this.Start(lock)
+function this.start(lock)
 	TimerManager.Start({
 		durationInSeconds = 0.8,
 		callback = this.onStartTimer,
@@ -52,6 +59,12 @@ function this.onStartTimer(callback)
 
 	lock.translation = this.getUpdatedTranslation(currentPhase, targetPhase, initialTranslation, targetTranslation)
 	lock:update()
+end
+
+---@private
+---@param e lockpickingStartEventData
+function this.onLockpickingStart(e)
+	this.start(e.lock)
 end
 
 function this.getUpdatedTranslation(currentPhase, targetPhase, initialTranslation, targetTranslation)

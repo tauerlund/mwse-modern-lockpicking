@@ -9,7 +9,7 @@ local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirecti
 local CONSTANTS = require("tauer.modern-lockpicking.services.knives.enums.constants")
 ---
 
----@class KnifeAnimator
+---@class KnifeAnimator : IInitializedService
 local this = {}
 
 ---@private
@@ -52,8 +52,15 @@ this.angles = {
 }
 
 ---@public
+---@return boolean
+function this.Initialize()
+	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
+	return true
+end
+
+---@private
 ---@param knife niNode
-function this.Start(knife)
+function this.start(knife)
 	this.knife = knife
 	this.blocked = true
 
@@ -107,6 +114,12 @@ end
 ---@param delta number
 function this.updatePhase(delta)
 	this.phase = math.min(this.phase + this.phaseSpeed * delta, 1)
+end
+
+---@private
+---@param e lockpickingStartEventData
+function this.onLockpickingStart(e)
+	this.start(e.knife)
 end
 
 ---@private

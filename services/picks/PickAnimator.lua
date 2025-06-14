@@ -8,7 +8,7 @@ local CONSTANTS = require("tauer.modern-lockpicking.services.picks.enums.constan
 local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 ---
 
----@class PickAnimator
+---@class PickAnimator : IInitializedService
 local this = {}
 
 ---@private
@@ -40,9 +40,16 @@ this.currentHelperAngle = 0
 this.targetHelperAngle = 0
 
 ---@public
+---@return boolean
+function this.Initialize()
+	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
+	return true
+end
+
+---@private
 ---@param pick pick
 ---@param helper niNode
-function this.Start(pick, helper)
+function this.start(pick, helper)
 	this.pick = pick
 	this.helper = helper
 	this.originalHelperRotation = helper.rotation:copy()
@@ -133,6 +140,12 @@ function this.rotatePick()
 
 	this.pick.rotation = this.originalPickRotation * rotation
 	this.pick:update()
+end
+
+---@private
+---@param e lockpickingStartEventData
+function this.onLockpickingStart(e)
+	this.start(e.pick, e.pickHelper)
 end
 
 ---@private

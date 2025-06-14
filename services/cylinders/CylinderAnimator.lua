@@ -4,7 +4,7 @@ local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirecti
 local CONSTANTS = require("tauer.modern-lockpicking.services.cylinders.enums.constants")
 ---
 
----@class CylinderAnimator
+---@class CylinderAnimator : IInitializedService
 local this = {}
 
 ---@private
@@ -24,8 +24,15 @@ this.rotationDirection = nil
 this.blocked = false
 
 ---@public
+---@@return boolean
+function this.Initialize()
+	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
+	return true
+end
+
+---@private
 ---@param cylinder cylinder
-function this.Start(cylinder)
+function this.start(cylinder)
 	this.cylinder = cylinder
 	this.registerEvents()
 end
@@ -69,6 +76,12 @@ function this.rotate()
 
 	cylinder.rotation = rotation
 	cylinder:update()
+end
+
+---@private
+---@param e lockpickingStartEventData
+function this.onLockpickingStart(e)
+	this.start(e.lock.cylinder)
 end
 
 ---@private
