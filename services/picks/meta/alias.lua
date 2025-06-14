@@ -1,2 +1,0 @@
----@meta
----@alias pick niNode

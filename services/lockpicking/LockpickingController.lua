@@ -1,4 +1,5 @@
 --- SERVICES
+local PickSelector = require("tauer.modern-lockpicking.services.picks.PickSelector")
 local LockSpawner = require("tauer.modern-lockpicking.services.locks.LockSpawner")
 local KnifeSpawner = require("tauer.modern-lockpicking.services.knives.KnifeSpawner")
 local PickSpawner = require("tauer.modern-lockpicking.services.picks.PickSpawner")
@@ -11,7 +12,6 @@ local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.c
 local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirection")
 local CYCLE = require("tauer.modern-lockpicking.shared.enums.cycleDirection")
-local OBJECT_NAMES = require("tauer.modern-lockpicking.shared.enums.objectNames")
 ---
 
 ---@class LockpickingController : IInitializedService
@@ -65,24 +65,24 @@ end
 function this.Start(activator, picks)
 	local lock = LockSpawner.Spawn(activator)
 	local knife = KnifeSpawner.Spawn(lock)
-	local pick = PickSpawner.Spawn(lock, picks)
-	local pickHelper = lock.mesh:getObjectByName(OBJECT_NAMES.pickHelper) --[[@as niNode]]
+
+	local pickItem = PickSelector.Select(picks)
+	local pick = PickSpawner.Spawn(lock, pickItem)
 
 	---@type lockpickingStartEventData
 	local data = {
+		activator = activator,
 		lock = lock,
 		knife = knife,
-		pick = pick,
-		pickHelper = pickHelper,
 		picks = picks,
-		activator = activator,
+		pick = pick,
 	}
 	event.trigger(EVENTS.lockpickingStart, data)
 
 	this.activator = activator
-	this.picks = picks
 	this.lock = lock
 	this.knife = knife
+	this.picks = picks
 	this.pick = pick
 
 	TimerManager.Start({
@@ -103,11 +103,11 @@ end
 ---@param e keyDownEventData
 function this.onKeyDown(e)
 	if this.rotationDirections[e.keyCode] then
-		this.onDirectionKeyDown(e)
+		this.onRotationDirectionKeyDown(e)
 		return
 	end
 	if this.pickCycleDirections[e.keyCode] then
-		this.onPickSelectionKeyDown(e)
+		this.onPickCycleKeyDown(e)
 		return
 	end
 end
@@ -116,7 +116,7 @@ end
 ---@param e keyUpEventData
 function this.onKeyUp(e)
 	if this.rotationDirections[e.keyCode] then
-		this.onDirectionKeyUp(e)
+		this.onRotationDirectionKeyUp(e)
 		return
 	end
 	if e.keyCode == Settings.keyBinds.exit.keyCode then
@@ -127,7 +127,7 @@ end
 
 ---@private
 ---@param e keyDownEventData
-function this.onDirectionKeyDown(e)
+function this.onRotationDirectionKeyDown(e)
 	---@type rotationEventData
 	local data = {
 		direction = this.rotationDirections[e.keyCode],
@@ -138,17 +138,21 @@ end
 
 ---@private
 ---@param e keyDownEventData
-function this.onPickSelectionKeyDown(e)
+function this.onPickCycleKeyDown(e)
+	local direction = this.pickCycleDirections[e.keyCode]
+	local pickItem = PickSelector.Select(this.picks, direction)
+
 	---@type pickCycledEventData
 	local data = {
 		direction = this.pickCycleDirections[e.keyCode],
+		pickItem = pickItem,
 	}
 	event.trigger(EVENTS.pickCycled, data)
 end
 
 ---@private
 ---@param e keyUpEventData
-function this.onDirectionKeyUp(e)
+function this.onRotationDirectionKeyUp(e)
 	if this.directionKeyIsBlocked(e.keyCode) then
 		return
 	end

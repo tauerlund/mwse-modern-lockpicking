@@ -1,0 +1,5 @@
+---@meta
+---@class pick
+---@field public item tes3itemStack
+---@field public mesh niNode
+---@field public helper niNode

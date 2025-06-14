@@ -12,8 +12,8 @@ local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 local this = {}
 
 ---@private
----@type pick
-this.pick = nil
+---@type niNode
+this.mesh = nil
 
 ---@private
 ---@type niNode
@@ -48,15 +48,14 @@ end
 
 ---@private
 ---@param pick pick
----@param helper niNode
-function this.start(pick, helper)
-	this.pick = pick
-	this.helper = helper
-	this.originalHelperRotation = helper.rotation:copy()
+function this.start(pick)
+	this.mesh = pick.mesh
+	this.helper = pick.helper
+	this.originalHelperRotation = pick.helper.rotation:copy()
 	this.blocked = true
 
 	MeshAnimator.Start({
-		mesh = pick,
+		mesh = pick.mesh,
 		durationInSeconds = CONSTANTS.animation.startAnimationDuration,
 		originalRotation = CONSTANTS.rotation.original,
 		targetRotation = CONSTANTS.rotation.target,
@@ -75,7 +74,7 @@ end
 ---@param _ mwseTimerCallbackData
 function this.onStartTimerFinished(_)
 	this.blocked = false
-	this.originalPickRotation = this.pick.rotation:copy()
+	this.originalPickRotation = this.mesh.rotation:copy()
 	this.currentHelperAngle = 0
 	this.targetHelperAngle = 0
 	this.registerEvents()
@@ -135,17 +134,17 @@ end
 
 ---@private
 function this.rotatePick()
-	local rotation = this.pick.rotation:copy()
+	local rotation = this.mesh.rotation:copy()
 	rotation:toRotationY(this.currentHelperAngle)
 
-	this.pick.rotation = this.originalPickRotation * rotation
-	this.pick:update()
+	this.mesh.rotation = this.originalPickRotation * rotation
+	this.mesh:update()
 end
 
 ---@private
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
-	this.start(e.pick, e.pickHelper)
+	this.start(e.pick)
 end
 
 ---@private
@@ -163,7 +162,7 @@ function this.onLockpickingEnded(_)
 	this.helper:update()
 
 	this.helper = nil
-	this.pick = nil
+	this.mesh = nil
 	this.originalHelperRotation = nil
 	this.originalPickRotation = nil
 	this.currentHelperAngle = 0

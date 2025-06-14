@@ -9,12 +9,12 @@ local this = {}
 
 ---@public
 ---@param lock lock
----@param picks tes3itemStack[]
+---@param pickItem tes3itemStack
 ---@return pick
-function this.Spawn(lock, picks)
+function this.Spawn(lock, pickItem)
 	this.registerEvents()
 
-	local pick = this.getMesh(picks[1].object --[[@as tes3lockpick]])
+	local pick = this.getMesh(pickItem.object --[[@as tes3lockpick]])
 	local helper = lock.mesh:getObjectByName(OBJECT_NAMES.pickHelper) --[[@as niNode]]
 
 	helper:attachChild(pick)
@@ -25,7 +25,11 @@ function this.Spawn(lock, picks)
 
 	helper:update()
 
-	return pick
+	return {
+		mesh = pick,
+		item = pickItem,
+		helper = helper,
+	}
 end
 
 ---@public
@@ -54,11 +58,7 @@ end
 ---@private
 ---@param e lockpickingEndedEventData
 function this.onLockpickingEnded(e)
-	local lock = e.lock
-	local pick = e.pick
-
-	local pickHelper = lock.mesh:getObjectByName(OBJECT_NAMES.pickHelper) --[[@as niNode]]
-	pickHelper:detachChild(pick)
+	e.pick.helper:detachChild(e.pick.mesh)
 end
 
 ---@private
