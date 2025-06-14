@@ -86,16 +86,10 @@ function this.onLockpickingEnded(e)
 		tes3.unlock({
 			reference = e.activator --[[@as tes3reference]],
 		})
-		this.activate(e.activator)
+		timer.delayOneFrame(function ()
+			tes3.player:activate(e.activator --[[@as tes3reference]])
+		end)
 	end
-end
-
----@private
----@param activator tes3containerInstance|tes3door
-function this.activate(activator)
-	timer.delayOneFrame(function ()
-		tes3.player:activate(activator --[[@as tes3reference]])
-	end)
 end
 
 ---@private
