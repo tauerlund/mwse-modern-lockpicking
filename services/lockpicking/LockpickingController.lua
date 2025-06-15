@@ -70,14 +70,20 @@ function this.Start(activator, picks)
 	local pick = PickSpawner.Spawn(lock, pickItem)
 
 	---@type lockpickingStartEventData
-	local data = {
+	local lockPickingStartEventData = {
 		activator = activator,
 		lock = lock,
 		knife = knife,
 		picks = picks,
 		pick = pick,
 	}
-	event.trigger(EVENTS.lockpickingStart, data)
+	event.trigger(EVENTS.lockpickingStart, lockPickingStartEventData)
+
+	---@type pickSelectedEventData
+	local pickSelectedEventData = {
+		pickItem = pickItem,
+	}
+	event.trigger(EVENTS.pickSelected, pickSelectedEventData)
 
 	this.activator = activator
 	this.lock = lock
@@ -142,12 +148,11 @@ function this.onPickCycleKeyDown(e)
 	local direction = this.pickCycleDirections[e.keyCode]
 	local pickItem = PickSelector.Select(this.picks, direction)
 
-	---@type pickCycledEventData
+	---@type pickSelectedEventData
 	local data = {
-		direction = this.pickCycleDirections[e.keyCode],
 		pickItem = pickItem,
 	}
-	event.trigger(EVENTS.pickCycled, data)
+	event.trigger(EVENTS.pickSelected, data)
 end
 
 ---@private

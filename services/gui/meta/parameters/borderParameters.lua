@@ -3,5 +3,5 @@
 ---@field all number?
 ---@field top number?
 ---@field bottom number?
----@ field left number?
+---@field left number?
 ---@field right number?

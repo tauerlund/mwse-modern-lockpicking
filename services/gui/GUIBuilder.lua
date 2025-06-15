@@ -1,3 +1,5 @@
+local Logger = require("tauer.modern-lockpicking.shared.Logger")
+
 ---@class GUIBuilder
 ---@field private element tes3uiElement
 ---@field private callbacks { [string]: function }
@@ -200,10 +202,44 @@ function GUIBuilder:WithSize(parameters)
 end
 
 ---@public
+---@param evt string
+---@param callback fun(element: tes3uiElement, e: table|nil)
+function GUIBuilder:WithCallback(evt, callback)
+	self.callbacks = self.callbacks or {}
+	if self.callbacks[evt] then
+		Logger:warn("Callback for event '%s' already registered", evt)
+		return
+	end
+
+	self.callbacks[evt] = callback
+	return self
+end
+
+---@public
 ---@return tes3uiElement
 function GUIBuilder:Build()
+	if self.callbacks then
+		for evt, callback in pairs(self.callbacks) do
+			self:registerCallback(evt, callback)
+		end
+	end
 	self.element:updateLayout()
 	return self.element
+end
+
+---@private
+---@param evt string
+---@param callback fun(element: tes3uiElement, e: table|nil)
+function GUIBuilder:registerCallback(evt, callback)
+	local outerCallback = function (e)
+		callback(self.element, e or nil)
+	end
+
+	event.register(evt, outerCallback)
+
+	self.element:register(tes3.uiEvent.destroy, function ()
+		event.unregister(evt, outerCallback)
+	end)
 end
 
 ---@private

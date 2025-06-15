@@ -139,7 +139,7 @@ function this.createControls()
 		:WithColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:Build()
 
-	local innerBlock = GUI.CreateThinBorder({ parent = outerBlock, id = CONSTANTS.controlsLabelContainerId })
+	local innerBlock = GUI.CreateThinBorder({ parent = outerBlock })
 		:WithFlowDirection(tes3.flowDirection.leftToRight)
 		:WithAutoSize()
 		:WithPadding({
@@ -152,6 +152,7 @@ function this.createControls()
 			x = 0.5,
 			y = 0.5,
 		})
+		:WithCallback(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
 		:Build()
 
 	local controlTexts = this.getControlTexts()
@@ -241,18 +242,18 @@ function this.createPicks(picks)
 		:WithAutoSize()
 		:Build()
 
-	local pickNameBlock = GUI.CreateBlock({ parent = lowerBlock })
+	local pickLabelContainer = GUI.CreateBlock({ parent = lowerBlock })
 		:WithFlowDirection(tes3.flowDirection.topToBottom)
 		:WithAutoSize()
 		:Build()
 
-	local pickCountBlock = GUI.CreateBlock({ parent = lowerBlock })
+	local pickCountLabelContainer = GUI.CreateBlock({ parent = lowerBlock })
 		:WithFlowDirection(tes3.flowDirection.topToBottom)
 		:WithAutoSize()
 		:Build()
 
 	for _, pick in ipairs(picks) do
-		GUI.CreateLabel({ parent = pickNameBlock })
+		GUI.CreateLabel({ parent = pickLabelContainer, id = string.format(CONSTANTS.picksLabelId, pick.object.id) })
 			:WithText(pick.object.name)
 			:WithColor(tes3ui.getPalette(tes3.palette.normalColor))
 			:WithBorder({
@@ -260,15 +261,21 @@ function this.createPicks(picks)
 				bottom = 4,
 				right = 16,
 			})
+			:WithCallback(EVENTS.pickSelected, this.onPickCycled)
 			:Build()
 
-		GUI.CreateLabel({ parent = pickCountBlock })
+		GUI.CreateLabel({
+			parent = pickCountLabelContainer,
+			id = string.format(CONSTANTS.picksCountLabelId,
+				pick.object.id)
+		})
 			:WithText(string.format("%d", this.getLockpickCount(pick)))
 			:WithColor(tes3ui.getPalette(tes3.palette.normalColor))
 			:WithBorder({
 				top = 4,
 				bottom = 4,
 			})
+			:WithCallback(EVENTS.pickSelected, this.onPickCycled)
 			:Build()
 	end
 
@@ -331,17 +338,11 @@ function this.onLoad(_)
 end
 
 ---@private
-function this.onKeyBindsUpdated()
-	if not this.controls then
-		return
-	end
-	local labels = this.controls:findChild(CONSTANTS.controlsLabelContainerId)
-	if not labels then
-		return
-	end
+---@param element tes3uiElement
+function this.onKeyBindsUpdated(element)
 	local texts = this.getControlTexts()
 	for i, text in ipairs(texts) do
-		local label = labels:findChild(string.format(CONSTANTS.controlsLabelId, i))
+		local label = element:findChild(string.format(CONSTANTS.controlsLabelId, i))
 		if not label then
 			return
 		else
@@ -352,10 +353,25 @@ function this.onKeyBindsUpdated()
 end
 
 ---@private
+---@param e pickSelectedEventData
+---@param element tes3uiElement
+function this.onPickCycled(element, e)
+	local labelId = string.format(CONSTANTS.picksLabelId, e.pickItem.object.id)
+	local countLabelId = string.format(CONSTANTS.picksCountLabelId, e.pickItem.object.id)
+
+	if element.name == labelId or element.name == countLabelId then
+		element.color = tes3ui.getPalette(tes3.palette.normalOverColor)
+	else
+		element.color = tes3ui.getPalette(tes3.palette.normalColor)
+	end
+
+	element:updateLayout()
+end
+
+---@private
 function this.registerEvents()
-	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
 	event.register(tes3.event.load, this.onLoad)
-	event.register(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
+	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
 end
 
 return this

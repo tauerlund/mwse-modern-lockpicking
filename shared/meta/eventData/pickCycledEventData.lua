@@ -1,4 +1,3 @@
 ---@meta
----@class pickCycledEventData
----@field public direction CYCLE_DIRECTION
+---@class pickSelectedEventData
 ---@field public pickItem tes3itemStack
