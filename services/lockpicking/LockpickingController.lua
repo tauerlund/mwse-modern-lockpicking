@@ -61,21 +61,23 @@ end
 ---@public
 ---@param activator tes3containerInstance|tes3door
 ---@param picks tes3itemStack[]
----@return boolean
 function this.Start(activator, picks)
-	local lock = LockSpawner.Spawn(activator)
-	local knife = KnifeSpawner.Spawn(lock)
+	this.activator = activator
+	this.lock = LockSpawner.Spawn(activator)
+	this.knife = KnifeSpawner.Spawn(this.lock)
 
 	local pickItem = PickSelector.Select(picks)
-	local pick = PickSpawner.Spawn(lock, pickItem)
+
+	this.pick = PickSpawner.Spawn(this.lock, pickItem)
+	this.picks = picks
 
 	---@type lockpickingStartEventData
 	local lockPickingStartEventData = {
 		activator = activator,
-		lock = lock,
-		knife = knife,
+		lock = this.lock,
+		knife = this.knife,
 		picks = picks,
-		pick = pick,
+		pick = this.pick,
 	}
 	event.trigger(EVENTS.lockpickingStart, lockPickingStartEventData)
 
@@ -85,19 +87,11 @@ function this.Start(activator, picks)
 	}
 	event.trigger(EVENTS.pickSelected, pickSelectedEventData)
 
-	this.activator = activator
-	this.lock = lock
-	this.knife = knife
-	this.picks = picks
-	this.pick = pick
-
 	TimerManager.Start({
 		durationInSeconds = 1.3,
 		finishedCallback = this.registerEvents,
 		cancelOn = EVENTS.lockpickingEnded,
 	})
-
-	return true
 end
 
 ---@public
