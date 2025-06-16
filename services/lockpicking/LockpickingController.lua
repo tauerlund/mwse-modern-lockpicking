@@ -63,13 +63,11 @@ end
 ---@param picks tes3itemStack[]
 function this.Start(activator, picks)
 	this.activator = activator
+	this.picks = picks
+
 	this.lock = LockSpawner.Spawn(activator)
 	this.knife = KnifeSpawner.Spawn(this.lock)
-
-	local pickItem = PickSelector.Select(picks)
-
-	this.pick = PickSpawner.Spawn(this.lock, pickItem)
-	this.picks = picks
+	this.pick = this.selectPick()
 
 	---@type lockpickingStartEventData
 	local lockPickingStartEventData = {
@@ -80,12 +78,6 @@ function this.Start(activator, picks)
 		pick = this.pick,
 	}
 	event.trigger(EVENTS.lockpickingStart, lockPickingStartEventData)
-
-	---@type pickSelectedEventData
-	local pickSelectedEventData = {
-		pickItem = pickItem,
-	}
-	event.trigger(EVENTS.pickSelected, pickSelectedEventData)
 
 	TimerManager.Start({
 		durationInSeconds = 1.3,
@@ -140,13 +132,7 @@ end
 ---@param e keyDownEventData
 function this.onPickCycleKeyDown(e)
 	local direction = this.pickCycleDirections[e.keyCode]
-	local pickItem = PickSelector.Select(this.picks, direction)
-
-	---@type pickSelectedEventData
-	local data = {
-		pickItem = pickItem,
-	}
-	event.trigger(EVENTS.pickSelected, data)
+	this.pick = this.selectPick(direction)
 end
 
 ---@private
@@ -180,6 +166,30 @@ function this.onEnterFrame(_)
 		this.finish({ success = true })
 		return
 	end
+end
+
+---@private
+---@param direction CYCLE_DIRECTION?
+---@return pick
+function this.selectPick(direction)
+	if this.pick then
+		---@type pickChangeEventData
+		local pickChangedEventData = {
+			pick = this.pick,
+		}
+		event.trigger(EVENTS.pickChange, pickChangedEventData)
+	end
+
+	local item = PickSelector.Select(this.picks, direction)
+	local pick = PickSpawner.Spawn(this.lock, item)
+
+	---@type pickSelectedEventData
+	local pickSelectedEventData = {
+		pick = pick,
+	}
+	event.trigger(EVENTS.pickSelected, pickSelectedEventData)
+
+	return pick
 end
 
 ---@private
@@ -225,6 +235,16 @@ function this.stop(parameters)
 	event.trigger(EVENTS.lockpickingEnded, data)
 
 	this.unregisterEvents()
+	this.resetFields()
+end
+
+function this.resetFields()
+	this.activator = nil
+	this.picks = nil
+	this.lock = nil
+	this.knife = nil
+	this.pick = nil
+	this.currentDirectionKey = nil
 end
 
 ---@private

@@ -233,6 +233,7 @@ end
 function GUIBuilder:registerCallback(evt, callback)
 	local outerCallback = function (e)
 		callback(self.element, e or nil)
+		self.element:updateLayout()
 	end
 
 	event.register(evt, outerCallback)

@@ -39,10 +39,14 @@ this.currentHelperAngle = 0
 ---@type number
 this.targetHelperAngle = 0
 
+---@private
+---@type number
+this.animationDuration = CONSTANTS.animation.startAnimationDuration
+
 ---@public
 ---@return boolean
 function this.Initialize()
-	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
+	event.register(EVENTS.pickSelected, this.onPickSelected)
 	return true
 end
 
@@ -56,16 +60,17 @@ function this.start(pick)
 
 	MeshAnimator.Start({
 		mesh = pick.mesh,
-		durationInSeconds = CONSTANTS.animation.startAnimationDuration,
+		durationInSeconds = this.animationDuration,
 		originalRotation = CONSTANTS.rotation.original,
 		targetRotation = CONSTANTS.rotation.target,
 		originalTranslation = CONSTANTS.translation.original,
 		targetTranslation = CONSTANTS.translation.target,
+		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickChange },
 	})
 
 	TimerManager.Start({
-		durationInSeconds = CONSTANTS.animation.startAnimationDuration,
-		cancelOn = EVENTS.lockpickingEnded,
+		durationInSeconds = this.animationDuration,
+		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickChange },
 		finishedCallback = this.onStartTimerFinished,
 	})
 end
@@ -148,6 +153,19 @@ function this.onLockpickingStart(e)
 end
 
 ---@private
+---@param _ pickChangeEventData
+function this.onPickChange(_)
+	this.stop()
+	this.animationDuration = CONSTANTS.animation.changeAnimationDuration
+end
+
+---@private
+---@param e pickSelectedEventData
+function this.onPickSelected(e)
+	this.start(e.pick)
+end
+
+---@private
 ---@param _ lockpickingEndEventData
 function this.onLockpickingEnd(_)
 	this.blocked = true
@@ -156,17 +174,16 @@ end
 ---@private
 ---@param _ lockpickingEndedEventData
 function this.onLockpickingEnded(_)
+	this.stop()
+	this.animationDuration = CONSTANTS.animation.startAnimationDuration
+end
+
+---@private
+function this.stop()
 	this.unregisterEvents()
 
 	this.helper.rotation = this.originalHelperRotation:copy()
 	this.helper:update()
-
-	this.helper = nil
-	this.mesh = nil
-	this.originalHelperRotation = nil
-	this.originalPickRotation = nil
-	this.currentHelperAngle = 0
-	this.targetHelperAngle = 0
 end
 
 ---@private
@@ -174,12 +191,17 @@ function this.registerEvents()
 	event.register(tes3.event.enterFrame, this.onEnterFrame)
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd, { doOnce = true })
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
+	event.register(EVENTS.pickChange, this.onPickChange, { doOnce = true })
+	event.register(EVENTS.pickSelected, this.onPickSelected, { doOnce = true })
 end
 
 ---@private
 function this.unregisterEvents()
 	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
 		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
+	end
+	if event.isRegistered(EVENTS.pickSelected, this.onPickSelected) then
+		event.unregister(EVENTS.pickSelected, this.onPickSelected)
 	end
 end
 

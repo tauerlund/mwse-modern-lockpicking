@@ -62,8 +62,15 @@ function this.onLockpickingEnded(e)
 end
 
 ---@private
+---@param e pickChangeEventData
+function this.onPickChange(e)
+	e.pick.helper:detachChild(e.pick.mesh)
+end
+
+---@private
 function this.registerEvents()
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
+	event.register(EVENTS.pickChange, this.onPickChange, { doOnce = true })
 end
 
 return this

@@ -36,7 +36,7 @@ end
 function this.start(e)
 	this.header = this.createHeader(e)
 	this.controls = this.createControls()
-	this.picks = this.createPicks(e.picks)
+	this.picks = this.createPicks(e.pick, e.picks)
 end
 
 ---@private
@@ -207,9 +207,10 @@ function this.getKeyName(keyBind)
 end
 
 ---@private
+---@param activePick pick
 ---@param picks tes3itemStack[]
 ---@return tes3uiElement
-function this.createPicks(picks)
+function this.createPicks(activePick, picks)
 	local picksMenu = GUI.CreateMenu({
 			id = CONSTANTS.picksId,
 			dragFrame = false,
@@ -253,15 +254,24 @@ function this.createPicks(picks)
 		:Build()
 
 	for _, pick in ipairs(picks) do
-		GUI.CreateLabel({ parent = pickLabelContainer, id = string.format(CONSTANTS.picksLabelId, pick.object.id) })
+		local color = pick.object.id == activePick.item.object.id and
+			tes3ui.getPalette(tes3.palette.normalOverColor) or
+			tes3ui.getPalette(tes3.palette.normalColor)
+
+		GUI.CreateLabel({
+			parent = pickLabelContainer,
+			id = string.format(CONSTANTS.picksLabelId,
+				pick.object.id)
+		})
 			:WithText(pick.object.name)
-			:WithColor(tes3ui.getPalette(tes3.palette.normalColor))
+			:WithColor(color)
 			:WithBorder({
 				top = 4,
 				bottom = 4,
 				right = 16,
 			})
-			:WithCallback(EVENTS.pickSelected, this.onPickCycled)
+			:WithCallback(EVENTS.pickChange, this.onPickChange)
+			:WithCallback(EVENTS.pickSelected, this.onPickSelected)
 			:Build()
 
 		GUI.CreateLabel({
@@ -270,12 +280,13 @@ function this.createPicks(picks)
 				pick.object.id)
 		})
 			:WithText(string.format("%d", this.getLockpickCount(pick)))
-			:WithColor(tes3ui.getPalette(tes3.palette.normalColor))
+			:WithColor(color)
 			:WithBorder({
 				top = 4,
 				bottom = 4,
 			})
-			:WithCallback(EVENTS.pickSelected, this.onPickCycled)
+			:WithCallback(EVENTS.pickChange, this.onPickChange)
+			:WithCallback(EVENTS.pickSelected, this.onPickSelected)
 			:Build()
 	end
 
@@ -347,25 +358,24 @@ function this.onKeyBindsUpdated(element)
 			return
 		else
 			label.text = text
-			label:updateLayout()
 		end
 	end
 end
 
 ---@private
----@param e pickSelectedEventData
 ---@param element tes3uiElement
-function this.onPickCycled(element, e)
-	local labelId = string.format(CONSTANTS.picksLabelId, e.pickItem.object.id)
-	local countLabelId = string.format(CONSTANTS.picksCountLabelId, e.pickItem.object.id)
+---@param _ pickChangeEventData
+function this.onPickChange(element, _)
+	element.color = tes3ui.getPalette(tes3.palette.normalColor)
+end
 
-	if element.name == labelId or element.name == countLabelId then
+---@private
+---@param element tes3uiElement
+---@param e pickSelectedEventData
+function this.onPickSelected(element, e)
+	if element.name:endswith(e.pick.item.object.id) then
 		element.color = tes3ui.getPalette(tes3.palette.normalOverColor)
-	else
-		element.color = tes3ui.getPalette(tes3.palette.normalColor)
 	end
-
-	element:updateLayout()
 end
 
 ---@private

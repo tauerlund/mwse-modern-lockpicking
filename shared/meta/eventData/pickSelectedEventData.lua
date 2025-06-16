@@ -1,3 +1,3 @@
 ---@meta
 ---@class pickSelectedEventData
----@field public pickItem tes3itemStack
+---@field public pick pick
