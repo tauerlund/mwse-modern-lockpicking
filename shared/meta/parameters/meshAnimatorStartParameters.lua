@@ -1,9 +1,5 @@
 ---@meta
 ---@class meshAnimatorStartParameters
----@field public mesh niNode
----@field public durationInSeconds number
----@field public originalTranslation tes3vector3
----@field public originalRotation tes3vector3
----@field public targetTranslation tes3vector3
----@field public targetRotation tes3vector3
+---@field public node niNode
+---@field public keyframes nodeAnimatorKeyframe[]
 ---@field public cancelOn string|string[]?

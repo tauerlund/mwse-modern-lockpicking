@@ -1,6 +1,6 @@
 --- SERVICES
 local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerManager")
-local MeshAnimator = require("tauer.modern-lockpicking.shared.MeshAnimator")
+local NodeAnimator = require("tauer.modern-lockpicking.services.nodes.NodeAnimator")
 ---
 
 --- ENUMS
@@ -51,6 +51,21 @@ this.angles = {
 	[DIRECTION.counterClockwise] = CONSTANTS.angles.counterClockwise,
 }
 
+---@private
+---@type nodeAnimatorKeyframe[]
+this.startAnimationKeyFrames = {
+	{
+		time = 0,
+		translation = CONSTANTS.translation.original,
+		rotation = CONSTANTS.rotation.original,
+	},
+	{
+		time = CONSTANTS.animation.startAnimationDuration,
+		translation = CONSTANTS.translation.target,
+		rotation = CONSTANTS.rotation.target,
+	},
+}
+
 ---@public
 ---@return boolean
 function this.Initialize()
@@ -64,13 +79,10 @@ function this.start(knife)
 	this.knife = knife
 	this.blocked = true
 
-	MeshAnimator.Start({
-		mesh = knife,
-		durationInSeconds = CONSTANTS.animation.startAnimationDuration,
-		originalTranslation = CONSTANTS.translation.original,
-		targetTranslation = CONSTANTS.translation.target,
-		originalRotation = CONSTANTS.rotation.original,
-		targetRotation = CONSTANTS.rotation.target,
+	NodeAnimator.Start({
+		node = knife,
+		keyframes = this.startAnimationKeyFrames,
+		cancelOn = EVENTS.lockpickingEnded,
 	})
 
 	TimerManager.Start({

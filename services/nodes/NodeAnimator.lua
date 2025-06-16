@@ -2,24 +2,31 @@
 local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerManager")
 ---
 
----@class MeshAnimator
+---@class NodeAnimator
 local this = {}
 
 ---@public
 ---@param parameters meshAnimatorStartParameters
 function this.Start(parameters)
-	this.initializeTransforms(parameters.mesh, parameters.originalTranslation, parameters.originalRotation)
+	local keyFramesLength = #parameters.keyframes
+	if keyFramesLength < 2 then
+		return
+	end
+
+	local firstKeyframe = parameters.keyframes[1]
+	local lastKeyframe = parameters.keyframes[keyFramesLength]
+
+	this.initializeTransforms(parameters.node, firstKeyframe.translation, firstKeyframe.rotation)
 	TimerManager.Start({
-		durationInSeconds = parameters.durationInSeconds,
+		durationInSeconds = lastKeyframe.time,
 		callback = this.onStartTimer,
 		cancelOn = parameters.cancelOn or nil,
 		---@type onMeshAnimatorTimerData
 		data = {
-			mesh = parameters.mesh,
-			originalRotation = parameters.originalRotation,
-			targetRotation = parameters.targetRotation,
-			originalTranslation = parameters.originalTranslation,
-			targetTranslation = parameters.targetTranslation,
+			node = parameters.node,
+			keyframes = parameters.keyframes,
+			currentFrame = 1,
+			currentPhase = 0,
 		},
 	})
 end
@@ -38,17 +45,30 @@ end
 ---@param callback mwseTimerCallbackData
 function this.onStartTimer(callback)
 	local data = callback.timer.data --[[@as onMeshAnimatorTimerData]]
-	local mesh = data.mesh
+	data.currentPhase = data.currentPhase + callback.timer.duration
 
-	local total = data.totalIterations --[[@as integer]]
-	local iteration = (total - callback.timer.iterations)
+	local currentFrame = data.currentFrame
+	local nextFrame = data.currentFrame + 1
 
-	local transition = math.remap(iteration, 0, total, 0, 1)
+	if data.keyframes[nextFrame] then
+		if data.currentPhase >= data.keyframes[nextFrame].time then
+			data.currentFrame = nextFrame
+		end
+	else
+		return
+	end
 
-	mesh.translation = this.getUpdatedTranslation(data.originalTranslation, data.targetTranslation, transition)
-	mesh.rotation = this.getUpdatedRotation(data.originalRotation, data.targetRotation, transition)
+	local currentTransform = data.keyframes[currentFrame]
+	local nextTransform = data.keyframes[nextFrame]
 
-	mesh:update()
+	local node = data.node
+	local transition = math.remap(data.currentPhase, currentTransform.time, nextTransform.time, 0, 1)
+
+	node.translation = this.getUpdatedTranslation(currentTransform.translation, nextTransform.translation,
+		transition)
+	node.rotation = this.getUpdatedRotation(currentTransform.rotation, nextTransform.rotation, transition)
+
+	node:update()
 end
 
 ---@private

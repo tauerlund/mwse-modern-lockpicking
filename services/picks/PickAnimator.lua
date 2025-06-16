@@ -1,5 +1,5 @@
 --- SERVICES
-local MeshAnimator = require("tauer.modern-lockpicking.shared.MeshAnimator")
+local NodeAnimator = require("tauer.modern-lockpicking.services.nodes.NodeAnimator")
 local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerManager")
 ---
 
@@ -40,36 +40,57 @@ this.currentHelperAngle = 0
 this.targetHelperAngle = 0
 
 ---@private
----@type number
-this.animationDuration = CONSTANTS.animation.startAnimationDuration
+---@type nodeAnimatorKeyframe[]
+this.startAnimationKeyFrames = {
+	{
+		time = 0,
+		translation = CONSTANTS.translation.original,
+		rotation = CONSTANTS.rotation.original,
+	},
+	{
+		time = CONSTANTS.animation.startAnimationDuration,
+		translation = CONSTANTS.translation.target,
+		rotation = CONSTANTS.rotation.target,
+	}
+}
+
+---@private
+---@type nodeAnimatorKeyframe[]
+this.cycleAnimationKeyFrames = {
+	{
+		time = 0,
+		translation = CONSTANTS.translation.original,
+		rotation = CONSTANTS.rotation.original,
+	},
+	{
+		time = CONSTANTS.animation.cycleAnimationDuration,
+		translation = CONSTANTS.translation.target,
+		rotation = CONSTANTS.rotation.target,
+	}
+}
 
 ---@public
 ---@return boolean
 function this.Initialize()
-	event.register(EVENTS.pickSelected, this.onPickSelected)
+	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
 	return true
 end
 
 ---@private
 ---@param pick pick
-function this.start(pick)
+---@param keyframes nodeAnimatorKeyframe[]
+function this.start(pick, keyframes)
 	this.mesh = pick.mesh
-	this.helper = pick.helper
-	this.originalHelperRotation = pick.helper.rotation:copy()
 	this.blocked = true
 
-	MeshAnimator.Start({
-		mesh = pick.mesh,
-		durationInSeconds = this.animationDuration,
-		originalRotation = CONSTANTS.rotation.original,
-		targetRotation = CONSTANTS.rotation.target,
-		originalTranslation = CONSTANTS.translation.original,
-		targetTranslation = CONSTANTS.translation.target,
+	NodeAnimator.Start({
+		node = pick.mesh,
+		keyframes = keyframes,
 		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickChange },
 	})
 
 	TimerManager.Start({
-		durationInSeconds = this.animationDuration,
+		durationInSeconds = keyframes[#keyframes].time,
 		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickChange },
 		finishedCallback = this.onStartTimerFinished,
 	})
@@ -80,8 +101,6 @@ end
 function this.onStartTimerFinished(_)
 	this.blocked = false
 	this.originalPickRotation = this.mesh.rotation:copy()
-	this.currentHelperAngle = 0
-	this.targetHelperAngle = 0
 	this.registerEvents()
 end
 
@@ -149,20 +168,16 @@ end
 ---@private
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
-	this.start(e.pick)
-end
-
----@private
----@param _ pickChangeEventData
-function this.onPickChange(_)
-	this.stop()
-	this.animationDuration = CONSTANTS.animation.changeAnimationDuration
+	this.helper = e.pick.helper
+	this.originalHelperRotation = e.pick.helper.rotation:copy()
+	this.start(e.pick, this.startAnimationKeyFrames)
 end
 
 ---@private
 ---@param e pickSelectedEventData
 function this.onPickSelected(e)
-	this.start(e.pick)
+	this.stop()
+	this.start(e.pick, this.cycleAnimationKeyFrames)
 end
 
 ---@private
@@ -174,16 +189,30 @@ end
 ---@private
 ---@param _ lockpickingEndedEventData
 function this.onLockpickingEnded(_)
+	this.resetHelper()
+	this.resetFields()
 	this.stop()
-	this.animationDuration = CONSTANTS.animation.startAnimationDuration
 end
 
 ---@private
 function this.stop()
 	this.unregisterEvents()
+end
 
+function this.resetHelper()
 	this.helper.rotation = this.originalHelperRotation:copy()
 	this.helper:update()
+end
+
+---@private
+function this.resetFields()
+	this.mesh = nil
+	this.helper = nil
+	this.blocked = false
+	this.originalHelperRotation = nil
+	this.originalPickRotation = nil
+	this.currentHelperAngle = 0
+	this.targetHelperAngle = 0
 end
 
 ---@private
@@ -191,7 +220,6 @@ function this.registerEvents()
 	event.register(tes3.event.enterFrame, this.onEnterFrame)
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd, { doOnce = true })
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
-	event.register(EVENTS.pickChange, this.onPickChange, { doOnce = true })
 	event.register(EVENTS.pickSelected, this.onPickSelected, { doOnce = true })
 end
 

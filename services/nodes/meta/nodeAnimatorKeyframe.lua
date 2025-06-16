@@ -1,0 +1,5 @@
+---@meta
+---@class nodeAnimatorKeyframe
+---@field public time number
+---@field public rotation tes3vector3
+---@field public translation tes3vector3

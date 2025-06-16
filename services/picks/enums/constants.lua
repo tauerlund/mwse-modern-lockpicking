@@ -12,7 +12,7 @@ local enum = {
 
 	animation = {
 		startAnimationDuration = 1.2,
-		changeAnimationDuration = 0.5,
+		cycleAnimationDuration = 0.5,
 		lerpSpeed = 9,
 	},
 }
