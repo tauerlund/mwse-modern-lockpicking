@@ -9,6 +9,7 @@ local this = {}
 ---@class timerDataInner : timerData
 ---@field package callback fun(callbackData:mwseTimerCallbackData)?
 ---@field package finishedCallback fun(data:timerData)?
+---@field package cancellationEvents { [string]: function }
 
 ---@public
 ---@param parameters timerParameters
@@ -21,6 +22,7 @@ function this.Start(parameters)
 	data.totalIterations = math.floor(parameters.durationInSeconds / CONSTANTS.tick)
 	data.callback = parameters.callback
 	data.finishedCallback = parameters.finishedCallback
+	data.cancellationEvents = {}
 
 	local timer = timer.start({
 		type = timer.real,
@@ -32,7 +34,7 @@ function this.Start(parameters)
 	})
 
 	if parameters.cancelOn then
-		this.registerCancellationEvents(parameters.cancelOn, timer)
+		this.registerCancellationEvents(parameters.cancelOn, data, timer)
 	end
 
 	return timer
@@ -48,34 +50,49 @@ function this.callbackInner(callback)
 	end
 
 	if callback.timer.iterations == 1 and data.finishedCallback then
+		this.unregisterCancellationEvents(data)
 		data.finishedCallback(data)
 	end
 end
 
 ---@private
 ---@param events string|string[]
+---@param data timerDataInner
 ---@param timer mwseTimer
-function this.registerCancellationEvents(events, timer)
+function this.registerCancellationEvents(events, data, timer)
 	if type(events) == "string" then
-		this.registerCancellationEvent(events, timer)
+		this.registerCancellationEvent(events, data, timer)
 		return
 	end
 
 	for _, event in pairs(events) do
-		this.registerCancellationEvent(event, timer)
+		this.registerCancellationEvent(event, data, timer)
 	end
 end
 
 ---@private
 ---@param evt string
+---@param data timerDataInner
 ---@param t mwseTimer
-function this.registerCancellationEvent(evt, t)
-	event.register(evt, function()
+function this.registerCancellationEvent(evt, data, t)
+	data.cancellationEvents[evt] = function ()
 		if not t or not t.state == timer.active then
 			return
 		end
 		t:cancel()
-	end, { doOnce = true })
+		this.unregisterCancellationEvents(data)
+	end
+	event.register(evt, data.cancellationEvents[evt], { doOnce = true })
+end
+
+---@private
+---@param data timerDataInner
+function this.unregisterCancellationEvents(data)
+	for evt, callback in pairs(data.cancellationEvents) do
+		if event.isRegistered(evt, callback) then
+			event.unregister(evt, callback)
+		end
+	end
 end
 
 return this
