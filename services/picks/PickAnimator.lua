@@ -101,7 +101,6 @@ end
 function this.onStartTimerFinished(_)
 	this.blocked = false
 	this.originalPickRotation = this.mesh.rotation:copy()
-	this.registerEvents()
 end
 
 ---@private
@@ -170,13 +169,14 @@ end
 function this.onLockpickingStart(e)
 	this.helper = e.pick.helper
 	this.originalHelperRotation = e.pick.helper.rotation:copy()
+
 	this.start(e.pick, this.startAnimationKeyFrames)
+	this.registerEvents()
 end
 
 ---@private
 ---@param e pickSelectedEventData
 function this.onPickSelected(e)
-	this.stop()
 	this.start(e.pick, this.cycleAnimationKeyFrames)
 end
 
@@ -191,11 +191,6 @@ end
 function this.onLockpickingEnded(_)
 	this.resetHelper()
 	this.resetFields()
-	this.stop()
-end
-
----@private
-function this.stop()
 	this.unregisterEvents()
 end
 
@@ -218,9 +213,9 @@ end
 ---@private
 function this.registerEvents()
 	event.register(tes3.event.enterFrame, this.onEnterFrame)
-	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd, { doOnce = true })
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
-	event.register(EVENTS.pickSelected, this.onPickSelected, { doOnce = true })
+	event.register(EVENTS.pickSelected, this.onPickSelected)
+	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 end
 
 ---@private
@@ -230,6 +225,12 @@ function this.unregisterEvents()
 	end
 	if event.isRegistered(EVENTS.pickSelected, this.onPickSelected) then
 		event.unregister(EVENTS.pickSelected, this.onPickSelected)
+	end
+	if event.isRegistered(EVENTS.lockpickingEnd, this.onLockpickingEnd) then
+		event.unregister(EVENTS.lockpickingEnd, this.onLockpickingEnd)
+	end
+	if event.isRegistered(EVENTS.lockpickingEnded, this.onLockpickingEnded) then
+		event.unregister(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 	end
 end
 

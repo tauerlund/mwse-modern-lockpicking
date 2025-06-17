@@ -58,19 +58,36 @@ end
 ---@private
 ---@param e lockpickingEndedEventData
 function this.onLockpickingEnded(e)
-	e.pick.helper:detachChild(e.pick.mesh)
+	this.despawn(e.pick)
 end
 
 ---@private
 ---@param e pickChangeEventData
 function this.onPickChange(e)
-	e.pick.helper:detachChild(e.pick.mesh)
+	this.despawn(e.pick)
+end
+
+---@private
+---@param pick pick
+function this.despawn(pick)
+	pick.helper:detachChild(pick.mesh)
+	this.unregisterEvents()
 end
 
 ---@private
 function this.registerEvents()
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
-	event.register(EVENTS.pickChange, this.onPickChange, { doOnce = true })
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+	event.register(EVENTS.pickChange, this.onPickChange)
+end
+
+---@private
+function this.unregisterEvents()
+	if event.isRegistered(EVENTS.lockpickingEnded, this.onLockpickingEnded) then
+		event.unregister(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+	end
+	if event.isRegistered(EVENTS.pickChange, this.onPickChange) then
+		event.unregister(EVENTS.pickChange, this.onPickChange)
+	end
 end
 
 return this
