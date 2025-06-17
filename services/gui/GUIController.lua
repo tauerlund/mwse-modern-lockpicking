@@ -34,9 +34,17 @@ end
 ---@private
 ---@param e lockpickingStartEventData
 function this.start(e)
-	this.header = this.createHeader(e)
-	this.controls = this.createControls()
-	this.picks = this.createPicks(e.pick, e.picks)
+	if not this.header then
+		this.header = this.createHeader(e)
+	end
+
+	if not this.controls then
+		this.controls = this.createControls()
+	end
+
+	if not this.picks then
+		this.picks = this.createPicks(e.pick, e.picks)
+	end
 end
 
 ---@private
@@ -333,7 +341,6 @@ end
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
 	this.start(e)
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
 end
 
 ---@private
@@ -382,6 +389,7 @@ end
 function this.registerEvents()
 	event.register(tes3.event.load, this.onLoad)
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 end
 
 return this

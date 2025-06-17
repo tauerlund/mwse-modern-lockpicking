@@ -16,8 +16,7 @@ function GUIBuilder.CreateMenu(parameters)
 		fixedFrame = parameters.fixedFrame,
 		modal = parameters.modal,
 	})
-	local self = setmetatable({ element = element }, GUIBuilder)
-	return self
+	return GUIBuilder.create(element)
 end
 
 ---@public
@@ -27,8 +26,7 @@ function GUIBuilder.CreateLabel(parameters)
 	local element = parameters.parent:createLabel({
 		id = parameters.id,
 	})
-	local self = setmetatable({ element = element }, GUIBuilder)
-	return self
+	return GUIBuilder.create(element)
 end
 
 ---@public
@@ -211,7 +209,11 @@ function GUIBuilder:WithCallback(evt, callback)
 		return
 	end
 
-	self.callbacks[evt] = callback
+	self.callbacks[evt] = function (e)
+		callback(self.element, e or nil)
+		self.element:updateLayout()
+	end
+
 	return self
 end
 
@@ -231,15 +233,14 @@ end
 ---@param evt string
 ---@param callback fun(element: tes3uiElement, e: table|nil)
 function GUIBuilder:registerCallback(evt, callback)
-	local outerCallback = function (e)
-		callback(self.element, e or nil)
-		self.element:updateLayout()
+	if not event.isRegistered(evt, callback) then
+		event.register(evt, callback)
 	end
 
-	event.register(evt, outerCallback)
-
-	self.element:register(tes3.uiEvent.destroy, function ()
-		event.unregister(evt, outerCallback)
+	self.element:registerBefore(tes3.uiEvent.destroy, function ()
+		if event.isRegistered(evt, callback) then
+			event.unregister(evt, callback)
+		end
 	end)
 end
 
@@ -247,8 +248,8 @@ end
 ---@param element tes3uiElement
 ---@return GUIBuilder
 function GUIBuilder.create(element)
-	local self = setmetatable({ element = element }, GUIBuilder)
-	return self
+	local instance = setmetatable({ element = element }, GUIBuilder)
+	return instance
 end
 
 return GUIBuilder
