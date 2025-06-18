@@ -18,7 +18,9 @@ function this.Initialize()
     this.registerEvents()
 
     this.depthOfField = mge.shaders.load({ name = "modern-lockpicking/Bokeh" })
-    this.depthOfField.enabled = false
+    if this.depthOfField then
+        this.depthOfField.enabled = false
+    end
 
     return true
 end
