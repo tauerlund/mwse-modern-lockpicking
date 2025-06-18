@@ -9,6 +9,7 @@ local LockAnimator = require("tauer.modern-lockpicking.services.locks.LockAnimat
 local KnifeAnimator = require("tauer.modern-lockpicking.services.knives.KnifeAnimator")
 local CylinderAnimator = require("tauer.modern-lockpicking.services.cylinders.CylinderAnimator")
 local PickAnimator = require("tauer.modern-lockpicking.services.picks.PickAnimator")
+local RenderingController = require("tauer.modern-lockpicking.services.rendering.RenderingController")
 
 ---@class ModernLockpicking
 local this = {}
@@ -32,6 +33,7 @@ function this.initializeMod()
 		KnifeAnimator,
 		CylinderAnimator,
 		PickAnimator,
+		RenderingController,
 	}
 
 	for _, service in pairs(services) do
