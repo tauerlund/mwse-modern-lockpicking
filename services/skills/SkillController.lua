@@ -3,12 +3,14 @@ local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 local CONSTANTS = require("tauer.modern-lockpicking.services.skills.enums.constants")
 ---
 
----@class SkillController
+---@class SkillController : IInitializedService
 local this = {}
 
 ---@public
-function this.Start()
+---@return boolean
+function this.Initialize()
 	this.registerEvents()
+	return true
 end
 
 ---@private

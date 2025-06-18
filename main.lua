@@ -34,6 +34,7 @@ function this.initializeMod()
 		CylinderAnimator,
 		PickAnimator,
 		RenderingController,
+		SkillController
 	}
 
 	for _, service in pairs(services) do
@@ -53,7 +54,6 @@ end
 function this.stopMod() end
 
 function this.startMod()
-	SkillController.Start()
 	PlayerController.Start()
 end
 
