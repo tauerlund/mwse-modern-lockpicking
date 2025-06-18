@@ -51,7 +51,9 @@ function this.initializeMod()
 	Logger:info("Initialized.")
 end
 
-function this.stopMod() end
+function this.stopMod()
+	PlayerController.Stop()
+end
 
 function this.startMod()
 	PlayerController.Start()

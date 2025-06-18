@@ -16,6 +16,10 @@ function this.Start()
 	this.registerEvents()
 end
 
+function this.Stop()
+	this.unregisterEvents()
+end
+
 ---@private
 ---@param e activateEventData
 function this.onActivate(e)
@@ -95,6 +99,19 @@ end
 ---@private
 function this.registerEvents()
 	event.register(tes3.event.activate, this.onActivate)
+end
+
+---@private
+function this.unregisterEvents()
+	if event.isRegistered(tes3.event.activate, this.onActivate) then
+		event.unregister(tes3.event.activate, this.onActivate)
+	end
+	if event.isRegistered(tes3.event.menuExit, this.onMenuExit) then
+		event.unregister(tes3.event.menuExit, this.onMenuExit)
+	end
+	if event.isRegistered(EVENTS.lockpickingEnded, this.onLockpickingEnded) then
+		event.unregister(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+	end
 end
 
 return this
