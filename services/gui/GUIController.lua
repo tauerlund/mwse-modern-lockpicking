@@ -266,6 +266,9 @@ function this.createPicks(activePick, picks)
 			tes3ui.getPalette(tes3.palette.normalOverColor) or
 			tes3ui.getPalette(tes3.palette.normalColor)
 
+		local verticalBorder = 8
+		local horizontalBorder = 16
+
 		GUI.CreateLabel({
 			parent = pickLabelContainer,
 			id = string.format(CONSTANTS.picksLabelId,
@@ -274,9 +277,9 @@ function this.createPicks(activePick, picks)
 			:WithText(pick.object.name)
 			:WithColor(color)
 			:WithBorder({
-				top = 4,
-				bottom = 4,
-				right = 16,
+				top = verticalBorder,
+				bottom = verticalBorder,
+				right = horizontalBorder,
 			})
 			:WithCallback(EVENTS.pickChange, this.onPickChange)
 			:WithCallback(EVENTS.pickSelected, this.onPickSelected)
@@ -290,8 +293,8 @@ function this.createPicks(activePick, picks)
 			:WithText(string.format("%d", this.getLockpickCount(pick)))
 			:WithColor(color)
 			:WithBorder({
-				top = 4,
-				bottom = 4,
+				top = verticalBorder,
+				bottom = verticalBorder,
 			})
 			:WithCallback(EVENTS.pickChange, this.onPickChange)
 			:WithCallback(EVENTS.pickSelected, this.onPickSelected)
