@@ -10,6 +10,7 @@ local KnifeAnimator = require("tauer.modern-lockpicking.services.knives.KnifeAni
 local CylinderAnimator = require("tauer.modern-lockpicking.services.cylinders.CylinderAnimator")
 local PickAnimator = require("tauer.modern-lockpicking.services.picks.PickAnimator")
 local RenderingController = require("tauer.modern-lockpicking.services.rendering.RenderingController")
+local SoundFileResolver = require("tauer.modern-lockpicking.services.sounds.SoundFileResolver")
 
 ---@class ModernLockpicking
 local this = {}
@@ -34,7 +35,8 @@ function this.initializeMod()
 		CylinderAnimator,
 		PickAnimator,
 		RenderingController,
-		SkillController
+		SkillController,
+		SoundFileResolver,
 	}
 
 	for _, service in pairs(services) do
