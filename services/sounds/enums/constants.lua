@@ -9,8 +9,8 @@ local enum = {
         rotateCylinder = "rotate-cylinder",
     },
     lockpickRotationMaxDelta = 0.1,
-    lockpickRotationSoundCountdown = 0.5,
-    cylinderRotationSoundCountdown = 0.9,
+    lockpickRotationSoundCountdown = 0.3,
+    cylinderRotationSoundCountdown = 0.35,
 }
 
 return enum
