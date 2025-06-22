@@ -60,6 +60,16 @@ function GUIBuilder.CreateDivider(parameters)
 end
 
 ---@public
+---@param parameters createParameters
+---@return GUIBuilder
+function GUIBuilder.CreateRect(parameters)
+	local element = parameters.parent:createRect({
+		id = parameters.id,
+	})
+	return GUIBuilder.create(element)
+end
+
+---@public
 ---@param text string
 ---@return GUIBuilder
 function GUIBuilder:WithText(text)
@@ -72,6 +82,14 @@ end
 ---@return GUIBuilder
 function GUIBuilder:WithColor(color)
 	self.element.color = color
+	return self
+end
+
+---@public
+---@param alpha number
+---@return GUIBuilder
+function GUIBuilder:WithAlpha(alpha)
+	self.element.alpha = alpha
 	return self
 end
 

@@ -24,6 +24,10 @@ this.controls = nil
 ---@type tes3uiElement
 this.picks = nil
 
+---@private
+---@type tes3uiElement
+this.indicator = nil
+
 ---@public
 ---@return boolean
 function this.Initialize()
@@ -44,6 +48,10 @@ function this.start(e)
 
 	if not this.picks then
 		this.picks = this.createPicks(e.pick, e.picks)
+	end
+
+	if not this.indicator then
+		this.indicator = this.createIndicator()
 	end
 end
 
@@ -305,6 +313,36 @@ function this.createPicks(activePick, picks)
 end
 
 ---@private
+---@return tes3uiElement
+function this.createIndicator()
+	local indicator = GUI.CreateMenu({
+			id = "indicator",
+			dragFrame = false,
+			fixedFrame = true,
+			modal = false
+		})
+		:WithPositionAlign({ x = 0.25, y = 0.25 })
+		:WithFlowDirection(tes3.flowDirection.topToBottom)
+		:WithMinSize({ width = 0, height = 400 })
+		:Build()
+
+	for i = 1, 400 do
+		local t = (i - 1) / 399 -- t goes from 0 to 1
+		local r = 1 - t   -- red decreases from 1 to 0
+		local g = t       -- green increases from 0 to 1
+
+		GUI.CreateRect({ parent = indicator })
+			:WithSize({ width = 10, height = 1 })
+			:WithColor({ r, g, 0 })
+			:Build()
+	end
+
+	indicator:updateLayout()
+
+	return indicator
+end
+
+---@private
 ---@param pick tes3itemStack
 ---@return integer
 function this.getLockpickCount(pick)
@@ -337,6 +375,11 @@ function this.stop()
 	if this.picks then
 		this.picks:destroy()
 		this.picks = nil
+	end
+
+	if this.indicator then
+		this.indicator:destroy()
+		this.indicator = nil
 	end
 end
 
