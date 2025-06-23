@@ -1,0 +1,4 @@
+---@meta
+---@class soundFile
+---@field public path string
+---@field public duration number

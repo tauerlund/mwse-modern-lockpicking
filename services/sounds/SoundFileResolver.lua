@@ -6,40 +6,83 @@ local CONSTANTS = require("tauer.modern-lockpicking.services.sounds.enums.consta
 local this = {}
 
 ---@private
----@type { [string]: string[] }
+---@type { [string]: soundFile[] }
 this.sounds = {}
+
+---@private
+---@type soundFile
+this.empty = {
+    path = "",
+    duration = 0,
+}
 
 ---@public
 ---@return boolean
 function this.Initialize()
-    for file in lfs.dir(string.format("data files/sound/%s", CONSTANTS.basePath)) do
+    for file in lfs.dir(string.format("%s/%s", CONSTANTS.paths.sound, CONSTANTS.paths.mod)) do
         if file:match("%.wav$") then
             local name = file:match("^(.*)%.wav$")
             local template = name:gsub("%-%d+$", "")
 
             this.sounds[template] = this.sounds[template] or {}
-            table.insert(this.sounds[template], string.format("%s/%s", CONSTANTS.basePath, file))
+
+            local path = string.format("%s/%s", CONSTANTS.paths.mod, file)
+            ---@type soundFile
+            local soundFile = {
+                path = path,
+                duration = this.calculateDuration(path),
+            }
+
+            table.insert(this.sounds[template], soundFile)
         end
     end
-    return true
+
+    return this.validate()
 end
 
 ---@public
 ---@param template string
----@return string
+---@return soundFile
 function this.Resolve(template)
     if not this.sounds[template] then
         Logger:error("Sound template '%s' not found.", template)
-        return ""
+        return this.empty
     end
 
     local sound = table.choice(this.sounds[template])
     if not sound then
         Logger:error("No sound files found for '%s'.", template)
-        return ""
+        return this.empty
     end
 
     return sound
+end
+
+---@private
+---@return boolean
+function this.validate()
+    for _, template in pairs(CONSTANTS.templates) do
+        if not this.sounds[template] then
+            Logger:error("Sound template '%s' is missing or has no sound files.", template)
+            return false
+        end
+    end
+    return true
+end
+
+---@private
+---@param path string
+---@return number
+function this.calculateDuration(path)
+    local fileSize = lfs.attributes(string.format("%s/%s", CONSTANTS.paths.sound, path), "size")
+
+    local headerSize = CONSTANTS.wav.headerSize
+    local sampleRate = CONSTANTS.wav.sampleRate
+    local bytesPerSample = CONSTANTS.wav.bytesPerSample
+
+    local bytesPerSecond = sampleRate * bytesPerSample
+
+    return (fileSize - headerSize) / bytesPerSecond
 end
 
 return this

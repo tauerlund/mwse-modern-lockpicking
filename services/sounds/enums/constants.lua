@@ -1,7 +1,10 @@
 ---@enum SOUND_CONSTANTS
 local enum = {
-    basePath = "tauer/modern-lockpicking",
-    soundTemplates = {
+    paths = {
+        sound = "data files/sound",
+        mod = "tauer/modern-lockpicking",
+    },
+    templates = {
         lockpickingStart = "lockpicking-start",
         changeLockpick = "change-lockpick",
         unlock = "unlock",
@@ -9,8 +12,11 @@ local enum = {
         rotateCylinder = "rotate-cylinder",
     },
     lockpickRotationMaxDelta = 0.1,
-    lockpickRotationSoundCountdown = 0.3,
-    cylinderRotationSoundCountdown = 0.35,
+    wav = {
+        headerSize = 96,
+        sampleRate = 22050,
+        bytesPerSample = 2,
+    }
 }
 
 return enum

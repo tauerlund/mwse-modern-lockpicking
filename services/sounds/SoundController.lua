@@ -22,6 +22,14 @@ this.cylinderRotationTimeCounter = 0
 ---@type boolean
 this.isRotatingCylinder = false
 
+---@private
+---@type number
+this.lockpickRotationTimeCooldown = 0
+
+---@private
+---@type number
+this.cylinderRotationTimeCooldown = 0
+
 ---@public
 function this.Initialize()
 	this.registerEvents()
@@ -33,7 +41,7 @@ end
 function this.onLockpickingStart(_)
 	tes3.playSound({
 		reference = tes3.player,
-		soundPath = SoundFileResolver.Resolve(CONSTANTS.soundTemplates.lockpickingStart),
+		soundPath = SoundFileResolver.Resolve(CONSTANTS.templates.lockpickingStart).path,
 	})
 	this.lastCursorPosition = tes3.getCursorPosition().x
 
@@ -46,7 +54,7 @@ function this.onLockpickingEnd(e)
 	if e.success then
 		tes3.playSound({
 			reference = tes3.player,
-			soundPath = SoundFileResolver.Resolve(CONSTANTS.soundTemplates.unlock),
+			soundPath = SoundFileResolver.Resolve(CONSTANTS.templates.unlock).path,
 		})
 	end
 
@@ -58,7 +66,7 @@ end
 function this.onPickChange(_)
 	tes3.playSound({
 		reference = tes3.player,
-		soundPath = SoundFileResolver.Resolve(CONSTANTS.soundTemplates.changeLockpick),
+		soundPath = SoundFileResolver.Resolve(CONSTANTS.templates.changeLockpick).path,
 	})
 end
 
@@ -75,12 +83,14 @@ function this.playLockpickRotationSound(delta)
 	local currentCursorPosition = tes3.getCursorPosition().x
 	local cursorPositionDelta = currentCursorPosition - this.lastCursorPosition
 
-	if math.abs(cursorPositionDelta) > CONSTANTS.lockpickRotationMaxDelta and this.lockpickRotationTimeCounter >= CONSTANTS.lockpickRotationSoundCountdown then
-		this.lastCursorPosition = currentCursorPosition
+	if math.abs(cursorPositionDelta) > CONSTANTS.lockpickRotationMaxDelta and this.lockpickRotationTimeCounter >= this.lockpickRotationTimeCooldown then
+		local soundFile = SoundFileResolver.Resolve(CONSTANTS.templates.rotateLockpick)
 		tes3.playSound({
 			reference = tes3.player,
-			soundPath = SoundFileResolver.Resolve(CONSTANTS.soundTemplates.rotateLockpick),
+			soundPath = soundFile.path,
 		})
+		this.lockpickRotationTimeCooldown = soundFile.duration
+		this.lastCursorPosition = currentCursorPosition
 		this.lockpickRotationTimeCounter = 0
 	end
 
@@ -91,12 +101,14 @@ end
 ---@private
 ---@param delta number
 function this.playCylinderRotationSound(delta)
-	if this.isRotatingCylinder and this.cylinderRotationTimeCounter >= CONSTANTS.cylinderRotationSoundCountdown then
+	if this.isRotatingCylinder and this.cylinderRotationTimeCounter >= this.cylinderRotationTimeCooldown then
+		local soundFile = SoundFileResolver.Resolve(CONSTANTS.templates.rotateCylinder)
 		tes3.playSound({
 			reference = tes3.player,
-			soundPath = SoundFileResolver.Resolve(CONSTANTS.soundTemplates.rotateCylinder),
+			soundPath = soundFile.path,
 		})
 		this.cylinderRotationTimeCounter = 0
+		this.cylinderRotationTimeCooldown = soundFile.duration
 	end
 
 	this.cylinderRotationTimeCounter = this.cylinderRotationTimeCounter + delta
