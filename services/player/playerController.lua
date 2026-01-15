@@ -1,14 +1,14 @@
 --- SERVICES
-local InventoryManager = require("tauer.modern-lockpicking.services.inventory.InventoryManager")
-local LockpickingController = require("tauer.modern-lockpicking.services.lockpicking.LockpickingController")
-local Translations = require("tauer.modern-lockpicking.shared.Translations")
+local inventoryManager = require("tauer.modern-lockpicking.services.inventory.inventoryManager")
+local lockpickingController = require("tauer.modern-lockpicking.services.lockpicking.lockpickingController")
+local translations = require("tauer.modern-lockpicking.shared.translations")
 ---
 
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 ---
 
----@class PlayerController
+---@class playerController
 local this = {}
 
 ---@public
@@ -62,13 +62,13 @@ end
 ---@private
 ---@param activator tes3containerInstance|tes3door
 function this.startLockpicking(activator)
-	local picks = InventoryManager.GetLockpicks()
+	local picks = inventoryManager.GetLockpicks()
 	if not picks then
-		tes3.messageBox(Translations.Get("messageBox.noLockpicks"))
+		tes3.messageBox(translations.Get("messageBox.noLockpicks"))
 		return
 	end
 
-	LockpickingController.Start(activator, picks)
+	lockpickingController.Start(activator, picks)
 
 	tes3ui.enterMenuMode("ModernLockpicking")
 
@@ -79,7 +79,7 @@ end
 ---@private
 ---@param _ menuExitEventData
 function this.onMenuExit(_)
-	LockpickingController.Stop()
+	lockpickingController.Stop()
 end
 
 ---@private

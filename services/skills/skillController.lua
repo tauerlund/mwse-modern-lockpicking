@@ -3,7 +3,7 @@ local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 local CONSTANTS = require("tauer.modern-lockpicking.services.skills.enums.constants")
 ---
 
----@class SkillController : IInitializedService
+---@class skillController : IInitializedService
 local this = {}
 
 ---@public

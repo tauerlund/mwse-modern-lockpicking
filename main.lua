@@ -1,16 +1,16 @@
-local Logger = require("tauer.modern-lockpicking.shared.Logger")
-local LockpickingController = require("tauer.modern-lockpicking.services.lockpicking.LockpickingController")
-local LockMeshResolver = require("tauer.modern-lockpicking.services.locks.LockMeshResolver")
-local SoundController = require("tauer.modern-lockpicking.services.sounds.SoundController")
-local PlayerController = require("tauer.modern-lockpicking.services.player.PlayerController")
-local SkillController = require("tauer.modern-lockpicking.services.skills.SkillController")
-local GUIController = require("tauer.modern-lockpicking.services.gui.GUIController")
-local LockAnimator = require("tauer.modern-lockpicking.services.locks.LockAnimator")
-local KnifeAnimator = require("tauer.modern-lockpicking.services.knives.KnifeAnimator")
-local CylinderAnimator = require("tauer.modern-lockpicking.services.cylinders.CylinderAnimator")
-local PickAnimator = require("tauer.modern-lockpicking.services.picks.PickAnimator")
-local RenderingController = require("tauer.modern-lockpicking.services.rendering.RenderingController")
-local SoundFileResolver = require("tauer.modern-lockpicking.services.sounds.SoundFileResolver")
+local Logger = require("tauer.modern-lockpicking.shared.loggingFactory")
+local lockpickingController = require("tauer.modern-lockpicking.services.lockpicking.lockpickingController")
+local lockMeshResolver = require("tauer.modern-lockpicking.services.locks.lockMeshResolver")
+local soundController = require("tauer.modern-lockpicking.services.sounds.soundController")
+local playerController = require("tauer.modern-lockpicking.services.player.playerController")
+local skillController = require("tauer.modern-lockpicking.services.skills.skillController")
+local guiController = require("tauer.modern-lockpicking.services.gui.guiController")
+local lockAnimator = require("tauer.modern-lockpicking.services.locks.lockAnimator")
+local knifeAnimator = require("tauer.modern-lockpicking.services.knives.knifeAnimator")
+local cylinderAnimator = require("tauer.modern-lockpicking.services.cylinders.cylinderAnimator")
+local pickAnimator = require("tauer.modern-lockpicking.services.picks.pickAnimator")
+local renderingController = require("tauer.modern-lockpicking.services.rendering.renderingController")
+local soundFileResolver = require("tauer.modern-lockpicking.services.sounds.soundFileResolver")
 
 ---@class ModernLockpicking
 local this = {}
@@ -26,17 +26,17 @@ function this.initializeMod()
 
 	---@type IInitializedService[]
 	local services = {
-		LockpickingController,
-		LockMeshResolver,
-		SoundController,
-		GUIController,
-		LockAnimator,
-		KnifeAnimator,
-		CylinderAnimator,
-		PickAnimator,
-		RenderingController,
-		SkillController,
-		SoundFileResolver,
+		lockpickingController,
+		lockMeshResolver,
+		soundController,
+		guiController,
+		lockAnimator,
+		knifeAnimator,
+		cylinderAnimator,
+		pickAnimator,
+		renderingController,
+		skillController,
+		soundFileResolver,
 	}
 
 	for _, service in pairs(services) do
@@ -54,11 +54,11 @@ function this.initializeMod()
 end
 
 function this.stopMod()
-	PlayerController.Stop()
+	playerController.Stop()
 end
 
 function this.startMod()
-	PlayerController.Start()
+	playerController.Start()
 end
 
 event.register(tes3.event.modConfigReady, this.initializeMcm)

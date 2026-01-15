@@ -1,6 +1,6 @@
 --- SERVICES
-local NodeAnimator = require("tauer.modern-lockpicking.services.nodes.NodeAnimator")
-local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerManager")
+local nodeAnimator = require("tauer.modern-lockpicking.services.nodes.nodeAnimator")
+local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
 ---
 
 --- ENUMS
@@ -8,7 +8,7 @@ local CONSTANTS = require("tauer.modern-lockpicking.services.picks.enums.constan
 local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 ---
 
----@class PickAnimator : IInitializedService
+---@class pickAnimator : IInitializedService
 local this = {}
 
 ---@private
@@ -83,13 +83,13 @@ function this.start(pick, keyframes)
 	this.mesh = pick.mesh
 	this.blocked = true
 
-	NodeAnimator.Start({
+	nodeAnimator.Start({
 		node = pick.mesh,
 		keyframes = keyframes,
 		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickChange },
 	})
 
-	TimerManager.Start({
+	timerManager.Start({
 		durationInSeconds = keyframes[#keyframes].time,
 		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickChange },
 		finishedCallback = this.onStartTimerFinished,

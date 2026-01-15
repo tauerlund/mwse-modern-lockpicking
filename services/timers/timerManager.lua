@@ -2,7 +2,7 @@
 local CONSTANTS = require("tauer.modern-lockpicking.services.timers.enums.constants")
 ---
 
----@class TimerManager
+---@class timerManager
 local this = {}
 
 ---@package

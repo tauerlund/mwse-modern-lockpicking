@@ -1,11 +1,11 @@
----@class Settings
+---@class settings
 local this = {}
 
 ---@private
 ---@type string
 this.path = "modern-lockpicking"
 
----@type SettingsMcm
+---@type settingsMcm
 this.defaults = {
     keyBinds = {
         rotateLockCounterclockwise = { keyCode = tes3.scanCode.a },
@@ -16,8 +16,8 @@ this.defaults = {
     }
 }
 
----@type SettingsMcm
-this.Mcm = mwse.loadConfig(this.path, this.defaults) --[[@as SettingsMcm]]
+---@type settingsMcm
+this.Mcm = mwse.loadConfig(this.path, this.defaults) --[[@as settingsMcm]]
 
 ---@public
 function this.Save()

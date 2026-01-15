@@ -1,6 +1,6 @@
 local CYCLE = require("tauer.modern-lockpicking.shared.enums.cycleDirection")
 
----@class PickSelector
+---@class pickSelector
 local this = {}
 
 ---@private

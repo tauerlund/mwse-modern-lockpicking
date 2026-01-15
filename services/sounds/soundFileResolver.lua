@@ -1,8 +1,8 @@
-local Logger = require("tauer.modern-lockpicking.shared.Logger")
+local Logger = require("tauer.modern-lockpicking.shared.loggingFactory")
 
 local CONSTANTS = require("tauer.modern-lockpicking.services.sounds.enums.constants")
 
----@class SoundFileResolver : IInitializedService
+---@class soundFileResolver : IInitializedService
 local this = {}
 
 ---@private

@@ -1,6 +1,6 @@
-Logger = require("tauer.modern-lockpicking.shared.Logger")
+Logger = require("tauer.modern-lockpicking.shared.loggingFactory")
 
----@class InventoryManager
+---@class inventoryManager
 local this = {}
 
 ---@public

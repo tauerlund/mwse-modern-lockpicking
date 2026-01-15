@@ -1,7 +1,7 @@
 --- SERVICES
-local GUI = require("tauer.modern-lockpicking.services.gui.GUIBuilder")
-local Translations = require("tauer.modern-lockpicking.shared.Translations")
-local Settings = require("tauer.modern-lockpicking.shared.Settings").Mcm
+local gui = require("tauer.modern-lockpicking.services.gui.guiBuilder")
+local translations = require("tauer.modern-lockpicking.shared.translations")
+local settings = require("tauer.modern-lockpicking.shared.settings").Mcm
 ---
 
 --- ENUMS
@@ -9,7 +9,7 @@ local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 local CONSTANTS = require("tauer.modern-lockpicking.services.gui.enums.constants")
 ---
 
----@class GUIController : IInitializedService
+---@class guiController : IInitializedService
 local this = {}
 
 ---@private
@@ -51,7 +51,7 @@ end
 ---@param e lockpickingStartEventData
 ---@return tes3uiElement
 function this.createHeader(e)
-	local header = GUI.CreateMenu({
+	local header = gui.CreateMenu({
 			id = CONSTANTS.headerId,
 			dragFrame = false,
 			fixedFrame = true,
@@ -63,7 +63,7 @@ function this.createHeader(e)
 		:WithAutoSize()
 		:Build()
 
-	local block = GUI
+	local block = gui
 		.CreateBlock({ parent = header })
 		:WithFlowDirection(tes3.flowDirection.topToBottom)
 		:WithAutoSize()
@@ -76,12 +76,12 @@ function this.createHeader(e)
 		})
 		:Build()
 
-	GUI.CreateLabel({ parent = block })
+	gui.CreateLabel({ parent = block })
 		:WithText(e.activator.baseObject.name)
 		:WithColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:Build()
 
-	GUI.CreateDivider({ parent = block })
+	gui.CreateDivider({ parent = block })
 		:WithProportional({ width = 1.0 })
 		:Build()
 
@@ -92,7 +92,7 @@ function this.createHeader(e)
 	local player = tes3.player.mobile --[[@as tes3mobileActor]]
 	local securitySkill = player:getSkillValue(tes3.skill.security)
 
-	GUI.CreateLabel({ parent = block })
+	gui.CreateLabel({ parent = block })
 		:WithText(this.createLockLevelText(lockLevel))
 		:WithColor(this.getLockLevelColor(lockLevel, securitySkill))
 		:Build()
@@ -124,7 +124,7 @@ end
 ---@private
 ---@return tes3uiElement
 function this.createControls()
-	local controls = GUI.CreateMenu({
+	local controls = gui.CreateMenu({
 			id = CONSTANTS.controlsId,
 			dragFrame = false,
 			fixedFrame = true,
@@ -134,7 +134,7 @@ function this.createControls()
 		:WithAutoSize()
 		:Build()
 
-	local outerBlock = GUI.CreateBlock({ parent = controls })
+	local outerBlock = gui.CreateBlock({ parent = controls })
 		:WithAutoSize()
 		:WithFlowDirection(tes3.flowDirection.topToBottom)
 		:WithChildAlignment({
@@ -142,12 +142,12 @@ function this.createControls()
 		})
 		:Build()
 
-	GUI.CreateLabel({ parent = outerBlock })
-		:WithText(Translations.Get("interface.controls.header"))
+	gui.CreateLabel({ parent = outerBlock })
+		:WithText(translations.Get("interface.controls.header"))
 		:WithColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:Build()
 
-	local innerBlock = GUI.CreateThinBorder({ parent = outerBlock })
+	local innerBlock = gui.CreateThinBorder({ parent = outerBlock })
 		:WithFlowDirection(tes3.flowDirection.leftToRight)
 		:WithAutoSize()
 		:WithPadding({
@@ -166,13 +166,13 @@ function this.createControls()
 	local controlTexts = this.getControlTexts()
 
 	for i, text in ipairs(controlTexts) do
-		GUI.CreateLabel({ parent = innerBlock, id = string.format(CONSTANTS.controlsLabelId, i) })
+		gui.CreateLabel({ parent = innerBlock, id = string.format(CONSTANTS.controlsLabelId, i) })
 			:WithText(text)
 			:WithColor(tes3ui.getPalette(tes3.palette.normalColor))
 			:Build()
 
 		if i < #controlTexts then
-			GUI.CreateThinBorder({ parent = innerBlock })
+			gui.CreateThinBorder({ parent = innerBlock })
 				:WithSize({ width = 1, height = 24 })
 				:WithBorder({
 					left = 12,
@@ -190,20 +190,20 @@ end
 function this.getControlTexts()
 	local mouse = tes3.findGMST(tes3.gmst.sMouse).value
 
-	local rotateLockCounterclockwise = this.getKeyName(Settings.keyBinds.rotateLockCounterclockwise)
-	local rotateLockClockwise = this.getKeyName(Settings.keyBinds.rotateLockClockwise)
+	local rotateLockCounterclockwise = this.getKeyName(settings.keyBinds.rotateLockCounterclockwise)
+	local rotateLockClockwise = this.getKeyName(settings.keyBinds.rotateLockClockwise)
 
-	local cyclePreviousPick = this.getKeyName(Settings.keyBinds.cyclePreviousPick)
-	local cycleNextPick = this.getKeyName(Settings.keyBinds.cycleNextPick)
+	local cyclePreviousPick = this.getKeyName(settings.keyBinds.cyclePreviousPick)
+	local cycleNextPick = this.getKeyName(settings.keyBinds.cycleNextPick)
 
-	local exit = this.getKeyName(Settings.keyBinds.exit)
+	local exit = this.getKeyName(settings.keyBinds.exit)
 
 	return {
-		string.format("%s: %s", Translations.Get("interface.controls.rotatePick"), mouse),
-		string.format("%s: %s / %s", Translations.Get("interface.controls.rotateLock"), rotateLockCounterclockwise,
+		string.format("%s: %s", translations.Get("interface.controls.rotatePick"), mouse),
+		string.format("%s: %s / %s", translations.Get("interface.controls.rotateLock"), rotateLockCounterclockwise,
 			rotateLockClockwise),
-		string.format("%s: %s / %s", Translations.Get("interface.controls.cyclePicks"), cyclePreviousPick, cycleNextPick),
-		string.format("%s: %s", Translations.Get("interface.controls.exit"), exit),
+		string.format("%s: %s / %s", translations.Get("interface.controls.cyclePicks"), cyclePreviousPick, cycleNextPick),
+		string.format("%s: %s", translations.Get("interface.controls.exit"), exit),
 	}
 end
 
@@ -219,7 +219,7 @@ end
 ---@param picks tes3itemStack[]
 ---@return tes3uiElement
 function this.createPicks(activePick, picks)
-	local picksMenu = GUI.CreateMenu({
+	local picksMenu = gui.CreateMenu({
 			id = CONSTANTS.picksId,
 			dragFrame = false,
 			fixedFrame = true,
@@ -230,7 +230,7 @@ function this.createPicks(activePick, picks)
 		:WithAutoSize()
 		:Build()
 
-	local upperBlock = GUI.CreateBlock({ parent = picksMenu })
+	local upperBlock = gui.CreateBlock({ parent = picksMenu })
 		:WithFlowDirection(tes3.flowDirection.topToBottom)
 		:WithAutoSize()
 		:WithPadding({
@@ -238,12 +238,12 @@ function this.createPicks(activePick, picks)
 		})
 		:Build()
 
-	GUI.CreateLabel({ parent = upperBlock })
-		:WithText(Translations.Get("interface.picks.header"))
+	gui.CreateLabel({ parent = upperBlock })
+		:WithText(translations.Get("interface.picks.header"))
 		:WithColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:Build()
 
-	local lowerBlock = GUI.CreateThinBorder({ parent = picksMenu })
+	local lowerBlock = gui.CreateThinBorder({ parent = picksMenu })
 		:WithFlowDirection(tes3.flowDirection.leftToRight)
 		:WithPadding({
 			all = 8,
@@ -251,12 +251,12 @@ function this.createPicks(activePick, picks)
 		:WithAutoSize()
 		:Build()
 
-	local pickLabelContainer = GUI.CreateBlock({ parent = lowerBlock })
+	local pickLabelContainer = gui.CreateBlock({ parent = lowerBlock })
 		:WithFlowDirection(tes3.flowDirection.topToBottom)
 		:WithAutoSize()
 		:Build()
 
-	local pickCountLabelContainer = GUI.CreateBlock({ parent = lowerBlock })
+	local pickCountLabelContainer = gui.CreateBlock({ parent = lowerBlock })
 		:WithFlowDirection(tes3.flowDirection.topToBottom)
 		:WithAutoSize()
 		:Build()
@@ -269,7 +269,7 @@ function this.createPicks(activePick, picks)
 		local verticalBorder = 8
 		local horizontalBorder = 16
 
-		GUI.CreateLabel({
+		gui.CreateLabel({
 			parent = pickLabelContainer,
 			id = string.format(CONSTANTS.picksLabelId,
 				pick.object.id)
@@ -285,7 +285,7 @@ function this.createPicks(activePick, picks)
 			:WithCallback(EVENTS.pickSelected, this.onPickSelected)
 			:Build()
 
-		GUI.CreateLabel({
+		gui.CreateLabel({
 			parent = pickCountLabelContainer,
 			id = string.format(CONSTANTS.picksCountLabelId,
 				pick.object.id)

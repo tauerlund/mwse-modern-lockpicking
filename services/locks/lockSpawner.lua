@@ -1,10 +1,10 @@
-local LockMeshResolver = require("tauer.modern-lockpicking.services.locks.LockMeshResolver")
+local lockMeshResolver = require("tauer.modern-lockpicking.services.locks.lockMeshResolver")
 local zBufferIndex = require("tauer.modern-lockpicking.shared.enums.zBufferIndex")
 
 local objectNames = require("tauer.modern-lockpicking.shared.enums.objectNames")
 local events = require("tauer.modern-lockpicking.shared.enums.events")
 
----@class LockSpawner
+---@class lockSpawner
 local this = {}
 
 ---@public
@@ -44,7 +44,7 @@ end
 ---@param activator tes3containerInstance|tes3door
 ---@return niNode
 function this.getMesh(activator)
-	local mesh = LockMeshResolver.Resolve(activator)
+	local mesh = lockMeshResolver.Resolve(activator)
 
 	mesh.name = "ModernLockpicking:Root"
 	mesh.translation = tes3.getCameraPosition():copy()

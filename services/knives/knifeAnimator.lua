@@ -1,6 +1,6 @@
 --- SERVICES
-local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerManager")
-local NodeAnimator = require("tauer.modern-lockpicking.services.nodes.NodeAnimator")
+local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
+local nodeAnimator = require("tauer.modern-lockpicking.services.nodes.nodeAnimator")
 ---
 
 --- ENUMS
@@ -9,7 +9,7 @@ local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirecti
 local CONSTANTS = require("tauer.modern-lockpicking.services.knives.enums.constants")
 ---
 
----@class KnifeAnimator : IInitializedService
+---@class knifeAnimator : IInitializedService
 local this = {}
 
 ---@private
@@ -79,13 +79,13 @@ function this.start(knife)
 	this.knife = knife
 	this.blocked = true
 
-	NodeAnimator.Start({
+	nodeAnimator.Start({
 		node = knife,
 		keyframes = this.startAnimationKeyFrames,
 		cancelOn = EVENTS.lockpickingEnded,
 	})
 
-	TimerManager.Start({
+	timerManager.Start({
 		durationInSeconds = CONSTANTS.animation.startAnimationDuration,
 		finishedCallback = this.onStartTimerFinished,
 		cancelOn = EVENTS.lockpickingEnded,

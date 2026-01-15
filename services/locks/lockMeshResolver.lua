@@ -1,6 +1,6 @@
 local CONSTANTS = require("tauer.modern-lockpicking.services.locks.enums.constants")
 
----@class LockMeshResolver : IInitializedService
+---@class lockMeshResolver : IInitializedService
 local this = {}
 
 ---@private

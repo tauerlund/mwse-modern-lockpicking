@@ -5,7 +5,7 @@ local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 local COSNTANTS = require("tauer.modern-lockpicking.services.knives.enums.constants")
 ---
 
----@class KnifeSpawner
+---@class knifeSpawner
 local this = {}
 
 ---@public

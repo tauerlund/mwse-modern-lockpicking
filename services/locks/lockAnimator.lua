@@ -1,5 +1,5 @@
 --- SERVICES
-local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerManager")
+local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
 ---
 
 --- ENUMS
@@ -7,7 +7,7 @@ local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 local CONSTANTS = require("tauer.modern-lockpicking.services.locks.enums.constants")
 ---
 
----@class LockAnimator : IInitializedService
+---@class lockAnimator : IInitializedService
 local this = {}
 
 ---@public
@@ -20,7 +20,7 @@ end
 ---@private
 ---@param lock lock
 function this.start(lock)
-	TimerManager.Start({
+	timerManager.Start({
 		durationInSeconds = 0.8,
 		callback = this.onStartTimer,
 		cancelOn = EVENTS.lockpickingEnded,

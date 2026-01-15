@@ -1,7 +1,7 @@
 local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 local CONSTANTS = require("tauer.modern-lockpicking.services.rendering.enums.constants")
 
----@class RenderingController : IInitializedService
+---@class renderingController : IInitializedService
 local this = {}
 
 ---@private

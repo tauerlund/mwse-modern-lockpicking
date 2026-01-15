@@ -4,7 +4,7 @@ local OBJECT_NAMES = require("tauer.modern-lockpicking.shared.enums.objectNames"
 local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 ---
 
----@class PickSpawner
+---@class pickSpawner
 local this = {}
 
 ---@public

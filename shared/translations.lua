@@ -1,4 +1,4 @@
----@class Translations
+---@class translations
 local this = {}
 
 ---@public

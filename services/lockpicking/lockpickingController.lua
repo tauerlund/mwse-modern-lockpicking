@@ -1,10 +1,10 @@
 --- SERVICES
-local PickSelector = require("tauer.modern-lockpicking.services.picks.PickSelector")
-local LockSpawner = require("tauer.modern-lockpicking.services.locks.LockSpawner")
-local KnifeSpawner = require("tauer.modern-lockpicking.services.knives.KnifeSpawner")
-local PickSpawner = require("tauer.modern-lockpicking.services.picks.PickSpawner")
-local TimerManager = require("tauer.modern-lockpicking.services.timers.TimerManager")
-local Settings = require("tauer.modern-lockpicking.shared.Settings").Mcm
+local pickSelector = require("tauer.modern-lockpicking.services.picks.pickSelector")
+local lockSpawner = require("tauer.modern-lockpicking.services.locks.lockSpawner")
+local knifeSpawner = require("tauer.modern-lockpicking.services.knives.knifeSpawner")
+local pickSpawner = require("tauer.modern-lockpicking.services.picks.pickSpawner")
+local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
+local settings = require("tauer.modern-lockpicking.shared.settings").Mcm
 ---
 
 --- ENUMS
@@ -14,7 +14,7 @@ local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirecti
 local CYCLE = require("tauer.modern-lockpicking.shared.enums.cycleDirection")
 ---
 
----@class LockpickingController : IInitializedService
+---@class lockpickingController : IInitializedService
 local this = {}
 
 ---@private
@@ -65,8 +65,8 @@ function this.Start(activator, picks)
 	this.activator = activator
 	this.picks = picks
 
-	this.lock = LockSpawner.Spawn(activator)
-	this.knife = KnifeSpawner.Spawn(this.lock)
+	this.lock = lockSpawner.Spawn(activator)
+	this.knife = knifeSpawner.Spawn(this.lock)
 	this.pick = this.selectPick()
 
 	---@type lockpickingStartEventData
@@ -79,7 +79,7 @@ function this.Start(activator, picks)
 	}
 	event.trigger(EVENTS.lockpickingStart, lockPickingStartEventData)
 
-	TimerManager.Start({
+	timerManager.Start({
 		durationInSeconds = 1.3,
 		finishedCallback = this.registerEvents,
 		cancelOn = EVENTS.lockpickingEnded,
@@ -111,7 +111,7 @@ function this.onKeyUp(e)
 		this.onRotationDirectionKeyUp(e)
 		return
 	end
-	if e.keyCode == Settings.keyBinds.exit.keyCode then
+	if e.keyCode == settings.keyBinds.exit.keyCode then
 		this.finish({ success = false })
 		return
 	end
@@ -180,8 +180,8 @@ function this.selectPick(direction)
 		event.trigger(EVENTS.pickChange, pickChangedEventData)
 	end
 
-	local item = PickSelector.Select(this.picks, direction)
-	local pick = PickSpawner.Spawn(this.lock, item)
+	local item = pickSelector.Select(this.picks, direction)
+	local pick = pickSpawner.Spawn(this.lock, item)
 
 	---@type pickSelectedEventData
 	local pickSelectedEventData = {
@@ -205,7 +205,7 @@ function this.finish(parameters)
 	}
 	event.trigger(EVENTS.lockpickingEnd, data)
 
-	TimerManager.Start({
+	timerManager.Start({
 		durationInSeconds = 1,
 		finishedCallback = this.onEndTimerFinished,
 		data = data --[[@as timerData]],
@@ -257,8 +257,8 @@ end
 ---@return { [tes3.scanCode]: ROTATION_DIRECTION }
 function this.getRotationDirections()
 	return {
-		[Settings.keyBinds.rotateLockClockwise.keyCode] = DIRECTION.clockwise,
-		[Settings.keyBinds.rotateLockCounterclockwise.keyCode] = DIRECTION.counterClockwise,
+		[settings.keyBinds.rotateLockClockwise.keyCode] = DIRECTION.clockwise,
+		[settings.keyBinds.rotateLockCounterclockwise.keyCode] = DIRECTION.counterClockwise,
 	}
 end
 
@@ -266,8 +266,8 @@ end
 ---@return { [tes3.scanCode]: CYCLE_DIRECTION }
 function this.getPickCycleDirections()
 	return {
-		[Settings.keyBinds.cycleNextPick.keyCode] = CYCLE.next,
-		[Settings.keyBinds.cyclePreviousPick.keyCode] = CYCLE.previous,
+		[settings.keyBinds.cycleNextPick.keyCode] = CYCLE.next,
+		[settings.keyBinds.cyclePreviousPick.keyCode] = CYCLE.previous,
 	}
 end
 

@@ -1,6 +1,6 @@
 local MWSELogger = require("logging.logger")
 
----@class LoggerFactoryFoo
+---@class loggingFactory
 local this = {}
 
 ---@enum
