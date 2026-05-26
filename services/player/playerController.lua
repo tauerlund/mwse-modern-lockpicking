@@ -8,7 +8,7 @@ local translations = require("tauer.modern-lockpicking.shared.translations")
 local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 ---
 
----@class playerController
+---@class playerController : initializedService
 local this = {}
 
 ---@public

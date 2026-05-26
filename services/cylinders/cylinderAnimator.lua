@@ -4,7 +4,7 @@ local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirecti
 local CONSTANTS = require("tauer.modern-lockpicking.services.cylinders.enums.constants")
 ---
 
----@class cylinderAnimator : IInitializedService
+---@class cylinderAnimator : initializedService
 local this = {}
 
 ---@private

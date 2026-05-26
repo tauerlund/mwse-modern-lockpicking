@@ -9,7 +9,7 @@ local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirecti
 local CONSTANTS = require("tauer.modern-lockpicking.services.knives.enums.constants")
 ---
 
----@class knifeAnimator : IInitializedService
+---@class knifeAnimator : initializedService
 local this = {}
 
 ---@private

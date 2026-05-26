@@ -14,7 +14,7 @@ local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirecti
 local CYCLE = require("tauer.modern-lockpicking.shared.enums.cycleDirection")
 ---
 
----@class lockpickingController : IInitializedService
+---@class lockpickingController : initializedService
 local this = {}
 
 ---@private

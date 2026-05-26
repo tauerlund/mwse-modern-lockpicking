@@ -7,7 +7,7 @@ local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 local CONSTANTS = require("tauer.modern-lockpicking.services.locks.enums.constants")
 ---
 
----@class lockAnimator : IInitializedService
+---@class lockAnimator : initializedService
 local this = {}
 
 ---@public
