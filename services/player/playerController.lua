@@ -12,12 +12,10 @@ local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 local this = {}
 
 ---@public
-function this.start()
+---@return boolean, string|nil
+function this.initialize()
 	this.registerEvents()
-end
-
-function this.stop()
-	this.unregisterEvents()
+	return true, nil
 end
 
 ---@private
@@ -99,19 +97,6 @@ end
 ---@private
 function this.registerEvents()
 	event.register(tes3.event.activate, this.onActivate)
-end
-
----@private
-function this.unregisterEvents()
-	if event.isRegistered(tes3.event.activate, this.onActivate) then
-		event.unregister(tes3.event.activate, this.onActivate)
-	end
-	if event.isRegistered(tes3.event.menuExit, this.onMenuExit) then
-		event.unregister(tes3.event.menuExit, this.onMenuExit)
-	end
-	if event.isRegistered(EVENTS.lockpickingEnded, this.onLockpickingEnded) then
-		event.unregister(EVENTS.lockpickingEnded, this.onLockpickingEnded)
-	end
 end
 
 return this

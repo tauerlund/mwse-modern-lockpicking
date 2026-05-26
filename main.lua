@@ -40,6 +40,7 @@ function this.initializeMod(_)
 		renderingController,
 		skillController,
 		soundFileResolver,
+		playerController,
 	}
 
 	for _, service in pairs(services) do
@@ -50,18 +51,7 @@ function this.initializeMod(_)
 		end
 	end
 
-	event.register(tes3.event.load, this.stopMod)
-	event.register(tes3.event.loaded, this.startMod)
-
 	logger:info("Initialized.")
-end
-
-function this.stopMod()
-	playerController.stop()
-end
-
-function this.startMod()
-	playerController.start()
 end
 
 event.register(tes3.event.modConfigReady, this.initializeMcm)
