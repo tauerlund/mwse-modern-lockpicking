@@ -1,6 +1,6 @@
 local logger = mwse.Logger.new()
 
-local CONSTANTS = require("tauer.modern-lockpicking.services.sounds.enums.constants")
+local CONSTANTS = require("tauer.modern-lockpicking.services.sounds.enums.CONSTANTS")
 
 ---@class soundFileResolver : initializedService
 local this = {}

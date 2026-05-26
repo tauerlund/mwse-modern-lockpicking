@@ -5,8 +5,8 @@ local nodeAnimator = require("tauer.modern-lockpicking.services.nodes.nodeAnimat
 
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirection")
-local CONSTANTS = require("tauer.modern-lockpicking.services.knives.enums.constants")
+local DIRECTION = require("tauer.modern-lockpicking.services.lockpicking.enums.ROTATION_DIRECTION")
+local CONSTANTS = require("tauer.modern-lockpicking.services.knives.enums.CONSTANTS")
 ---
 
 ---@class knifeAnimator : initializedService

@@ -8,10 +8,10 @@ local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mc
 ---
 
 --- ENUMS
-local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.constants")
+local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.CONSTANTS")
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirection")
-local CYCLE = require("tauer.modern-lockpicking.shared.enums.cycleDirection")
+local DIRECTION = require("tauer.modern-lockpicking.services.lockpicking.enums.ROTATION_DIRECTION")
+local CYCLE = require("tauer.modern-lockpicking.services.lockpicking.enums.CYCLE_DIRECTION")
 ---
 
 ---@class lockpickingController : initializedService

@@ -1,5 +1,5 @@
 ---@meta
----@class onMeshAnimatorTimerData : timerData
+---@class onNodeAnimatorTimerData : timerData
 ---@field public node niNode
 ---@field public keyframes nodeAnimatorKeyframe[]
 ---@field public currentPhase number

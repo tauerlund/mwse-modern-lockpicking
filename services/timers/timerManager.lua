@@ -1,5 +1,5 @@
 --- ENUMS
-local CONSTANTS = require("tauer.modern-lockpicking.services.timers.enums.constants")
+local CONSTANTS = require("tauer.modern-lockpicking.services.timers.enums.CONSTANTS")
 ---
 
 ---@class timerManager

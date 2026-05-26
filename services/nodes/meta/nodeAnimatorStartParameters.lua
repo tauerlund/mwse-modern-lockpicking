@@ -1,5 +1,5 @@
 ---@meta
----@class meshAnimatorStartParameters
+---@class nodeAnimator.start.params
 ---@field public node niNode
 ---@field public keyframes nodeAnimatorKeyframe[]
 ---@field public cancelOn string|string[]?

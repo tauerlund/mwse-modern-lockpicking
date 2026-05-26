@@ -6,7 +6,7 @@ local timerManager = require("tauer.modern-lockpicking.services.timers.timerMana
 local this = {}
 
 ---@public
----@param parameters meshAnimatorStartParameters
+---@param parameters nodeAnimator.start.params
 function this.start(parameters)
 	local keyFramesLength = #parameters.keyframes
 	if keyFramesLength < 2 then
@@ -21,7 +21,7 @@ function this.start(parameters)
 		durationInSeconds = lastKeyframe.time,
 		callback = this.onStartTimer,
 		cancelOn = parameters.cancelOn or nil,
-		---@type onMeshAnimatorTimerData
+		---@type onNodeAnimatorTimerData
 		data = {
 			node = parameters.node,
 			keyframes = parameters.keyframes,
@@ -44,7 +44,7 @@ end
 ---@private
 ---@param callback mwseTimerCallbackData
 function this.onStartTimer(callback)
-	local data = callback.timer.data --[[@as onMeshAnimatorTimerData]]
+	local data = callback.timer.data --[[@as onNodeAnimatorTimerData]]
 	data.currentPhase = data.currentPhase + callback.timer.duration
 
 	local currentFrame = data.currentFrame

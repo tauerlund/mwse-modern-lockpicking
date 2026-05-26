@@ -1,4 +1,4 @@
-local CYCLE = require("tauer.modern-lockpicking.shared.enums.cycleDirection")
+local CYCLE = require("tauer.modern-lockpicking.services.lockpicking.enums.CYCLE_DIRECTION")
 
 ---@class pickSelector
 local this = {}

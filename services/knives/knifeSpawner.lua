@@ -1,8 +1,8 @@
 --- ENUMS
-local Z_BUFFER_INDEX = require("tauer.modern-lockpicking.shared.enums.zBufferIndex")
-local OBJECT_NAMES = require("tauer.modern-lockpicking.shared.enums.objectNames")
+local Z_BUFFER_INDEX = require("tauer.modern-lockpicking.services.rendering.enums.Z_BUFFER_INDEX")
+local OBJECT_NAMES = require("tauer.modern-lockpicking.services.nodes.enums.OBJECT_NAMES")
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local COSNTANTS = require("tauer.modern-lockpicking.services.knives.enums.constants")
+local COSNTANTS = require("tauer.modern-lockpicking.services.knives.enums.CONSTANTS")
 ---
 
 ---@class knifeSpawner
