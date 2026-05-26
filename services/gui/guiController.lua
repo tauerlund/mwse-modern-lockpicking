@@ -51,39 +51,39 @@ end
 ---@param e lockpickingStartEventData
 ---@return tes3uiElement
 function this.createHeader(e)
-	local header = gui.CreateMenu({
+	local header = gui.createMenu({
 			id = CONSTANTS.headerId,
 			dragFrame = false,
 			fixedFrame = true,
 			modal = true
 		})
-		:WithPositionAlign({ x = 0.5, y = 0.05 })
-		:WithFlowDirection(tes3.flowDirection.topToBottom)
-		:WithMinSize({ width = 0, height = 0 })
-		:WithAutoSize()
-		:Build()
+		:withPositionAlign({ x = 0.5, y = 0.05 })
+		:withFlowDirection(tes3.flowDirection.topToBottom)
+		:withMinSize({ width = 0, height = 0 })
+		:withAutoSize()
+		:wuild()
 
 	local block = gui
-		.CreateBlock({ parent = header })
-		:WithFlowDirection(tes3.flowDirection.topToBottom)
-		:WithAutoSize()
-		:WithMinSize({ width = 300 })
-		:WithBorder({
+		.createBlock({ parent = header })
+		:withFlowDirection(tes3.flowDirection.topToBottom)
+		:withAutoSize()
+		:withMinSize({ width = 300 })
+		:withBorder({
 			all = 8
 		})
-		:WithChildAlignment({
+		:withChildAlignment({
 			x = 0.5,
 		})
-		:Build()
+		:wuild()
 
-	gui.CreateLabel({ parent = block })
-		:WithText(e.activator.baseObject.name)
-		:WithColor(tes3ui.getPalette(tes3.palette.headerColor))
-		:Build()
+	gui.createLabel({ parent = block })
+		:withText(e.activator.baseObject.name)
+		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
+		:wuild()
 
-	gui.CreateDivider({ parent = block })
-		:WithProportional({ width = 1.0 })
-		:Build()
+	gui.createDivider({ parent = block })
+		:withProportional({ width = 1.0 })
+		:wuild()
 
 	local lockLevel = tes3.getLockLevel({
 		reference = e.activator --[[@as tes3reference]],
@@ -92,10 +92,10 @@ function this.createHeader(e)
 	local player = tes3.player.mobile --[[@as tes3mobileActor]]
 	local securitySkill = player:getSkillValue(tes3.skill.security)
 
-	gui.CreateLabel({ parent = block })
-		:WithText(this.createLockLevelText(lockLevel))
-		:WithColor(this.getLockLevelColor(lockLevel, securitySkill))
-		:Build()
+	gui.createLabel({ parent = block })
+		:withText(this.createLockLevelText(lockLevel))
+		:withColor(this.getLockLevelColor(lockLevel, securitySkill))
+		:wuild()
 
 	return header
 end
@@ -124,61 +124,61 @@ end
 ---@private
 ---@return tes3uiElement
 function this.createControls()
-	local controls = gui.CreateMenu({
+	local controls = gui.createMenu({
 			id = CONSTANTS.controlsId,
 			dragFrame = false,
 			fixedFrame = true,
 			modal = true
 		})
-		:WithPositionAlign({ x = 0.5, y = 0.95 })
-		:WithAutoSize()
-		:Build()
+		:withPositionAlign({ x = 0.5, y = 0.95 })
+		:withAutoSize()
+		:wuild()
 
-	local outerBlock = gui.CreateBlock({ parent = controls })
-		:WithAutoSize()
-		:WithFlowDirection(tes3.flowDirection.topToBottom)
-		:WithChildAlignment({
+	local outerBlock = gui.createBlock({ parent = controls })
+		:withAutoSize()
+		:withFlowDirection(tes3.flowDirection.topToBottom)
+		:withChildAlignment({
 			x = 0.5,
 		})
-		:Build()
+		:wuild()
 
-	gui.CreateLabel({ parent = outerBlock })
-		:WithText(translations.Get("interface.controls.header"))
-		:WithColor(tes3ui.getPalette(tes3.palette.headerColor))
-		:Build()
+	gui.createLabel({ parent = outerBlock })
+		:withText(translations.Get("interface.controls.header"))
+		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
+		:wuild()
 
-	local innerBlock = gui.CreateThinBorder({ parent = outerBlock })
-		:WithFlowDirection(tes3.flowDirection.leftToRight)
-		:WithAutoSize()
-		:WithPadding({
+	local innerBlock = gui.createThinBorder({ parent = outerBlock })
+		:withFlowDirection(tes3.flowDirection.leftToRight)
+		:withAutoSize()
+		:withPadding({
 			all = 8,
 		})
-		:WithBorder({
+		:withBorder({
 			top = 8,
 		})
-		:WithChildAlignment({
+		:withChildAlignment({
 			x = 0.5,
 			y = 0.5,
 		})
-		:WithCallback(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
-		:Build()
+		:withCallback(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
+		:wuild()
 
 	local controlTexts = this.getControlTexts()
 
 	for i, text in ipairs(controlTexts) do
-		gui.CreateLabel({ parent = innerBlock, id = string.format(CONSTANTS.controlsLabelId, i) })
-			:WithText(text)
-			:WithColor(tes3ui.getPalette(tes3.palette.normalColor))
-			:Build()
+		gui.createLabel({ parent = innerBlock, id = string.format(CONSTANTS.controlsLabelId, i) })
+			:withText(text)
+			:withColor(tes3ui.getPalette(tes3.palette.normalColor))
+			:wuild()
 
 		if i < #controlTexts then
-			gui.CreateThinBorder({ parent = innerBlock })
-				:WithSize({ width = 1, height = 24 })
-				:WithBorder({
+			gui.createThinBorder({ parent = innerBlock })
+				:withSize({ width = 1, height = 24 })
+				:withBorder({
 					left = 12,
 					right = 12,
 				})
-				:Build()
+				:wuild()
 		end
 	end
 
@@ -219,47 +219,47 @@ end
 ---@param picks tes3itemStack[]
 ---@return tes3uiElement
 function this.createPicks(activePick, picks)
-	local picksMenu = gui.CreateMenu({
+	local picksMenu = gui.createMenu({
 			id = CONSTANTS.picksId,
 			dragFrame = false,
 			fixedFrame = true,
 			modal = true
 		})
-		:WithFlowDirection(tes3.flowDirection.topToBottom)
-		:WithPositionAlign({ x = 0.75, y = 0.25 })
-		:WithAutoSize()
-		:Build()
+		:withFlowDirection(tes3.flowDirection.topToBottom)
+		:withPositionAlign({ x = 0.75, y = 0.25 })
+		:withAutoSize()
+		:wuild()
 
-	local upperBlock = gui.CreateBlock({ parent = picksMenu })
-		:WithFlowDirection(tes3.flowDirection.topToBottom)
-		:WithAutoSize()
-		:WithPadding({
+	local upperBlock = gui.createBlock({ parent = picksMenu })
+		:withFlowDirection(tes3.flowDirection.topToBottom)
+		:withAutoSize()
+		:withPadding({
 			all = 8,
 		})
-		:Build()
+		:wuild()
 
-	gui.CreateLabel({ parent = upperBlock })
-		:WithText(translations.Get("interface.picks.header"))
-		:WithColor(tes3ui.getPalette(tes3.palette.headerColor))
-		:Build()
+	gui.createLabel({ parent = upperBlock })
+		:withText(translations.Get("interface.picks.header"))
+		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
+		:wuild()
 
-	local lowerBlock = gui.CreateThinBorder({ parent = picksMenu })
-		:WithFlowDirection(tes3.flowDirection.leftToRight)
-		:WithPadding({
+	local lowerBlock = gui.createThinBorder({ parent = picksMenu })
+		:withFlowDirection(tes3.flowDirection.leftToRight)
+		:withPadding({
 			all = 8,
 		})
-		:WithAutoSize()
-		:Build()
+		:withAutoSize()
+		:wuild()
 
-	local pickLabelContainer = gui.CreateBlock({ parent = lowerBlock })
-		:WithFlowDirection(tes3.flowDirection.topToBottom)
-		:WithAutoSize()
-		:Build()
+	local pickLabelContainer = gui.createBlock({ parent = lowerBlock })
+		:withFlowDirection(tes3.flowDirection.topToBottom)
+		:withAutoSize()
+		:wuild()
 
-	local pickCountLabelContainer = gui.CreateBlock({ parent = lowerBlock })
-		:WithFlowDirection(tes3.flowDirection.topToBottom)
-		:WithAutoSize()
-		:Build()
+	local pickCountLabelContainer = gui.createBlock({ parent = lowerBlock })
+		:withFlowDirection(tes3.flowDirection.topToBottom)
+		:withAutoSize()
+		:wuild()
 
 	for _, pick in ipairs(picks) do
 		local color = pick.object.id == activePick.item.object.id and
@@ -269,36 +269,36 @@ function this.createPicks(activePick, picks)
 		local verticalBorder = 8
 		local horizontalBorder = 16
 
-		gui.CreateLabel({
+		gui.createLabel({
 			parent = pickLabelContainer,
 			id = string.format(CONSTANTS.picksLabelId,
 				pick.object.id)
 		})
-			:WithText(pick.object.name)
-			:WithColor(color)
-			:WithBorder({
+			:withText(pick.object.name)
+			:withColor(color)
+			:withBorder({
 				top = verticalBorder,
 				bottom = verticalBorder,
 				right = horizontalBorder,
 			})
-			:WithCallback(EVENTS.pickChange, this.onPickChange)
-			:WithCallback(EVENTS.pickSelected, this.onPickSelected)
-			:Build()
+			:withCallback(EVENTS.pickChange, this.onPickChange)
+			:withCallback(EVENTS.pickSelected, this.onPickSelected)
+			:wuild()
 
-		gui.CreateLabel({
+		gui.createLabel({
 			parent = pickCountLabelContainer,
 			id = string.format(CONSTANTS.picksCountLabelId,
 				pick.object.id)
 		})
-			:WithText(string.format("%d", this.getLockpickCount(pick)))
-			:WithColor(color)
-			:WithBorder({
+			:withText(string.format("%d", this.getLockpickCount(pick)))
+			:withColor(color)
+			:withBorder({
 				top = verticalBorder,
 				bottom = verticalBorder,
 			})
-			:WithCallback(EVENTS.pickChange, this.onPickChange)
-			:WithCallback(EVENTS.pickSelected, this.onPickSelected)
-			:Build()
+			:withCallback(EVENTS.pickChange, this.onPickChange)
+			:withCallback(EVENTS.pickSelected, this.onPickSelected)
+			:wuild()
 	end
 
 	return picksMenu
