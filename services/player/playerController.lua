@@ -1,7 +1,7 @@
 --- SERVICES
 local inventoryManager = require("tauer.modern-lockpicking.services.inventory.inventoryManager")
 local lockpickingController = require("tauer.modern-lockpicking.services.lockpicking.lockpickingController")
-local translations = require("tauer.modern-lockpicking.shared.translations")
+local translations = require("tauer.modern-lockpicking.services.translations.translations")
 ---
 
 --- ENUMS

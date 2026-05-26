@@ -11,17 +11,20 @@ local cylinderAnimator = require("tauer.modern-lockpicking.services.cylinders.cy
 local pickAnimator = require("tauer.modern-lockpicking.services.picks.pickAnimator")
 local renderingController = require("tauer.modern-lockpicking.services.rendering.renderingController")
 local soundFileResolver = require("tauer.modern-lockpicking.services.sounds.soundFileResolver")
+local mcm = require("tauer.modern-lockpicking.services.mcm.mcmInitializer")
 
 ---@class ModernLockpicking
 local this = {}
 
----@private
-function this.initializeMcm()
-	dofile("Data Files\\MWSE\\mods\\tauer\\modern-lockpicking\\mcm.lua")
+---@package
+---@param _ modConfigReadyEventData
+function this.initializeMcm(_)
+	mcm.initialize()
 end
 
----@private
-function this.initializeMod()
+---@package
+---@param _ initializedEventData
+function this.initializeMod(_)
 	Logger:info("Initializing...")
 
 	---@type initializedService[]

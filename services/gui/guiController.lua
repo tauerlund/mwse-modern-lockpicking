@@ -1,11 +1,12 @@
 --- SERVICES
 local gui = require("tauer.modern-lockpicking.services.gui.guiBuilder")
-local translations = require("tauer.modern-lockpicking.shared.translations")
-local settings = require("tauer.modern-lockpicking.shared.settings").Mcm
+local translations = require("tauer.modern-lockpicking.services.translations.translations")
+local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
 ---
 
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
+local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
 local CONSTANTS = require("tauer.modern-lockpicking.services.gui.enums.constants")
 ---
 
@@ -143,7 +144,7 @@ function this.createControls()
 		:wuild()
 
 	gui.createLabel({ parent = outerBlock })
-		:withText(translations.get("interface.controls.header"))
+		:withText(translations.get(TRANSLATION_KEY.interfaceControlsHeader))
 		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:wuild()
 
@@ -199,11 +200,12 @@ function this.getControlTexts()
 	local exit = this.getKeyName(settings.keyBinds.exit)
 
 	return {
-		string.format("%s: %s", translations.get("interface.controls.rotatePick"), mouse),
-		string.format("%s: %s / %s", translations.get("interface.controls.rotateLock"), rotateLockCounterclockwise,
-			rotateLockClockwise),
-		string.format("%s: %s / %s", translations.get("interface.controls.cyclePicks"), cyclePreviousPick, cycleNextPick),
-		string.format("%s: %s", translations.get("interface.controls.exit"), exit),
+		string.format("%s: %s", translations.get(TRANSLATION_KEY.interfaceControlsRotatePick), mouse),
+		string.format("%s: %s / %s", translations.get(TRANSLATION_KEY.interfaceControlsRotateLock),
+			rotateLockCounterclockwise, rotateLockClockwise),
+		string.format("%s: %s / %s", translations.get(TRANSLATION_KEY.interfaceControlsCyclePicks), cyclePreviousPick,
+			cycleNextPick),
+		string.format("%s: %s", translations.get(TRANSLATION_KEY.interfaceControlsExit), exit),
 	}
 end
 
@@ -239,7 +241,7 @@ function this.createPicks(activePick, picks)
 		:wuild()
 
 	gui.createLabel({ parent = upperBlock })
-		:withText(translations.get("interface.picks.header"))
+		:withText(translations.get(TRANSLATION_KEY.interfacePicksHeader))
 		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:wuild()
 

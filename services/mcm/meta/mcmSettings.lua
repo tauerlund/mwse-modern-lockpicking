@@ -10,5 +10,5 @@
 ---@field public cycleNextPick keyBind
 ---@field public exit keyBind
 
----@class settingsMcm
+---@class settings
 ---@field public keyBinds keybindSettings

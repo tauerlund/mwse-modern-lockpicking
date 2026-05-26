@@ -4,7 +4,7 @@ local lockSpawner = require("tauer.modern-lockpicking.services.locks.lockSpawner
 local knifeSpawner = require("tauer.modern-lockpicking.services.knives.knifeSpawner")
 local pickSpawner = require("tauer.modern-lockpicking.services.picks.pickSpawner")
 local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
-local settings = require("tauer.modern-lockpicking.shared.settings").Mcm
+local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
 ---
 
 --- ENUMS
