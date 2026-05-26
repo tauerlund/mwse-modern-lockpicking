@@ -68,7 +68,7 @@ this.startAnimationKeyFrames = {
 
 ---@public
 ---@return boolean
-function this.Initialize()
+function this.initialize()
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
 	return true
 end
@@ -79,13 +79,13 @@ function this.start(knife)
 	this.knife = knife
 	this.blocked = true
 
-	nodeAnimator.Start({
+	nodeAnimator.start({
 		node = knife,
 		keyframes = this.startAnimationKeyFrames,
 		cancelOn = EVENTS.lockpickingEnded,
 	})
 
-	timerManager.Start({
+	timerManager.start({
 		durationInSeconds = CONSTANTS.animation.startAnimationDuration,
 		finishedCallback = this.onStartTimerFinished,
 		cancelOn = EVENTS.lockpickingEnded,

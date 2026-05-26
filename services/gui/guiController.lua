@@ -26,7 +26,7 @@ this.picks = nil
 
 ---@public
 ---@return boolean
-function this.Initialize()
+function this.initialize()
 	this.registerEvents()
 	return true
 end
@@ -143,7 +143,7 @@ function this.createControls()
 		:wuild()
 
 	gui.createLabel({ parent = outerBlock })
-		:withText(translations.Get("interface.controls.header"))
+		:withText(translations.get("interface.controls.header"))
 		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:wuild()
 
@@ -199,11 +199,11 @@ function this.getControlTexts()
 	local exit = this.getKeyName(settings.keyBinds.exit)
 
 	return {
-		string.format("%s: %s", translations.Get("interface.controls.rotatePick"), mouse),
-		string.format("%s: %s / %s", translations.Get("interface.controls.rotateLock"), rotateLockCounterclockwise,
+		string.format("%s: %s", translations.get("interface.controls.rotatePick"), mouse),
+		string.format("%s: %s / %s", translations.get("interface.controls.rotateLock"), rotateLockCounterclockwise,
 			rotateLockClockwise),
-		string.format("%s: %s / %s", translations.Get("interface.controls.cyclePicks"), cyclePreviousPick, cycleNextPick),
-		string.format("%s: %s", translations.Get("interface.controls.exit"), exit),
+		string.format("%s: %s / %s", translations.get("interface.controls.cyclePicks"), cyclePreviousPick, cycleNextPick),
+		string.format("%s: %s", translations.get("interface.controls.exit"), exit),
 	}
 end
 
@@ -239,7 +239,7 @@ function this.createPicks(activePick, picks)
 		:wuild()
 
 	gui.createLabel({ parent = upperBlock })
-		:withText(translations.Get("interface.picks.header"))
+		:withText(translations.get("interface.picks.header"))
 		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:wuild()
 

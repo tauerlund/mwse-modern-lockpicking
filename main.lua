@@ -40,7 +40,7 @@ function this.initializeMod()
 	}
 
 	for _, service in pairs(services) do
-		local initialized = service.Initialize()
+		local initialized = service.initialize()
 		if not initialized then
 			Logger:error("Initialization failed.")
 			return
@@ -54,11 +54,11 @@ function this.initializeMod()
 end
 
 function this.stopMod()
-	playerController.Stop()
+	playerController.stop()
 end
 
 function this.startMod()
-	playerController.Start()
+	playerController.start()
 end
 
 event.register(tes3.event.modConfigReady, this.initializeMcm)

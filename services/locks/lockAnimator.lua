@@ -12,7 +12,7 @@ local this = {}
 
 ---@public
 ---@return boolean
-function this.Initialize()
+function this.initialize()
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
 	return true
 end
@@ -20,7 +20,7 @@ end
 ---@private
 ---@param lock lock
 function this.start(lock)
-	timerManager.Start({
+	timerManager.start({
 		durationInSeconds = 0.8,
 		callback = this.onStartTimer,
 		cancelOn = EVENTS.lockpickingEnded,

@@ -7,7 +7,7 @@ local translations = require("tauer.modern-lockpicking.shared.translations")
 local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
 ---
 
-local template = mwse.mcm.createTemplate { name = translations.Get("modName"), headerImagePath = "textures\\tauer\\modern-lockpicking\\logo.tga" }
+local template = mwse.mcm.createTemplate { name = translations.get("modName"), headerImagePath = "textures\\tauer\\modern-lockpicking\\logo.tga" }
 template.onClose = function ()
     Settings:Save()
     event.trigger(EVENTS.keyBindsUpdated)
@@ -28,16 +28,16 @@ template:register()
 --     step = 1,
 -- })
 
-local controlsPage = template:createSideBarPage { label = translations.Get("interface.controls.header") }
+local controlsPage = template:createSideBarPage { label = translations.get("interface.controls.header") }
 
 local rotateLockCategory = controlsPage:createCategory({
-    label = translations.Get("interface.controls.rotateLock"),
-    description = translations.Get("mcm.description.rotateLock"),
+    label = translations.get("interface.controls.rotateLock"),
+    description = translations.get("mcm.description.rotateLock"),
 })
 
 rotateLockCategory:createKeyBinder({
-    label = translations.Get("mcm.labels.left"),
-    description = translations.Get("mcm.description.rotateLockCounterclockwise"),
+    label = translations.get("mcm.labels.left"),
+    description = translations.get("mcm.description.rotateLockCounterclockwise"),
     allowCombinations = false,
     variable = mwse.mcm.createTableVariable({
         id = "rotateLockCounterclockwise",
@@ -46,8 +46,8 @@ rotateLockCategory:createKeyBinder({
 })
 
 rotateLockCategory:createKeyBinder({
-    label = translations.Get("mcm.labels.right"),
-    description = translations.Get("mcm.description.rotateLockClockwise"),
+    label = translations.get("mcm.labels.right"),
+    description = translations.get("mcm.description.rotateLockClockwise"),
     allowCombinations = false,
     variable = mwse.mcm.createTableVariable({
         id = "rotateLockClockwise",
@@ -57,13 +57,13 @@ rotateLockCategory:createKeyBinder({
 
 
 local cyclePicksCategory = controlsPage:createCategory({
-    label = translations.Get("interface.controls.cyclePicks"),
-    description = translations.Get("mcm.description.cyclePicks"),
+    label = translations.get("interface.controls.cyclePicks"),
+    description = translations.get("mcm.description.cyclePicks"),
 })
 
 cyclePicksCategory:createKeyBinder({
-    label = translations.Get("mcm.labels.previous"),
-    description = translations.Get("mcm.description.cyclePreviousPick"),
+    label = translations.get("mcm.labels.previous"),
+    description = translations.get("mcm.description.cyclePreviousPick"),
     allowCombinations = false,
     variable = mwse.mcm.createTableVariable({
         id = "cyclePreviousPick",
@@ -73,8 +73,8 @@ cyclePicksCategory:createKeyBinder({
 
 
 cyclePicksCategory:createKeyBinder({
-    label = translations.Get("mcm.labels.next"),
-    description = translations.Get("mcm.description.cycleNextPick"),
+    label = translations.get("mcm.labels.next"),
+    description = translations.get("mcm.description.cycleNextPick"),
     allowCombinations = false,
     variable = mwse.mcm.createTableVariable({
         id = "cycleNextPick",
@@ -83,13 +83,13 @@ cyclePicksCategory:createKeyBinder({
 })
 
 local otherCategory = controlsPage:createCategory({
-    label = translations.Get("mcm.labels.other"),
-    description = translations.Get("mcm.description.other"),
+    label = translations.get("mcm.labels.other"),
+    description = translations.get("mcm.description.other"),
 })
 
 otherCategory:createKeyBinder({
-    label = translations.Get("interface.controls.exit"),
-    description = translations.Get("mcm.description.exit"),
+    label = translations.get("interface.controls.exit"),
+    description = translations.get("mcm.description.exit"),
     allowCombinations = false,
     variable = mwse.mcm.createTableVariable({
         id = "exit",

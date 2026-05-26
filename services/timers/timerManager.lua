@@ -14,7 +14,7 @@ local this = {}
 ---@public
 ---@param parameters timerParameters
 ---@return mwseTimer
-function this.Start(parameters)
+function this.start(parameters)
 	local data = parameters.data or {}
 
 	---@cast data +timerDataInner, -timerData

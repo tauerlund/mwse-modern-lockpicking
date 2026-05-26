@@ -10,8 +10,8 @@ local this = {}
 ---@public
 ---@param activator tes3containerInstance|tes3door
 ---@return lock
-function this.Spawn(activator)
-	local mesh = this.spawn(activator)
+function this.spawn(activator)
+	local mesh = this.spawnMesh(activator)
 
 	event.register(events.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
 
@@ -25,7 +25,7 @@ end
 ---@private
 ---@param activator tes3containerInstance|tes3door
 ---@return niNode
-function this.spawn(activator)
+function this.spawnMesh(activator)
 	local mesh = this.getMesh(activator)
 	local root = this.getRootNode()
 
@@ -44,7 +44,7 @@ end
 ---@param activator tes3containerInstance|tes3door
 ---@return niNode
 function this.getMesh(activator)
-	local mesh = lockMeshResolver.Resolve(activator)
+	local mesh = lockMeshResolver.resolve(activator)
 
 	mesh.name = "ModernLockpicking:Root"
 	mesh.translation = tes3.getCameraPosition():copy()

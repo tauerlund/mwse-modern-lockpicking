@@ -20,7 +20,7 @@ this.defaults = {
 this.Mcm = mwse.loadConfig(this.path, this.defaults) --[[@as settingsMcm]]
 
 ---@public
-function this.Save()
+function this.save()
     mwse.saveConfig(this.path, this.Mcm)
 end
 

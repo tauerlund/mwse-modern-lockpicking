@@ -12,7 +12,7 @@ this.defaultMesh = nil
 this.meshes = {}
 
 ---@public
-function this.Initialize()
+function this.initialize()
 	this.defaultMesh = tes3.loadMesh(CONSTANTS.paths.defaultLockMesh, true):clone() --[[@as niNode]]
 	return true
 end
@@ -20,7 +20,7 @@ end
 ---@public
 ---@param activator tes3containerInstance|tes3door
 ---@return niNode
-function this.Resolve(activator)
+function this.resolve(activator)
 	return this.meshes[activator.mesh] or this.defaultMesh
 end
 

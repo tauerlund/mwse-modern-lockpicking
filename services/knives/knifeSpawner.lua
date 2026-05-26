@@ -11,7 +11,7 @@ local this = {}
 ---@public
 ---@param lock lock
 ---@return knife
-function this.Spawn(lock)
+function this.spawn(lock)
 	this.registerEvents()
 
 	local knife = this.getMesh()

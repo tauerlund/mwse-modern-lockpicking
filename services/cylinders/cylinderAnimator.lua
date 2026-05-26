@@ -25,7 +25,7 @@ this.blocked = false
 
 ---@public
 ---@@return boolean
-function this.Initialize()
+function this.initialize()
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
 	return true
 end

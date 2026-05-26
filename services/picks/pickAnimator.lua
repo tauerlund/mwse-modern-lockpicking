@@ -71,7 +71,7 @@ this.cycleAnimationKeyFrames = {
 
 ---@public
 ---@return boolean
-function this.Initialize()
+function this.initialize()
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
 	return true
 end
@@ -83,13 +83,13 @@ function this.start(pick, keyframes)
 	this.mesh = pick.mesh
 	this.blocked = true
 
-	nodeAnimator.Start({
+	nodeAnimator.start({
 		node = pick.mesh,
 		keyframes = keyframes,
 		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickChange },
 	})
 
-	timerManager.Start({
+	timerManager.start({
 		durationInSeconds = keyframes[#keyframes].time,
 		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickChange },
 		finishedCallback = this.onStartTimerFinished,

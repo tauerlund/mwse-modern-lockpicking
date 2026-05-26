@@ -1,3 +1,3 @@
 ---@meta
 ---@class initializedService
----@field public Initialize fun():boolean
+---@field public initialize fun():boolean

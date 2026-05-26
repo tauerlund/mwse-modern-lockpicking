@@ -11,7 +11,7 @@ local this = {}
 ---@param lock lock
 ---@param pickItem tes3itemStack
 ---@return pick
-function this.Spawn(lock, pickItem)
+function this.spawn(lock, pickItem)
 	this.registerEvents()
 
 	local pick = this.getMesh(pickItem.object --[[@as tes3lockpick]])

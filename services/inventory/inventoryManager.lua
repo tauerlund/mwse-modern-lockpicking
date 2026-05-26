@@ -5,7 +5,7 @@ local this = {}
 
 ---@public
 ---@return tes3itemStack[]|nil
-function this.GetLockpicks()
+function this.getLockpicks()
 	---@type tes3itemStack[]
 	local lockpicks = {}
 

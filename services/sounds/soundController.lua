@@ -31,7 +31,7 @@ this.lockpickRotationTimeCooldown = 0
 this.cylinderRotationTimeCooldown = 0
 
 ---@public
-function this.Initialize()
+function this.initialize()
 	this.registerEvents()
 	return true
 end
@@ -41,7 +41,7 @@ end
 function this.onLockpickingStart(_)
 	tes3.playSound({
 		reference = tes3.player,
-		soundPath = soundFileResolver.Resolve(CONSTANTS.templates.lockpickingStart).path,
+		soundPath = soundFileResolver.resolve(CONSTANTS.templates.lockpickingStart).path,
 	})
 	this.lastCursorPosition = tes3.getCursorPosition().x
 
@@ -54,7 +54,7 @@ function this.onLockpickingEnd(e)
 	if e.success then
 		tes3.playSound({
 			reference = tes3.player,
-			soundPath = soundFileResolver.Resolve(CONSTANTS.templates.unlock).path,
+			soundPath = soundFileResolver.resolve(CONSTANTS.templates.unlock).path,
 		})
 	end
 
@@ -66,7 +66,7 @@ end
 function this.onPickChange(_)
 	tes3.playSound({
 		reference = tes3.player,
-		soundPath = soundFileResolver.Resolve(CONSTANTS.templates.changeLockpick).path,
+		soundPath = soundFileResolver.resolve(CONSTANTS.templates.changeLockpick).path,
 	})
 end
 
@@ -84,7 +84,7 @@ function this.playLockpickRotationSound(delta)
 	local cursorPositionDelta = currentCursorPosition - this.lastCursorPosition
 
 	if math.abs(cursorPositionDelta) > CONSTANTS.lockpickRotationMaxDelta and this.lockpickRotationTimeCounter >= this.lockpickRotationTimeCooldown then
-		local soundFile = soundFileResolver.Resolve(CONSTANTS.templates.rotateLockpick)
+		local soundFile = soundFileResolver.resolve(CONSTANTS.templates.rotateLockpick)
 		tes3.playSound({
 			reference = tes3.player,
 			soundPath = soundFile.path,
@@ -102,7 +102,7 @@ end
 ---@param delta number
 function this.playCylinderRotationSound(delta)
 	if this.isRotatingCylinder and this.cylinderRotationTimeCounter >= this.cylinderRotationTimeCooldown then
-		local soundFile = soundFileResolver.Resolve(CONSTANTS.templates.rotateCylinder)
+		local soundFile = soundFileResolver.resolve(CONSTANTS.templates.rotateCylinder)
 		tes3.playSound({
 			reference = tes3.player,
 			soundPath = soundFile.path,

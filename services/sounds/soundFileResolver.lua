@@ -18,7 +18,7 @@ this.empty = {
 
 ---@public
 ---@return boolean
-function this.Initialize()
+function this.initialize()
     for file in lfs.dir(string.format("%s/%s", CONSTANTS.paths.sound, CONSTANTS.paths.mod)) do
         if file:match("%.wav$") then
             local name = file:match("^(.*)%.wav$")
@@ -43,7 +43,7 @@ end
 ---@public
 ---@param template string
 ---@return soundFile
-function this.Resolve(template)
+function this.resolve(template)
     if not this.sounds[template] then
         Logger:error("Sound template '%s' not found.", template)
         return this.empty

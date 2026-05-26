@@ -11,7 +11,7 @@ this.currentIndex = 1
 ---@param picks tes3itemStack[]
 ---@param direction CYCLE_DIRECTION?
 ---@return tes3itemStack
-function this.Select(picks, direction)
+function this.select(picks, direction)
     if not direction then
         this.currentIndex = this.getInitialIndex()
     elseif direction == CYCLE.next then

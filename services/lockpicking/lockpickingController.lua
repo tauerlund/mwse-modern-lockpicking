@@ -51,7 +51,7 @@ this.pickCycleDirections = nil
 
 ---@public
 ---@return boolean
-function this.Initialize()
+function this.initialize()
 	event.register(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
 	this.rotationDirections = this.getRotationDirections()
 	this.pickCycleDirections = this.getPickCycleDirections()
@@ -61,12 +61,12 @@ end
 ---@public
 ---@param activator tes3containerInstance|tes3door
 ---@param picks tes3itemStack[]
-function this.Start(activator, picks)
+function this.start(activator, picks)
 	this.activator = activator
 	this.picks = picks
 
-	this.lock = lockSpawner.Spawn(activator)
-	this.knife = knifeSpawner.Spawn(this.lock)
+	this.lock = lockSpawner.spawn(activator)
+	this.knife = knifeSpawner.spawn(this.lock)
 	this.pick = this.selectPick()
 
 	---@type lockpickingStartEventData
@@ -79,7 +79,7 @@ function this.Start(activator, picks)
 	}
 	event.trigger(EVENTS.lockpickingStart, lockPickingStartEventData)
 
-	timerManager.Start({
+	timerManager.start({
 		durationInSeconds = 1.3,
 		finishedCallback = this.registerEvents,
 		cancelOn = EVENTS.lockpickingEnded,
@@ -87,7 +87,7 @@ function this.Start(activator, picks)
 end
 
 ---@public
-function this.Stop()
+function this.exit()
 	this.stop({ success = false })
 end
 
@@ -180,8 +180,8 @@ function this.selectPick(direction)
 		event.trigger(EVENTS.pickChange, pickChangedEventData)
 	end
 
-	local item = pickSelector.Select(this.picks, direction)
-	local pick = pickSpawner.Spawn(this.lock, item)
+	local item = pickSelector.select(this.picks, direction)
+	local pick = pickSpawner.spawn(this.lock, item)
 
 	---@type pickSelectedEventData
 	local pickSelectedEventData = {
@@ -205,7 +205,7 @@ function this.finish(parameters)
 	}
 	event.trigger(EVENTS.lockpickingEnd, data)
 
-	timerManager.Start({
+	timerManager.start({
 		durationInSeconds = 1,
 		finishedCallback = this.onEndTimerFinished,
 		data = data --[[@as timerData]],

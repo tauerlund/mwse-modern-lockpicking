@@ -7,7 +7,7 @@ local this = {}
 
 ---@public
 ---@param parameters meshAnimatorStartParameters
-function this.Start(parameters)
+function this.start(parameters)
 	local keyFramesLength = #parameters.keyframes
 	if keyFramesLength < 2 then
 		return
@@ -17,7 +17,7 @@ function this.Start(parameters)
 	local lastKeyframe = parameters.keyframes[keyFramesLength]
 
 	this.initializeTransforms(parameters.node, firstKeyframe.translation, firstKeyframe.rotation)
-	timerManager.Start({
+	timerManager.start({
 		durationInSeconds = lastKeyframe.time,
 		callback = this.onStartTimer,
 		cancelOn = parameters.cancelOn or nil,

@@ -14,7 +14,7 @@ this.depthOfField = nil
 
 ---@public
 ---@return boolean
-function this.Initialize()
+function this.initialize()
     this.registerEvents()
 
     this.depthOfField = mge.shaders.load({ name = "modern-lockpicking/Bokeh" })

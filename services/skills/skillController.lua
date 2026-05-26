@@ -8,7 +8,7 @@ local this = {}
 
 ---@public
 ---@return boolean
-function this.Initialize()
+function this.initialize()
 	this.registerEvents()
 	return true
 end
