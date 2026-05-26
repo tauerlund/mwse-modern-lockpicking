@@ -1,4 +1,6 @@
 local logger = mwse.Logger.new()
+
+--- SERVICES
 local lockpickingController = require("tauer.modern-lockpicking.services.lockpicking.lockpickingController")
 local lockMeshResolver = require("tauer.modern-lockpicking.services.locks.lockMeshResolver")
 local soundController = require("tauer.modern-lockpicking.services.sounds.soundController")
@@ -12,6 +14,7 @@ local pickAnimator = require("tauer.modern-lockpicking.services.picks.pickAnimat
 local renderingController = require("tauer.modern-lockpicking.services.rendering.renderingController")
 local soundFileResolver = require("tauer.modern-lockpicking.services.sounds.soundFileResolver")
 local mcm = require("tauer.modern-lockpicking.services.mcm.mcmInitializer")
+---
 
 ---@class ModernLockpicking
 local this = {}

@@ -1,4 +1,6 @@
+--- ENUMS
 local CONSTANTS = require("tauer.modern-lockpicking.services.locks.enums.CONSTANTS")
+---
 
 ---@class lockMeshResolver : initializedService
 local this = {}

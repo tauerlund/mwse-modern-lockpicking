@@ -1,6 +1,8 @@
 local logger = mwse.Logger.new()
 
+--- ENUMS
 local EVENTS = require("mods.tauer.modern-lockpicking.services.events.enums.events")
+---
 
 ---@class eventLogger : initializedService
 local this = {}

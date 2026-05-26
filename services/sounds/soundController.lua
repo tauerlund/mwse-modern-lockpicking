@@ -1,7 +1,11 @@
+--- SERVICES
 local soundFileResolver = require("tauer.modern-lockpicking.services.sounds.soundFileResolver")
+---
 
+--- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local CONSTANTS = require("tauer.modern-lockpicking.services.sounds.enums.CONSTANTS")
+---
 
 ---@class soundController : initializedService
 local this = {}

@@ -1,10 +1,17 @@
+--- SERVICES
 local translations = require("tauer.modern-lockpicking.services.translations.translations")
 local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings")
+---
+
+--- PAGES
 local controlsPage = require("tauer.modern-lockpicking.services.mcm.pages.controlsPage")
 local debuggingPage = require("tauer.modern-lockpicking.services.mcm.pages.debuggingPage")
+---
 
+--- ENUMS
 local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
+---
 
 ---@class mcmInitializer : initializedService
 local this = {}
