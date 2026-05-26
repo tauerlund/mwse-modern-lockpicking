@@ -31,9 +31,10 @@ this.lockpickRotationTimeCooldown = 0
 this.cylinderRotationTimeCooldown = 0
 
 ---@public
+---@return boolean,string|nil
 function this.initialize()
 	this.registerEvents()
-	return true
+	return true, nil
 end
 
 ---@private

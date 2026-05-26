@@ -12,9 +12,10 @@ this.defaultMesh = nil
 this.meshes = {}
 
 ---@public
+---@return boolean,string|nil
 function this.initialize()
 	this.defaultMesh = tes3.loadMesh(CONSTANTS.paths.defaultLockMesh, true):clone() --[[@as niNode]]
-	return true
+	return true, nil
 end
 
 ---@public

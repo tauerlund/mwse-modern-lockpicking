@@ -40,9 +40,9 @@ function this.initializeMod()
 	}
 
 	for _, service in pairs(services) do
-		local initialized = service.initialize()
+		local initialized, reason = service.initialize()
 		if not initialized then
-			Logger:error("Initialization failed.")
+			Logger:error("Initialization failed. Reason: %s", reason)
 			return
 		end
 	end

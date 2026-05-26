@@ -50,12 +50,12 @@ this.rotationDirections = nil
 this.pickCycleDirections = nil
 
 ---@public
----@return boolean
+---@return boolean,string|nil
 function this.initialize()
 	event.register(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
 	this.rotationDirections = this.getRotationDirections()
 	this.pickCycleDirections = this.getPickCycleDirections()
-	return true
+	return true, nil
 end
 
 ---@public

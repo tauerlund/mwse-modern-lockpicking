@@ -25,10 +25,10 @@ this.controls = nil
 this.picks = nil
 
 ---@public
----@return boolean
+---@return boolean,string|nil
 function this.initialize()
 	this.registerEvents()
-	return true
+	return true, nil
 end
 
 ---@private

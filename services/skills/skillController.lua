@@ -7,10 +7,10 @@ local CONSTANTS = require("tauer.modern-lockpicking.services.skills.enums.consta
 local this = {}
 
 ---@public
----@return boolean
+---@return boolean,string|nil
 function this.initialize()
 	this.registerEvents()
-	return true
+	return true, nil
 end
 
 ---@private

@@ -24,10 +24,10 @@ this.rotationDirection = nil
 this.blocked = false
 
 ---@public
----@@return boolean
+---@return boolean,string|nil
 function this.initialize()
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
-	return true
+	return true, nil
 end
 
 ---@private

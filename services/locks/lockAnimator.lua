@@ -11,10 +11,10 @@ local CONSTANTS = require("tauer.modern-lockpicking.services.locks.enums.constan
 local this = {}
 
 ---@public
----@return boolean
+---@return boolean,string|nil
 function this.initialize()
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
-	return true
+	return true, nil
 end
 
 ---@private

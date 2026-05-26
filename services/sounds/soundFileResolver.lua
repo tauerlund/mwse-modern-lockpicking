@@ -17,7 +17,7 @@ this.empty = {
 }
 
 ---@public
----@return boolean
+---@return boolean,string|nil
 function this.initialize()
     for file in lfs.dir(string.format("%s/%s", CONSTANTS.paths.sound, CONSTANTS.paths.mod)) do
         if file:match("%.wav$") then
@@ -59,15 +59,14 @@ function this.resolve(template)
 end
 
 ---@private
----@return boolean
+---@return boolean, string|nil
 function this.validate()
     for _, template in pairs(CONSTANTS.templates) do
         if not this.sounds[template] then
-            Logger:error("Sound template '%s' is missing or has no sound files.", template)
-            return false
+            return false, string.format("sound template '%s' is missing or has no sound files.", template)
         end
     end
-    return true
+    return true, nil
 end
 
 ---@private

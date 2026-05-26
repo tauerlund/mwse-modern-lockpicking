@@ -13,7 +13,7 @@ this.pauseRenderingInMenus = false
 this.depthOfField = nil
 
 ---@public
----@return boolean
+---@return boolean,string|nil
 function this.initialize()
     this.registerEvents()
 
@@ -22,7 +22,7 @@ function this.initialize()
         this.depthOfField.enabled = false
     end
 
-    return true
+    return true, nil
 end
 
 ---@private
