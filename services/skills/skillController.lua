@@ -1,5 +1,5 @@
 --- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
+local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local CONSTANTS = require("tauer.modern-lockpicking.services.skills.enums.constants")
 ---
 

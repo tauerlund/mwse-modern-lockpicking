@@ -1,7 +1,7 @@
 --- ENUMS
 local Z_BUFFER_INDEX = require("tauer.modern-lockpicking.shared.enums.zBufferIndex")
 local OBJECT_NAMES = require("tauer.modern-lockpicking.shared.enums.objectNames")
-local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
+local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local COSNTANTS = require("tauer.modern-lockpicking.services.knives.enums.constants")
 ---
 

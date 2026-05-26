@@ -4,7 +4,7 @@ local controlsPage = require("tauer.modern-lockpicking.services.mcm.pages.contro
 local debuggingPage = require("tauer.modern-lockpicking.services.mcm.pages.debuggingPage")
 
 local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
-local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
+local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 
 ---@class mcmInitializer : initializedService
 local this = {}

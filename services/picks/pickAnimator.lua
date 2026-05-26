@@ -5,7 +5,7 @@ local timerManager = require("tauer.modern-lockpicking.services.timers.timerMana
 
 --- ENUMS
 local CONSTANTS = require("tauer.modern-lockpicking.services.picks.enums.constants")
-local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
+local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 ---
 
 ---@class pickAnimator : initializedService

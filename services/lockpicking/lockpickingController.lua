@@ -9,7 +9,7 @@ local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mc
 
 --- ENUMS
 local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.constants")
-local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
+local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirection")
 local CYCLE = require("tauer.modern-lockpicking.shared.enums.cycleDirection")
 ---

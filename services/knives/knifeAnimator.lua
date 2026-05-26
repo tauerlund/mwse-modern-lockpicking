@@ -4,7 +4,7 @@ local nodeAnimator = require("tauer.modern-lockpicking.services.nodes.nodeAnimat
 ---
 
 --- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
+local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local DIRECTION = require("tauer.modern-lockpicking.shared.enums.rotationDirection")
 local CONSTANTS = require("tauer.modern-lockpicking.services.knives.enums.constants")
 ---

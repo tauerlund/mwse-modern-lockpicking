@@ -5,7 +5,7 @@ local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mc
 ---
 
 --- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.shared.enums.events")
+local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
 local CONSTANTS = require("tauer.modern-lockpicking.services.gui.enums.constants")
 ---

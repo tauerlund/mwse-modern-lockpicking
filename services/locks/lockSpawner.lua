@@ -2,7 +2,7 @@ local lockMeshResolver = require("tauer.modern-lockpicking.services.locks.lockMe
 local zBufferIndex = require("tauer.modern-lockpicking.shared.enums.zBufferIndex")
 
 local objectNames = require("tauer.modern-lockpicking.shared.enums.objectNames")
-local events = require("tauer.modern-lockpicking.shared.enums.events")
+local events = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 
 ---@class lockSpawner
 local this = {}
