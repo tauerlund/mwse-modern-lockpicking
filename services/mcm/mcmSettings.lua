@@ -13,7 +13,8 @@ this.defaults = {
         cyclePreviousPick = { keyCode = tes3.scanCode.w },
         cycleNextPick = { keyCode = tes3.scanCode.s },
         exit = { keyCode = tes3.scanCode.tab },
-    }
+    },
+    logLevel = "INFO",
 }
 
 ---@type settings

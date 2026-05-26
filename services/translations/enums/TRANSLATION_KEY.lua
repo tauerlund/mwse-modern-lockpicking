@@ -22,6 +22,7 @@ local this = {
     mcmDescriptionCycleNextPick = "mcm.description.cycleNextPick",
     mcmDescriptionExit = "mcm.description.exit",
     mcmDescriptionOther = "mcm.description.other",
+    mcmHeaderDebugging = "mcm.header.debugging"
 }
 
 return this

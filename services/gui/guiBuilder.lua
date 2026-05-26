@@ -1,4 +1,4 @@
-local Logger = require("tauer.modern-lockpicking.shared.loggingFactory")
+local logger = mwse.Logger.new()
 
 ---@class guiBuilder
 ---@field private element tes3uiElement
@@ -205,7 +205,7 @@ end
 function guiBuilder:withCallback(evt, callback)
 	self.callbacks = self.callbacks or {}
 	if self.callbacks[evt] then
-		Logger:warn("Callback for event '%s' already registered", evt)
+		logger:warn("Callback for event '%s' already registered", evt)
 		return
 	end
 

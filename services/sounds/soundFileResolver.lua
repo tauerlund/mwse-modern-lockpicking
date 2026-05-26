@@ -1,4 +1,4 @@
-local Logger = require("tauer.modern-lockpicking.shared.loggingFactory")
+local logger = mwse.Logger.new()
 
 local CONSTANTS = require("tauer.modern-lockpicking.services.sounds.enums.constants")
 
@@ -45,13 +45,13 @@ end
 ---@return soundFile
 function this.resolve(template)
     if not this.sounds[template] then
-        Logger:error("Sound template '%s' not found.", template)
+        logger:error("Sound template '%s' not found.", template)
         return this.empty
     end
 
     local sound = table.choice(this.sounds[template])
     if not sound then
-        Logger:error("No sound files found for '%s'.", template)
+        logger:error("No sound files found for '%s'.", template)
         return this.empty
     end
 

@@ -12,3 +12,4 @@
 
 ---@class settings
 ---@field public keyBinds keybindSettings
+---@field public logLevel string

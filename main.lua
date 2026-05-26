@@ -1,4 +1,4 @@
-local Logger = require("tauer.modern-lockpicking.shared.loggingFactory")
+local logger = mwse.Logger.new()
 local lockpickingController = require("tauer.modern-lockpicking.services.lockpicking.lockpickingController")
 local lockMeshResolver = require("tauer.modern-lockpicking.services.locks.lockMeshResolver")
 local soundController = require("tauer.modern-lockpicking.services.sounds.soundController")
@@ -25,7 +25,7 @@ end
 ---@package
 ---@param _ initializedEventData
 function this.initializeMod(_)
-	Logger:info("Initializing...")
+	logger:info("Initializing...")
 
 	---@type initializedService[]
 	local services = {
@@ -45,7 +45,7 @@ function this.initializeMod(_)
 	for _, service in pairs(services) do
 		local initialized, reason = service.initialize()
 		if not initialized then
-			Logger:error("Initialization failed. Reason: %s", reason)
+			logger:error("Initialization failed. Reason: %s", reason)
 			return
 		end
 	end
@@ -53,7 +53,7 @@ function this.initializeMod(_)
 	event.register(tes3.event.load, this.stopMod)
 	event.register(tes3.event.loaded, this.startMod)
 
-	Logger:info("Initialized.")
+	logger:info("Initialized.")
 end
 
 function this.stopMod()

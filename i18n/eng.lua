@@ -23,4 +23,5 @@ return {
 	[TRANSLATION_KEY.mcmDescriptionCycleNextPick] = "Set the key for cycling to the next pick.",
 	[TRANSLATION_KEY.mcmDescriptionExit] = "Set the key to exit the lockpicking interface.",
 	[TRANSLATION_KEY.mcmDescriptionOther] = "Other keybinds.",
+	[TRANSLATION_KEY.mcmHeaderDebugging] = "Debugging",
 }

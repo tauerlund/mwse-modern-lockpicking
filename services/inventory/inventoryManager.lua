@@ -1,5 +1,3 @@
-Logger = require("tauer.modern-lockpicking.shared.loggingFactory")
-
 ---@class inventoryManager
 local this = {}
 
