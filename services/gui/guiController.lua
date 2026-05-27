@@ -380,7 +380,7 @@ end
 
 ---@private
 ---@param element tes3uiElement
----@param _ pickChangeEventData
+---@param _ pickCycledEventData
 function this.onPickChange(element, _)
 	element.color = tes3ui.getPalette(tes3.palette.normalColor)
 end

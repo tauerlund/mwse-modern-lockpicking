@@ -1,0 +1,3 @@
+---@meta
+---@class lockpickingStartedEventData
+---@field public session lockpickingSession

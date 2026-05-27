@@ -67,7 +67,7 @@ function this.onLockpickingEnd(e)
 end
 
 ---@private
----@param _ pickChangeEventData
+---@param _ pickCycledEventData
 function this.onPickChange(_)
 	tes3.playSound({
 		reference = tes3.player,

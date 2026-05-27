@@ -62,7 +62,7 @@ function this.onLockpickingEnded(e)
 end
 
 ---@private
----@param e pickChangeEventData
+---@param e pickCycledEventData
 function this.onPickChange(e)
 	this.despawn(e.pick)
 end

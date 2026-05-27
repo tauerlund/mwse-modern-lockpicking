@@ -13,8 +13,6 @@ local translations = require("tauer.modern-lockpicking.services.translations.tra
 --- ENUMS
 local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.CONSTANTS")
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local DIRECTION = require("tauer.modern-lockpicking.services.lockpicking.enums.ROTATION_DIRECTION")
-local CYCLE = require("tauer.modern-lockpicking.services.lockpicking.enums.CYCLE_DIRECTION")
 local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
 ---
 
@@ -24,18 +22,6 @@ local this = {}
 ---@private
 ---@type lockpickingSession|nil
 this.session = nil
-
----@private
----@type tes3.scanCode
-this.currentDirectionKey = nil
-
----@private
----@type { [tes3.scanCode]: ROTATION_DIRECTION }
-this.rotationDirections = nil
-
----@private
----@type { [tes3.scanCode]: CYCLE_DIRECTION }
-this.pickCycleDirections = nil
 
 ---@private
 ---@type { [string]: activationStrategy }
@@ -57,7 +43,6 @@ function this.initialize()
 		return false, "Failed to load activation strategies"
 	end
 
-	this.applyKeybinds()
 	this.applyActivationStrategy()
 
 	this.registerEvents()
@@ -94,7 +79,7 @@ function this.onLockPickingActivated(e)
 
 	timerManager.start({
 		durationInSeconds = 1.3,
-		finishedCallback = this.enable,
+		finishedCallback = this.onLockpickingReady,
 		cancelOn = EVENTS.lockpickingEnded,
 	})
 end
@@ -105,69 +90,20 @@ function this.exit()
 end
 
 ---@private
----@param e keyDownEventData
-function this.onKeyDown(e)
-	if this.rotationDirections[e.keyCode] then
-		this.onRotationDirectionKeyDown(e)
-		return
-	end
-	if this.pickCycleDirections[e.keyCode] then
-		this.onPickCycleKeyDown(e)
-		return
-	end
+function this.onLockpickingReady()
+	this.enable()
+	event.trigger(EVENTS.lockpickingStarted)
 end
 
 ---@private
----@param e keyUpEventData
-function this.onKeyUp(e)
-	if this.rotationDirections[e.keyCode] then
-		this.onRotationDirectionKeyUp(e)
-		return
-	end
-	if e.keyCode == settings.keyBinds.exit.keyCode then
-		this.finish({ success = false })
-		return
-	end
+---@param e pickCycleRequestedEventData
+function this.onPickCycleRequested(e)
+	this.session.pick = this.selectPick(e.direction)
 end
 
 ---@private
----@param e keyDownEventData
-function this.onRotationDirectionKeyDown(e)
-	---@type rotationEventData
-	local data = {
-		direction = this.rotationDirections[e.keyCode],
-	}
-	event.trigger(EVENTS.rotationStarted, data)
-	this.currentDirectionKey = e.keyCode
-end
-
----@private
----@param e keyDownEventData
-function this.onPickCycleKeyDown(e)
-	local direction = this.pickCycleDirections[e.keyCode]
-	this.session.pick = this.selectPick(direction)
-end
-
----@private
----@param e keyUpEventData
-function this.onRotationDirectionKeyUp(e)
-	if this.directionKeyIsBlocked(e.keyCode) then
-		return
-	end
-
-	---@type rotationEventData
-	local data = {
-		direction = this.rotationDirections[e.keyCode],
-	}
-	event.trigger(EVENTS.rotationEnded, data)
-	this.currentDirectionKey = nil
-end
-
----@private
----@param keyCode tes3.scanCode
----@return boolean
-function this.directionKeyIsBlocked(keyCode)
-	return this.currentDirectionKey and this.currentDirectionKey ~= keyCode
+function this.onExitRequested()
+	this.finish({ success = false })
 end
 
 ---@private
@@ -186,7 +122,7 @@ end
 ---@return pick
 function this.selectPick(direction)
 	if this.session.pick then
-		---@type pickChangeEventData
+		---@type pickCycledEventData
 		local pickChangedEventData = {
 			pick = this.session.pick,
 		}
@@ -258,12 +194,6 @@ end
 
 function this.resetFields()
 	this.session = nil
-	this.currentDirectionKey = nil
-end
-
----@private
-function this.onKeyBindsUpdated()
-	this.applyKeybinds()
 end
 
 ---@private
@@ -277,25 +207,7 @@ function this.applyActivationStrategy()
 end
 
 ---@private
-function this.applyKeybinds()
-	this.rotationDirections = {
-		[settings.keyBinds.rotateLockClockwise.keyCode] = DIRECTION.clockwise,
-		[settings.keyBinds.rotateLockCounterclockwise.keyCode] = DIRECTION.counterClockwise,
-	}
-	this.pickCycleDirections = {
-		[settings.keyBinds.cycleNextPick.keyCode] = CYCLE.next,
-		[settings.keyBinds.cyclePreviousPick.keyCode] = CYCLE.previous,
-	}
-end
-
----@private
 function this.enable()
-	if not event.isRegistered(tes3.event.keyDown, this.onKeyDown) then
-		event.register(tes3.event.keyDown, this.onKeyDown)
-	end
-	if not event.isRegistered(tes3.event.keyUp, this.onKeyUp) then
-		event.register(tes3.event.keyUp, this.onKeyUp)
-	end
 	if not event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
 		event.register(tes3.event.enterFrame, this.onEnterFrame)
 	end
@@ -303,12 +215,6 @@ end
 
 ---@private
 function this.disable()
-	if event.isRegistered(tes3.event.keyDown, this.onKeyDown) then
-		event.unregister(tes3.event.keyDown, this.onKeyDown)
-	end
-	if event.isRegistered(tes3.event.keyUp, this.onKeyUp) then
-		event.unregister(tes3.event.keyUp, this.onKeyUp)
-	end
 	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
 		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
 	end
@@ -316,8 +222,9 @@ end
 
 ---@private
 function this.registerEvents()
-	event.register(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
 	event.register(EVENTS.lockpickingActivated, this.onLockPickingActivated)
+	event.register(EVENTS.pickCycleRequested, this.onPickCycleRequested)
+	event.register(EVENTS.exitRequested, this.onExitRequested)
 end
 
 return this

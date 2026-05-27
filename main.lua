@@ -2,6 +2,7 @@ local logger = mwse.Logger.new()
 
 --- SERVICES
 local lockpickingController = require("tauer.modern-lockpicking.services.lockpicking.lockpickingController")
+local lockpickingInputHandler = require("tauer.modern-lockpicking.services.lockpicking.lockpickingInputHandler")
 local lockMeshResolver = require("tauer.modern-lockpicking.services.locks.lockMeshResolver")
 local soundController = require("tauer.modern-lockpicking.services.sounds.soundController")
 local skillController = require("tauer.modern-lockpicking.services.skills.skillController")
@@ -32,6 +33,7 @@ function this.initializeMod(_)
 	---@type initializedService[]
 	local services = {
 		lockpickingController,
+		lockpickingInputHandler,
 		lockMeshResolver,
 		soundController,
 		guiController,

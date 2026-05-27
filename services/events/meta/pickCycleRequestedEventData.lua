@@ -1,0 +1,3 @@
+---@meta
+---@class pickCycleRequestedEventData
+---@field public direction CYCLE_DIRECTION
