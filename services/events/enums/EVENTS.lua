@@ -9,8 +9,6 @@ local enum = {
 	rotationEnded = "tauer.modern-lockpicking.rotationEnded",
 	keyBindsUpdated = "tauer.modern-lockpicking.keyBindsUpdated",
 	pickCycled = "tauer.modern-lockpicking.pickCycled",
-	pickCycleRequested = "tauer.modern-lockpicking.pickCycleRequested",
-	exitRequested = "tauer.modern-lockpicking.exitRequested",
 	settingsUpdated = "tauer.modern-lockpicking.settingsUpdated",
 	cylinderTargetReached = "tauer.modern-lockpicking.cylinderTargetReached"
 }

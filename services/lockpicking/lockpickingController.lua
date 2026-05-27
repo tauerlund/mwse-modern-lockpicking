@@ -1,4 +1,5 @@
 --- SERVICES
+local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
 local lockSpawner = require("tauer.modern-lockpicking.services.locks.lockSpawner")
 local knifeSpawner = require("tauer.modern-lockpicking.services.knives.knifeSpawner")
 local pickSelector = require("tauer.modern-lockpicking.services.picks.pickSelector")
@@ -26,7 +27,6 @@ function this.initialize()
 	event.register(EVENTS.lockpickingActivated, this.onLockPickingActivated)
 	event.register(EVENTS.cylinderTargetReached, this.onCylinderTargetReached)
 	event.register(EVENTS.pickCycled, this.onPickCycled)
-	event.register(EVENTS.exitRequested, this.onExitRequested)
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
 	return true, nil
 end
@@ -83,6 +83,7 @@ function this.onStartTimerFinished()
 		session = this.session,
 	}
 	event.trigger(EVENTS.lockpickingStarted, eventData)
+	this.enableInput()
 end
 
 ---@private
@@ -102,18 +103,22 @@ function this.onPickCycled(e)
 end
 
 ---@private
-function this.onExitRequested()
-	---@type lockpickingEndEventData
-	local data = {
-		session = this.session,
-		success = false,
-	}
-	event.trigger(EVENTS.lockpickingEnd, data)
+---@param e keyUpEventData
+function this.onKeyUp(e)
+	if e.keyCode == settings.keyBinds.exit.keyCode then
+		---@type lockpickingEndEventData
+		local data = {
+			session = this.session,
+			success = false,
+		}
+		event.trigger(EVENTS.lockpickingEnd, data)
+	end
 end
 
 ---@private
 ---@param e lockpickingEndEventData
 function this.onLockpickingEnd(e)
+	this.disableInput()
 	timerManager.start({
 		durationInSeconds = 1,
 		finishedCallback = this.onEndTimerFinished,
@@ -132,6 +137,20 @@ function this.onEndTimerFinished(data)
 	}
 	event.trigger(EVENTS.lockpickingEnded, eventData)
 	this.session = nil
+end
+
+---@private
+function this.enableInput()
+	if not event.isRegistered(tes3.event.keyUp, this.onKeyUp) then
+		event.register(tes3.event.keyUp, this.onKeyUp)
+	end
+end
+
+---@private
+function this.disableInput()
+	if event.isRegistered(tes3.event.keyUp, this.onKeyUp) then
+		event.unregister(tes3.event.keyUp, this.onKeyUp)
+	end
 end
 
 return this
