@@ -5,6 +5,9 @@ local knifeSpawner = require("tauer.modern-lockpicking.services.knives.knifeSpaw
 local pickSpawner = require("tauer.modern-lockpicking.services.picks.pickSpawner")
 local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
 local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
+local inventoryManager = require("tauer.modern-lockpicking.services.inventory.inventoryManager")
+local strategyLoader = require("tauer.modern-lockpicking.services.strategies.strategyLoader")
+local translations = require("tauer.modern-lockpicking.services.translations.translations")
 ---
 
 --- ENUMS
@@ -12,6 +15,7 @@ local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.C
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local DIRECTION = require("tauer.modern-lockpicking.services.lockpicking.enums.ROTATION_DIRECTION")
 local CYCLE = require("tauer.modern-lockpicking.services.lockpicking.enums.CYCLE_DIRECTION")
+local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
 ---
 
 ---@class lockpickingController : initializedService
@@ -49,29 +53,53 @@ this.rotationDirections = nil
 ---@type { [tes3.scanCode]: CYCLE_DIRECTION }
 this.pickCycleDirections = nil
 
+---@private
+---@type { [string]: activationStrategy }
+this.activationStrategies = nil
+
+---@private
+---@type activationStrategy
+this.currentActivationStrategy = nil
+
 ---@public
 ---@return boolean,string|nil
 function this.initialize()
-	event.register(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
-	this.rotationDirections = this.getRotationDirections()
-	this.pickCycleDirections = this.getPickCycleDirections()
+	this.activationStrategies = strategyLoader.loadAll({
+		directory = "tauer\\modern-lockpicking\\services\\lockpicking\\strategies",
+		requireNotEmpty = true,
+	}) --[[@as { [string]: activationStrategy }]]
+
+	if not this.activationStrategies then
+		return false, "Failed to load activation strategies"
+	end
+
+	this.applyKeybinds()
+	this.applyActivationStrategy()
+
+	this.registerEvents()
+
 	return true, nil
 end
 
 ---@public
----@param activator tes3containerInstance|tes3door
----@param picks tes3itemStack[]
-function this.start(activator, picks)
-	this.activator = activator
-	this.picks = picks
+---@param e lockpickingActivatedEventData
+function this.onLockPickingActivated(e)
+	local picks = inventoryManager.getLockpicks()
+	if not picks then
+		tes3.messageBox(translations.get(TRANSLATION_KEY.messageBoxNoLockpicks))
+		return
+	end
 
-	this.lock = lockSpawner.spawn(activator)
+	this.picks = picks
+	this.activator = e.activator
+
+	this.lock = lockSpawner.spawn(this.activator)
 	this.knife = knifeSpawner.spawn(this.lock)
 	this.pick = this.selectPick()
 
 	---@type lockpickingStartEventData
 	local lockPickingStartEventData = {
-		activator = activator,
+		activator = this.activator,
 		lock = this.lock,
 		knife = this.knife,
 		picks = picks,
@@ -81,7 +109,7 @@ function this.start(activator, picks)
 
 	timerManager.start({
 		durationInSeconds = 1.3,
-		finishedCallback = this.registerEvents,
+		finishedCallback = this.enable,
 		cancelOn = EVENTS.lockpickingEnded,
 	})
 end
@@ -211,7 +239,7 @@ function this.finish(parameters)
 		data = data --[[@as timerData]],
 	})
 
-	this.unregisterEvents()
+	this.disable()
 end
 
 ---@private
@@ -234,7 +262,18 @@ function this.stop(parameters)
 	}
 	event.trigger(EVENTS.lockpickingEnded, data)
 
-	this.unregisterEvents()
+	local activator = this.activator
+
+	if parameters.success then
+		tes3.unlock({
+			reference = activator --[[@as tes3reference]],
+		})
+		timer.delayOneFrame(function ()
+			tes3.player:activate(activator --[[@as tes3reference]])
+		end)
+	end
+
+	this.disable()
 	this.resetFields()
 end
 
@@ -249,37 +288,46 @@ end
 
 ---@private
 function this.onKeyBindsUpdated()
-	this.rotationDirections = this.getRotationDirections()
-	this.pickCycleDirections = this.getPickCycleDirections()
+	this.applyKeybinds()
 end
 
 ---@private
----@return { [tes3.scanCode]: ROTATION_DIRECTION }
-function this.getRotationDirections()
-	return {
+function this.applyActivationStrategy()
+	if this.currentActivationStrategy then
+		this.currentActivationStrategy.disable()
+	end
+
+	this.currentActivationStrategy = this.activationStrategies[settings.activationStrategy]
+	this.currentActivationStrategy.enable()
+end
+
+---@private
+function this.applyKeybinds()
+	this.rotationDirections = {
 		[settings.keyBinds.rotateLockClockwise.keyCode] = DIRECTION.clockwise,
 		[settings.keyBinds.rotateLockCounterclockwise.keyCode] = DIRECTION.counterClockwise,
 	}
-end
-
----@private
----@return { [tes3.scanCode]: CYCLE_DIRECTION }
-function this.getPickCycleDirections()
-	return {
+	this.pickCycleDirections = {
 		[settings.keyBinds.cycleNextPick.keyCode] = CYCLE.next,
 		[settings.keyBinds.cyclePreviousPick.keyCode] = CYCLE.previous,
 	}
 end
 
 ---@private
-function this.registerEvents()
-	event.register(tes3.event.keyDown, this.onKeyDown)
-	event.register(tes3.event.keyUp, this.onKeyUp)
-	event.register(tes3.event.enterFrame, this.onEnterFrame)
+function this.enable()
+	if not event.isRegistered(tes3.event.keyDown, this.onKeyDown) then
+		event.register(tes3.event.keyDown, this.onKeyDown)
+	end
+	if not event.isRegistered(tes3.event.keyUp, this.onKeyUp) then
+		event.register(tes3.event.keyUp, this.onKeyUp)
+	end
+	if not event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
+		event.register(tes3.event.enterFrame, this.onEnterFrame)
+	end
 end
 
 ---@private
-function this.unregisterEvents()
+function this.disable()
 	if event.isRegistered(tes3.event.keyDown, this.onKeyDown) then
 		event.unregister(tes3.event.keyDown, this.onKeyDown)
 	end
@@ -289,6 +337,12 @@ function this.unregisterEvents()
 	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
 		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
 	end
+end
+
+---@private
+function this.registerEvents()
+	event.register(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
+	event.register(EVENTS.lockpickingActivated, this.onLockPickingActivated)
 end
 
 return this

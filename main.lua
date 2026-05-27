@@ -4,7 +4,6 @@ local logger = mwse.Logger.new()
 local lockpickingController = require("tauer.modern-lockpicking.services.lockpicking.lockpickingController")
 local lockMeshResolver = require("tauer.modern-lockpicking.services.locks.lockMeshResolver")
 local soundController = require("tauer.modern-lockpicking.services.sounds.soundController")
-local playerController = require("tauer.modern-lockpicking.services.player.playerController")
 local skillController = require("tauer.modern-lockpicking.services.skills.skillController")
 local guiController = require("tauer.modern-lockpicking.services.gui.guiController")
 local lockAnimator = require("tauer.modern-lockpicking.services.locks.lockAnimator")
@@ -43,7 +42,6 @@ function this.initializeMod(_)
 		renderingController,
 		skillController,
 		soundFileResolver,
-		playerController,
 	}
 
 	for _, service in pairs(services) do

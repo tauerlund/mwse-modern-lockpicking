@@ -1,0 +1,3 @@
+---@meta
+---@class strategyValidator
+---@field public validate fun(strategy:strategy):boolean, string|nil

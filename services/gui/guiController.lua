@@ -35,6 +35,8 @@ end
 ---@private
 ---@param e lockpickingStartEventData
 function this.start(e)
+	tes3ui.enterMenuMode("ModernLockpicking")
+
 	if not this.header then
 		this.header = this.createHeader(e)
 	end
@@ -340,6 +342,8 @@ function this.stop()
 		this.picks:destroy()
 		this.picks = nil
 	end
+
+	tes3ui.leaveMenuMode()
 end
 
 ---@private

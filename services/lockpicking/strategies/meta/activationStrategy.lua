@@ -1,0 +1,4 @@
+---@meta
+---@class activationStrategy : strategy
+---@field public enable function
+---@field public disable function
