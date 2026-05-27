@@ -4,9 +4,7 @@ local lockSpawner = require("tauer.modern-lockpicking.services.locks.lockSpawner
 local knifeSpawner = require("tauer.modern-lockpicking.services.knives.knifeSpawner")
 local pickSpawner = require("tauer.modern-lockpicking.services.picks.pickSpawner")
 local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
-local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
 local inventoryManager = require("tauer.modern-lockpicking.services.inventory.inventoryManager")
-local strategyLoader = require("tauer.modern-lockpicking.services.strategies.strategyLoader")
 local translations = require("tauer.modern-lockpicking.services.translations.translations")
 ---
 
@@ -23,59 +21,26 @@ local this = {}
 ---@type lockpickingSession|nil
 this.session = nil
 
----@private
----@type { [string]: activationStrategy }
-this.activationStrategies = nil
-
----@private
----@type activationStrategy
-this.currentActivationStrategy = nil
-
 ---@public
 ---@return boolean,string|nil
 function this.initialize()
-	this.activationStrategies = strategyLoader.loadAll({
-		directory = "tauer\\modern-lockpicking\\services\\lockpicking\\strategies",
-		requireNotEmpty = true,
-	}) --[[@as { [string]: activationStrategy }]]
-
-	if not this.activationStrategies then
-		return false, "Failed to load activation strategies"
-	end
-
-	this.applyActivationStrategy()
-
 	this.registerEvents()
-
 	return true, nil
 end
 
----@public
+---@private
 ---@param e lockpickingActivatedEventData
 function this.onLockPickingActivated(e)
-	local picks = inventoryManager.getLockpicks()
-	if not picks then
-		tes3.messageBox(translations.get(TRANSLATION_KEY.messageBoxNoLockpicks))
+	this.session = this.createSession(e.activator)
+	if not this.session then
 		return
 	end
 
-	local lock = lockSpawner.spawn(e.activator)
-	local knife = knifeSpawner.spawn(lock)
-
-	this.session = {
-		activator = e.activator,
-		picks = picks,
-		lock = lock,
-		knife = knife,
-	}
-
-	this.session.pick = this.selectPick()
-
 	---@type lockpickingStartEventData
-	local lockPickingStartEventData = {
+	local eventData = {
 		session = this.session,
 	}
-	event.trigger(EVENTS.lockpickingStart, lockPickingStartEventData)
+	event.trigger(EVENTS.lockpickingStart, eventData)
 
 	timerManager.start({
 		durationInSeconds = 1.3,
@@ -84,21 +49,50 @@ function this.onLockPickingActivated(e)
 	})
 end
 
----@public
-function this.exit()
-	this.stop({ success = false })
+---@private
+---@param activator tes3containerInstance|tes3door
+---@return lockpickingSession|nil
+function this.createSession(activator)
+	local picks = inventoryManager.getLockpicks()
+	if not picks then
+		tes3.messageBox(translations.get(TRANSLATION_KEY.messageBoxNoLockpicks))
+		return nil
+	end
+
+	local lock = lockSpawner.spawn(activator)
+	local knife = knifeSpawner.spawn(lock)
+
+	local session = {
+		activator = activator,
+		picks = picks,
+		lock = lock,
+		knife = knife,
+	}
+
+	session.pick = this.selectPick({
+		session = session
+	})
+
+	return session
 end
 
 ---@private
 function this.onLockpickingReady()
 	this.enable()
-	event.trigger(EVENTS.lockpickingStarted)
+
+	---@type lockpickingStartedEventData
+	local eventData = {
+		session = this.session,
+	}
+	event.trigger(EVENTS.lockpickingStarted, eventData)
 end
 
 ---@private
 ---@param e pickCycleRequestedEventData
 function this.onPickCycleRequested(e)
-	this.session.pick = this.selectPick(e.direction)
+	this.session.pick = this.selectPick({
+		direction = e.direction
+	})
 end
 
 ---@private
@@ -118,10 +112,15 @@ function this.onEnterFrame(_)
 end
 
 ---@private
----@param direction CYCLE_DIRECTION?
----@return pick
-function this.selectPick(direction)
-	if this.session.pick then
+---@param params lockpickingController.selectPick.params
+---@return pick|nil
+function this.selectPick(params)
+	local session = params.session or this.session
+	if not session then
+		return nil
+	end
+
+	if session.pick then
 		---@type pickCycledEventData
 		local pickChangedEventData = {
 			pick = this.session.pick,
@@ -129,8 +128,8 @@ function this.selectPick(direction)
 		event.trigger(EVENTS.pickCycled, pickChangedEventData)
 	end
 
-	local item = pickSelector.select(this.session.picks, direction)
-	local pick = pickSpawner.spawn(this.session.lock, item)
+	local item = pickSelector.select(session.picks, params.direction)
+	local pick = pickSpawner.spawn(session.lock, item)
 
 	---@type pickSelectedEventData
 	local pickSelectedEventData = {
@@ -194,16 +193,6 @@ end
 
 function this.resetFields()
 	this.session = nil
-end
-
----@private
-function this.applyActivationStrategy()
-	if this.currentActivationStrategy then
-		this.currentActivationStrategy.disable()
-	end
-
-	this.currentActivationStrategy = this.activationStrategies[settings.activationStrategy]
-	this.currentActivationStrategy.enable()
 end
 
 ---@private

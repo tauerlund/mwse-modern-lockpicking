@@ -1,7 +1,7 @@
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local ACTIVATION_STRATEGY_NAMES = require(
-    "tauer.modern-lockpicking.services.lockpicking.strategies.enums.ACTIVATION_STRATEGY_NAMES")
+    "tauer.modern-lockpicking.services.lockpicking.activation-strategies.enums.ACTIVATION_STRATEGY_NAMES")
 ---
 
 ---@class defaultActivationStrategy : activationStrategy

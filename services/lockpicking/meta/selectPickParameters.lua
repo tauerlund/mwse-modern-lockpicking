@@ -1,0 +1,4 @@
+---@meta
+---@class lockpickingController.selectPick.params
+---@field public direction CYCLE_DIRECTION?
+---@field public session lockpickingSession?
