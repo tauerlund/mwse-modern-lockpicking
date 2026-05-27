@@ -126,7 +126,7 @@ function this.selectPick(direction)
 		local pickChangedEventData = {
 			pick = this.session.pick,
 		}
-		event.trigger(EVENTS.pickChange, pickChangedEventData)
+		event.trigger(EVENTS.pickCycled, pickChangedEventData)
 	end
 
 	local item = pickSelector.select(this.session.picks, direction)

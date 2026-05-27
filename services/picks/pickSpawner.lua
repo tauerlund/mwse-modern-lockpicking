@@ -63,7 +63,7 @@ end
 
 ---@private
 ---@param e pickCycledEventData
-function this.onPickChange(e)
+function this.onPickCycled(e)
 	this.despawn(e.pick)
 end
 
@@ -77,7 +77,7 @@ end
 ---@private
 function this.registerEvents()
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
-	event.register(EVENTS.pickChange, this.onPickChange)
+	event.register(EVENTS.pickCycled, this.onPickCycled)
 end
 
 ---@private
@@ -85,8 +85,8 @@ function this.unregisterEvents()
 	if event.isRegistered(EVENTS.lockpickingEnded, this.onLockpickingEnded) then
 		event.unregister(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 	end
-	if event.isRegistered(EVENTS.pickChange, this.onPickChange) then
-		event.unregister(EVENTS.pickChange, this.onPickChange)
+	if event.isRegistered(EVENTS.pickCycled, this.onPickCycled) then
+		event.unregister(EVENTS.pickCycled, this.onPickCycled)
 	end
 end
 

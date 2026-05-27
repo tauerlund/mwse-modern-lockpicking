@@ -86,12 +86,12 @@ function this.start(pick, keyframes)
 	nodeAnimator.start({
 		node = pick.mesh,
 		keyframes = keyframes,
-		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickChange },
+		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickCycled },
 	})
 
 	timerManager.start({
 		durationInSeconds = keyframes[#keyframes].time,
-		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickChange },
+		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickCycled },
 		finishedCallback = this.onStartTimerFinished,
 	})
 end

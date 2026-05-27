@@ -68,7 +68,7 @@ end
 
 ---@private
 ---@param _ pickCycledEventData
-function this.onPickChange(_)
+function this.onPickCycled(_)
 	tes3.playSound({
 		reference = tes3.player,
 		soundPath = soundFileResolver.resolve(CONSTANTS.templates.changeLockpick).path,
@@ -135,7 +135,7 @@ end
 function this.registerEvents()
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
-	event.register(EVENTS.pickChange, this.onPickChange)
+	event.register(EVENTS.pickCycled, this.onPickCycled)
 	event.register(EVENTS.rotationStarted, this.onRotationStarted)
 	event.register(EVENTS.rotationEnded, this.onRotationEnded)
 end

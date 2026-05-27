@@ -285,7 +285,7 @@ function this.createPicks(activePick, picks)
 				bottom = verticalBorder,
 				right = horizontalBorder,
 			})
-			:withCallback(EVENTS.pickChange, this.onPickChange)
+			:withCallback(EVENTS.pickCycled, this.onPickCycled)
 			:withCallback(EVENTS.pickSelected, this.onPickSelected)
 			:wuild()
 
@@ -300,7 +300,7 @@ function this.createPicks(activePick, picks)
 				top = verticalBorder,
 				bottom = verticalBorder,
 			})
-			:withCallback(EVENTS.pickChange, this.onPickChange)
+			:withCallback(EVENTS.pickCycled, this.onPickCycled)
 			:withCallback(EVENTS.pickSelected, this.onPickSelected)
 			:wuild()
 	end
@@ -381,7 +381,7 @@ end
 ---@private
 ---@param element tes3uiElement
 ---@param _ pickCycledEventData
-function this.onPickChange(element, _)
+function this.onPickCycled(element, _)
 	element.color = tes3ui.getPalette(tes3.palette.normalColor)
 end
 
