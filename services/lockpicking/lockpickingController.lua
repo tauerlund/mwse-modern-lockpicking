@@ -1,294 +1,137 @@
 --- SERVICES
-local pickSelector = require("tauer.modern-lockpicking.services.picks.pickSelector")
 local lockSpawner = require("tauer.modern-lockpicking.services.locks.lockSpawner")
 local knifeSpawner = require("tauer.modern-lockpicking.services.knives.knifeSpawner")
+local pickSelector = require("tauer.modern-lockpicking.services.picks.pickSelector")
 local pickSpawner = require("tauer.modern-lockpicking.services.picks.pickSpawner")
 local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
-local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
+local inventoryManager = require("tauer.modern-lockpicking.services.inventory.inventoryManager")
+local translations = require("tauer.modern-lockpicking.services.translations.translations")
 ---
 
 --- ENUMS
-local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.CONSTANTS")
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local DIRECTION = require("tauer.modern-lockpicking.services.lockpicking.enums.ROTATION_DIRECTION")
-local CYCLE = require("tauer.modern-lockpicking.services.lockpicking.enums.CYCLE_DIRECTION")
+local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
 ---
 
 ---@class lockpickingController : initializedService
 local this = {}
 
 ---@private
----@type tes3containerInstance|tes3door
-this.activator = nil
-
----@private
----@type tes3itemStack[]
-this.picks = nil
-
----@private
----@type lock
-this.lock = nil
-
----@private
----@type knife
-this.knife = nil
-
----@private
----@type pick
-this.pick = nil
-
----@private
----@type tes3.scanCode
-this.currentDirectionKey = nil
-
----@private
----@type { [tes3.scanCode]: ROTATION_DIRECTION }
-this.rotationDirections = nil
-
----@private
----@type { [tes3.scanCode]: CYCLE_DIRECTION }
-this.pickCycleDirections = nil
+---@type lockpickingSession|nil
+this.session = nil
 
 ---@public
 ---@return boolean,string|nil
 function this.initialize()
-	event.register(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
-	this.rotationDirections = this.getRotationDirections()
-	this.pickCycleDirections = this.getPickCycleDirections()
+	event.register(EVENTS.lockpickingActivated, this.onLockPickingActivated)
+	event.register(EVENTS.cylinderTargetReached, this.onCylinderTargetReached)
+	event.register(EVENTS.pickCycled, this.onPickCycled)
+	event.register(EVENTS.exitRequested, this.onExitRequested)
+	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
 	return true, nil
 end
 
----@public
----@param activator tes3containerInstance|tes3door
----@param picks tes3itemStack[]
-function this.start(activator, picks)
-	this.activator = activator
-	this.picks = picks
-
-	this.lock = lockSpawner.spawn(activator)
-	this.knife = knifeSpawner.spawn(this.lock)
-	this.pick = this.selectPick()
+---@private
+---@param e lockpickingActivatedEventData
+function this.onLockPickingActivated(e)
+	this.session = this.createSession(e.activator)
+	if not this.session then
+		return
+	end
 
 	---@type lockpickingStartEventData
-	local lockPickingStartEventData = {
-		activator = activator,
-		lock = this.lock,
-		knife = this.knife,
-		picks = picks,
-		pick = this.pick,
+	local eventData = {
+		session = this.session,
 	}
-	event.trigger(EVENTS.lockpickingStart, lockPickingStartEventData)
+	event.trigger(EVENTS.lockpickingStart, eventData)
 
 	timerManager.start({
 		durationInSeconds = 1.3,
-		finishedCallback = this.registerEvents,
+		finishedCallback = this.onStartTimerFinished,
 		cancelOn = EVENTS.lockpickingEnded,
 	})
 end
 
----@public
-function this.exit()
-	this.stop({ success = false })
-end
-
 ---@private
----@param e keyDownEventData
-function this.onKeyDown(e)
-	if this.rotationDirections[e.keyCode] then
-		this.onRotationDirectionKeyDown(e)
-		return
-	end
-	if this.pickCycleDirections[e.keyCode] then
-		this.onPickCycleKeyDown(e)
-		return
-	end
-end
-
----@private
----@param e keyUpEventData
-function this.onKeyUp(e)
-	if this.rotationDirections[e.keyCode] then
-		this.onRotationDirectionKeyUp(e)
-		return
-	end
-	if e.keyCode == settings.keyBinds.exit.keyCode then
-		this.finish({ success = false })
-		return
-	end
-end
-
----@private
----@param e keyDownEventData
-function this.onRotationDirectionKeyDown(e)
-	---@type rotationEventData
-	local data = {
-		direction = this.rotationDirections[e.keyCode],
-	}
-	event.trigger(EVENTS.rotationStarted, data)
-	this.currentDirectionKey = e.keyCode
-end
-
----@private
----@param e keyDownEventData
-function this.onPickCycleKeyDown(e)
-	local direction = this.pickCycleDirections[e.keyCode]
-	this.pick = this.selectPick(direction)
-end
-
----@private
----@param e keyUpEventData
-function this.onRotationDirectionKeyUp(e)
-	if this.directionKeyIsBlocked(e.keyCode) then
-		return
+---@param activator tes3containerInstance|tes3door
+---@return lockpickingSession|nil
+function this.createSession(activator)
+	local picks = inventoryManager.getLockpicks()
+	if not picks then
+		tes3.messageBox(translations.get(TRANSLATION_KEY.messageBoxNoLockpicks))
+		return nil
 	end
 
-	---@type rotationEventData
-	local data = {
-		direction = this.rotationDirections[e.keyCode],
-	}
-	event.trigger(EVENTS.rotationEnded, data)
-	this.currentDirectionKey = nil
-end
+	local lock = lockSpawner.spawn(activator)
+	local knife = knifeSpawner.spawn(lock)
+	local item = pickSelector.select(picks, nil)
+	local pick = pickSpawner.spawn(lock, item)
 
----@private
----@param keyCode tes3.scanCode
----@return boolean
-function this.directionKeyIsBlocked(keyCode)
-	return this.currentDirectionKey and this.currentDirectionKey ~= keyCode
-end
-
----@private
----@param _ enterFrameEventData
-function this.onEnterFrame(_)
-	local rotation = this.lock.cylinder.rotation:toEulerXYZ().y
-
-	if rotation <= CONSTANTS.targetRotationLeft or rotation >= CONSTANTS.targetRotationRight then
-		this.finish({ success = true })
-		return
-	end
-end
-
----@private
----@param direction CYCLE_DIRECTION?
----@return pick
-function this.selectPick(direction)
-	if this.pick then
-		---@type pickChangeEventData
-		local pickChangedEventData = {
-			pick = this.pick,
-		}
-		event.trigger(EVENTS.pickChange, pickChangedEventData)
-	end
-
-	local item = pickSelector.select(this.picks, direction)
-	local pick = pickSpawner.spawn(this.lock, item)
-
-	---@type pickSelectedEventData
-	local pickSelectedEventData = {
+	return {
+		activator = activator,
+		picks = picks,
+		lock = lock,
+		knife = knife,
 		pick = pick,
 	}
-	event.trigger(EVENTS.pickSelected, pickSelectedEventData)
-
-	return pick
 end
 
 ---@private
----@param parameters stopLockpickingParameters
-function this.finish(parameters)
+function this.onStartTimerFinished()
+	---@type lockpickingStartedEventData
+	local eventData = {
+		session = this.session,
+	}
+	event.trigger(EVENTS.lockpickingStarted, eventData)
+end
+
+---@private
+function this.onCylinderTargetReached()
 	---@type lockpickingEndEventData
 	local data = {
-		lock = this.lock,
-		knife = this.knife,
-		pick = this.pick,
-		activator = this.activator,
-		success = parameters.success,
+		session = this.session,
+		success = true,
 	}
 	event.trigger(EVENTS.lockpickingEnd, data)
+end
 
+---@private
+---@param e pickCycledEventData
+function this.onPickCycled(e)
+	this.session.pick = e.pick
+end
+
+---@private
+function this.onExitRequested()
+	---@type lockpickingEndEventData
+	local data = {
+		session = this.session,
+		success = false,
+	}
+	event.trigger(EVENTS.lockpickingEnd, data)
+end
+
+---@private
+---@param e lockpickingEndEventData
+function this.onLockpickingEnd(e)
 	timerManager.start({
 		durationInSeconds = 1,
 		finishedCallback = this.onEndTimerFinished,
-		data = data --[[@as timerData]],
+		data = e --[[@as timerData]],
 	})
-
-	this.unregisterEvents()
 end
 
 ---@private
 ---@param data timerData
 function this.onEndTimerFinished(data)
-	---@cast data +lockpickingEndedEventData, -timerData
-	this.stop({ success = data.success })
-end
-
----@private
----@param parameters stopLockpickingParameters
-function this.stop(parameters)
+	---@cast data +lockpickingEndEventData, -timerData
 	---@type lockpickingEndedEventData
-	local data = {
-		lock = this.lock,
-		knife = this.knife,
-		pick = this.pick,
-		activator = this.activator,
-		success = parameters.success,
+	local eventData = {
+		session = this.session,
+		success = data.success,
 	}
-	event.trigger(EVENTS.lockpickingEnded, data)
-
-	this.unregisterEvents()
-	this.resetFields()
-end
-
-function this.resetFields()
-	this.activator = nil
-	this.picks = nil
-	this.lock = nil
-	this.knife = nil
-	this.pick = nil
-	this.currentDirectionKey = nil
-end
-
----@private
-function this.onKeyBindsUpdated()
-	this.rotationDirections = this.getRotationDirections()
-	this.pickCycleDirections = this.getPickCycleDirections()
-end
-
----@private
----@return { [tes3.scanCode]: ROTATION_DIRECTION }
-function this.getRotationDirections()
-	return {
-		[settings.keyBinds.rotateLockClockwise.keyCode] = DIRECTION.clockwise,
-		[settings.keyBinds.rotateLockCounterclockwise.keyCode] = DIRECTION.counterClockwise,
-	}
-end
-
----@private
----@return { [tes3.scanCode]: CYCLE_DIRECTION }
-function this.getPickCycleDirections()
-	return {
-		[settings.keyBinds.cycleNextPick.keyCode] = CYCLE.next,
-		[settings.keyBinds.cyclePreviousPick.keyCode] = CYCLE.previous,
-	}
-end
-
----@private
-function this.registerEvents()
-	event.register(tes3.event.keyDown, this.onKeyDown)
-	event.register(tes3.event.keyUp, this.onKeyUp)
-	event.register(tes3.event.enterFrame, this.onEnterFrame)
-end
-
----@private
-function this.unregisterEvents()
-	if event.isRegistered(tes3.event.keyDown, this.onKeyDown) then
-		event.unregister(tes3.event.keyDown, this.onKeyDown)
-	end
-	if event.isRegistered(tes3.event.keyUp, this.onKeyUp) then
-		event.unregister(tes3.event.keyUp, this.onKeyUp)
-	end
-	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
-	end
+	event.trigger(EVENTS.lockpickingEnded, eventData)
+	this.session = nil
 end
 
 return this

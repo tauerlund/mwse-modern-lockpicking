@@ -28,13 +28,35 @@ this.picks = nil
 ---@public
 ---@return boolean,string|nil
 function this.initialize()
-	this.registerEvents()
+	event.register(tes3.event.load, this.onLoad)
+	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 	return true, nil
+end
+
+---@private
+---@param _ loadEventData
+function this.onLoad(_)
+	this.stop()
+end
+
+---@private
+---@param e lockpickingStartEventData
+function this.onLockpickingStart(e)
+	this.start(e)
+end
+
+---@private
+---@param _ lockpickingEndedEventData
+function this.onLockpickingEnded(_)
+	this.stop()
 end
 
 ---@private
 ---@param e lockpickingStartEventData
 function this.start(e)
+	tes3ui.enterMenuMode("ModernLockpicking")
+
 	if not this.header then
 		this.header = this.createHeader(e)
 	end
@@ -44,7 +66,7 @@ function this.start(e)
 	end
 
 	if not this.picks then
-		this.picks = this.createPicks(e.pick, e.picks)
+		this.picks = this.createPicks(e.session.pick, e.session.picks)
 	end
 end
 
@@ -78,7 +100,7 @@ function this.createHeader(e)
 		:wuild()
 
 	gui.createLabel({ parent = block })
-		:withText(e.activator.baseObject.name)
+		:withText(e.session.activator.baseObject.name)
 		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:wuild()
 
@@ -87,7 +109,7 @@ function this.createHeader(e)
 		:wuild()
 
 	local lockLevel = tes3.getLockLevel({
-		reference = e.activator --[[@as tes3reference]],
+		reference = e.session.activator --[[@as tes3reference]],
 	})
 
 	local player = tes3.player.mobile --[[@as tes3mobileActor]]
@@ -283,8 +305,7 @@ function this.createPicks(activePick, picks)
 				bottom = verticalBorder,
 				right = horizontalBorder,
 			})
-			:withCallback(EVENTS.pickChange, this.onPickChange)
-			:withCallback(EVENTS.pickSelected, this.onPickSelected)
+			:withCallback(EVENTS.pickCycled, this.onPickCycled)
 			:wuild()
 
 		gui.createLabel({
@@ -298,8 +319,7 @@ function this.createPicks(activePick, picks)
 				top = verticalBorder,
 				bottom = verticalBorder,
 			})
-			:withCallback(EVENTS.pickChange, this.onPickChange)
-			:withCallback(EVENTS.pickSelected, this.onPickSelected)
+			:withCallback(EVENTS.pickCycled, this.onPickCycled)
 			:wuild()
 	end
 
@@ -340,24 +360,8 @@ function this.stop()
 		this.picks:destroy()
 		this.picks = nil
 	end
-end
 
----@private
----@param e lockpickingStartEventData
-function this.onLockpickingStart(e)
-	this.start(e)
-end
-
----@private
----@param _ lockpickingEndedEventData
-function this.onLockpickingEnded(_)
-	this.stop()
-end
-
----@private
----@param _ loadEventData
-function this.onLoad(_)
-	this.stop()
+	tes3ui.leaveMenuMode()
 end
 
 ---@private
@@ -376,25 +380,12 @@ end
 
 ---@private
 ---@param element tes3uiElement
----@param _ pickChangeEventData
-function this.onPickChange(element, _)
-	element.color = tes3ui.getPalette(tes3.palette.normalColor)
-end
-
----@private
----@param element tes3uiElement
----@param e pickSelectedEventData
-function this.onPickSelected(element, e)
-	if element.name:endswith(e.pick.item.object.id) then
-		element.color = tes3ui.getPalette(tes3.palette.normalOverColor)
-	end
-end
-
----@private
-function this.registerEvents()
-	event.register(tes3.event.load, this.onLoad)
-	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+---@param e pickCycledEventData
+function this.onPickCycled(element, e)
+	local isSelected = element.name:endswith(e.pick.item.object.id)
+	element.color = isSelected
+		and tes3ui.getPalette(tes3.palette.normalOverColor)
+		or tes3ui.getPalette(tes3.palette.normalColor)
 end
 
 return this

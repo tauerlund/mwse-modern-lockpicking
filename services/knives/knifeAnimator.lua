@@ -70,68 +70,34 @@ this.startAnimationKeyFrames = {
 ---@return boolean,string|nil
 function this.initialize()
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
+	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+	event.register(EVENTS.rotationStarted, this.onRotationStarted)
+	event.register(EVENTS.rotationEnded, this.onRotationEnded)
 	return true, nil
-end
-
----@private
----@param knife niNode
-function this.start(knife)
-	this.knife = knife
-	this.blocked = true
-
-	nodeAnimator.start({
-		node = knife,
-		keyframes = this.startAnimationKeyFrames,
-		cancelOn = EVENTS.lockpickingEnded,
-	})
-
-	timerManager.start({
-		durationInSeconds = CONSTANTS.animation.startAnimationDuration,
-		finishedCallback = this.onStartTimerFinished,
-		cancelOn = EVENTS.lockpickingEnded,
-	})
-
-	this.registerEvents()
-end
-
----@private
-function this.onStartTimerFinished()
-	this.baseRotation = this.knife.rotation:copy()
-	this.blocked = false
-end
-
----@private
----@param e enterFrameEventData
-function this.onEnterFrame(e)
-	if this.blocked then
-		return
-	end
-
-	this.updatePhase(e.delta)
-	this.rotate()
-end
-
----@private
-function this.rotate()
-	this.currentAngle = math.lerp(this.sourceAngle, this.targetAngle, this.phase)
-
-	local rotation = tes3matrix33.new()
-	rotation:toRotationY(this.currentAngle)
-
-	this.knife.rotation = this.baseRotation * rotation
-	this.knife:update()
-end
-
----@private
----@param delta number
-function this.updatePhase(delta)
-	this.phase = math.min(this.phase + this.phaseSpeed * delta, 1)
 end
 
 ---@private
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
-	this.start(e.knife)
+	this.start(e.session.knife)
+	this.enable()
+end
+
+---@private
+---@param _ lockpickingEndedEventData
+function this.onLockpickingEnd(_)
+	this.blocked = true
+end
+
+---@private
+---@param _ lockpickingEndedEventData
+function this.onLockpickingEnded(_)
+	this.phase = 0
+	this.targetAngle = 0
+	this.sourceAngle = 0
+	this.baseRotation = nil
+	this.disable()
 end
 
 ---@private
@@ -153,20 +119,70 @@ function this.onRotationEnded(_)
 end
 
 ---@private
----@param _ lockpickingEndedEventData
-function this.onLockpickingEnd(_)
-	this.blocked = true
+function this.enable()
+	if not event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
+		event.register(tes3.event.enterFrame, this.onEnterFrame)
+	end
 end
 
 ---@private
----@param _ lockpickingEndedEventData
-function this.onLockpickingEnded(_)
-	this.phase = 0
-	this.targetAngle = 0
-	this.sourceAngle = 0
-	this.baseRotation = nil
+function this.disable()
+	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
+		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
+	end
+end
 
-	this.unregisterEvents()
+---@private
+---@param e enterFrameEventData
+function this.onEnterFrame(e)
+	if this.blocked then
+		return
+	end
+
+	this.updatePhase(e.delta)
+	this.rotate()
+end
+
+---@private
+---@param knife niNode
+function this.start(knife)
+	this.knife = knife
+	this.blocked = true
+
+	nodeAnimator.start({
+		node = knife,
+		keyframes = this.startAnimationKeyFrames,
+		cancelOn = EVENTS.lockpickingEnded,
+	})
+
+	timerManager.start({
+		durationInSeconds = CONSTANTS.animation.startAnimationDuration,
+		finishedCallback = this.onStartTimerFinished,
+		cancelOn = EVENTS.lockpickingEnded,
+	})
+end
+
+---@private
+function this.onStartTimerFinished()
+	this.baseRotation = this.knife.rotation:copy()
+	this.blocked = false
+end
+
+---@private
+function this.rotate()
+	this.currentAngle = math.lerp(this.sourceAngle, this.targetAngle, this.phase)
+
+	local rotation = tes3matrix33.new()
+	rotation:toRotationY(this.currentAngle)
+
+	this.knife.rotation = this.baseRotation * rotation
+	this.knife:update()
+end
+
+---@private
+---@param delta number
+function this.updatePhase(delta)
+	this.phase = math.min(this.phase + this.phaseSpeed * delta, 1)
 end
 
 ---@private
@@ -175,28 +191,6 @@ function this.getRelativePhaseSpeed()
 		return CONSTANTS.animation.phaseSpeed
 	end
 	return CONSTANTS.animation.phaseSpeed / this.phase
-end
-
----@private
-function this.registerEvents()
-	event.register(tes3.event.enterFrame, this.onEnterFrame)
-	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd, { doOnce = true })
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
-	event.register(EVENTS.rotationStarted, this.onRotationStarted)
-	event.register(EVENTS.rotationEnded, this.onRotationEnded)
-end
-
----@private
-function this.unregisterEvents()
-	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
-	end
-	if event.isRegistered(EVENTS.rotationStarted, this.onRotationStarted) then
-		event.unregister(EVENTS.rotationStarted, this.onRotationStarted)
-	end
-	if event.isRegistered(EVENTS.rotationEnded, this.onRotationEnded) then
-		event.unregister(EVENTS.rotationEnded, this.onRotationEnded)
-	end
 end
 
 return this

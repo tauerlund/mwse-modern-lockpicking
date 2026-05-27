@@ -1,3 +1,0 @@
----@meta
----@class pickChangeEventData
----@field public pick pick

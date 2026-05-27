@@ -27,14 +27,58 @@ this.blocked = false
 ---@return boolean,string|nil
 function this.initialize()
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
+	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+	event.register(EVENTS.rotationStarted, this.onRotationStarted)
+	event.register(EVENTS.rotationEnded, this.onRotationEnded)
 	return true, nil
 end
 
 ---@private
----@param cylinder cylinder
-function this.start(cylinder)
-	this.cylinder = cylinder
-	this.registerEvents()
+---@param e lockpickingStartEventData
+function this.onLockpickingStart(e)
+	this.cylinder = e.session.lock.cylinder
+	this.enable()
+end
+
+---@private
+---@param _ lockpickingEndEventData
+function this.onLockpickingEnd(_)
+	this.blocked = true
+end
+
+---@private
+---@param _ lockpickingEndedEventData
+function this.onLockpickingEnded(_)
+	this.phase = 0
+	this.blocked = false
+	this.rotationDirection = nil
+	this.disable()
+end
+
+---@private
+---@param e rotationEventData
+function this.onRotationStarted(e)
+	this.rotationDirection = e.direction
+end
+
+---@private
+function this.onRotationEnded()
+	this.rotationDirection = nil
+end
+
+---@private
+function this.enable()
+	if not event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
+		event.register(tes3.event.enterFrame, this.onEnterFrame)
+	end
+end
+
+---@private
+function this.disable()
+	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
+		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
+	end
 end
 
 ---@private
@@ -76,60 +120,6 @@ function this.rotate()
 
 	cylinder.rotation = rotation
 	cylinder:update()
-end
-
----@private
----@param e lockpickingStartEventData
-function this.onLockpickingStart(e)
-	this.start(e.lock.cylinder)
-end
-
----@private
----@param e rotationEventData
-function this.onRotationStarted(e)
-	this.rotationDirection = e.direction
-end
-
----@private
-function this.onRotationEnded()
-	this.rotationDirection = nil
-end
-
----@private
----@param _ lockpickingEndEventData
-function this.onLockpickingEnd(_)
-	this.blocked = true
-end
-
----@private
----@param _ lockpickingEndedEventData
-function this.onLockpickingEnded(_)
-	this.phase = 0
-	this.blocked = false
-	this.rotationDirection = nil
-	this.unregisterEvents()
-end
-
----@private
-function this.registerEvents()
-	event.register(tes3.event.enterFrame, this.onEnterFrame)
-	event.register(EVENTS.rotationStarted, this.onRotationStarted)
-	event.register(EVENTS.rotationEnded, this.onRotationEnded)
-	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd, { doOnce = true })
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
-end
-
----@private
-function this.unregisterEvents()
-	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
-	end
-	if event.isRegistered(EVENTS.rotationStarted, this.onRotationStarted) then
-		event.unregister(EVENTS.rotationStarted, this.onRotationStarted)
-	end
-	if event.isRegistered(EVENTS.rotationEnded, this.onRotationEnded) then
-		event.unregister(EVENTS.rotationEnded, this.onRotationEnded)
-	end
 end
 
 return this

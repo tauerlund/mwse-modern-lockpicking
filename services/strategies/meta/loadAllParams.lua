@@ -1,0 +1,5 @@
+---@meta
+---@class strategyLoader.loadAll.params
+---@field public directory string -- The directory from which to load the strategy implementations.
+---@field public validator strategyValidator? -- **Optional** A strategy validator to use when validating the loaded strategies.
+---@field public requireNotEmpty boolean? -- **Optional** If true, the loader will return nil if no strategies are found. Defaults to false.

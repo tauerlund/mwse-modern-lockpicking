@@ -28,8 +28,14 @@ function this.initialize()
 end
 
 ---@private
+function this.registerEvents()
+    event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
+    event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+end
+
+---@private
 ---@param _ lockpickingStartEventData
-function this.start(_)
+function this.onLockpickingStart(_)
     this.pauseRenderingInMenus = mge.render.pauseRenderingInMenus
     mge.render.pauseRenderingInMenus = false
 
@@ -42,18 +48,12 @@ end
 
 ---@privates
 ---@param _ lockpickingEndedEventData
-function this.stop(_)
+function this.onLockpickingEnded(_)
     mge.render.pauseRenderingInMenus = this.pauseRenderingInMenus
 
     if this.depthOfField then
         this.depthOfField.enabled = false
     end
-end
-
----@private
-function this.registerEvents()
-    event.register(EVENTS.lockpickingStart, this.start)
-    event.register(EVENTS.lockpickingEnded, this.stop)
 end
 
 return this

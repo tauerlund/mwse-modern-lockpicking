@@ -1,7 +1,4 @@
 ---@meta
 ---@class lockpickingEndedEventData
----@field public lock lock
----@field public knife knife
----@field public pick pick
----@field public activator tes3containerInstance|tes3door
+---@field public session lockpickingSession
 ---@field public success boolean

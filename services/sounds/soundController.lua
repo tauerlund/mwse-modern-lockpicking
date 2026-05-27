@@ -37,7 +37,11 @@ this.cylinderRotationTimeCooldown = 0
 ---@public
 ---@return boolean,string|nil
 function this.initialize()
-	this.registerEvents()
+	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
+	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
+	event.register(EVENTS.pickCycled, this.onPickCycled)
+	event.register(EVENTS.rotationStarted, this.onRotationStarted)
+	event.register(EVENTS.rotationEnded, this.onRotationEnded)
 	return true, nil
 end
 
@@ -50,11 +54,13 @@ function this.onLockpickingStart(_)
 	})
 	this.lastCursorPosition = tes3.getCursorPosition().x
 
-	event.register(tes3.event.enterFrame, this.onEnterFrame)
+	if not event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
+		event.register(tes3.event.enterFrame, this.onEnterFrame)
+	end
 end
 
 ---@private
----@param e lockpickingEndedEventData
+---@param e lockpickingEndEventData
 function this.onLockpickingEnd(e)
 	if e.success then
 		tes3.playSound({
@@ -63,12 +69,14 @@ function this.onLockpickingEnd(e)
 		})
 	end
 
-	event.unregister(tes3.event.enterFrame, this.onEnterFrame)
+	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
+		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
+	end
 end
 
 ---@private
----@param _ pickChangeEventData
-function this.onPickChange(_)
+---@param _ pickCycledEventData
+function this.onPickCycled(_)
 	tes3.playSound({
 		reference = tes3.player,
 		soundPath = soundFileResolver.resolve(CONSTANTS.templates.changeLockpick).path,
@@ -129,15 +137,6 @@ end
 ---@param _ rotationEventData
 function this.onRotationEnded(_)
 	this.isRotatingCylinder = false
-end
-
----@private
-function this.registerEvents()
-	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
-	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
-	event.register(EVENTS.pickChange, this.onPickChange)
-	event.register(EVENTS.rotationStarted, this.onRotationStarted)
-	event.register(EVENTS.rotationEnded, this.onRotationEnded)
 end
 
 return this

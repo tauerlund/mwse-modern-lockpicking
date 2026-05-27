@@ -73,7 +73,67 @@ this.cycleAnimationKeyFrames = {
 ---@return boolean,string|nil
 function this.initialize()
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
+	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+	event.register(EVENTS.pickCycled, this.onPickCycled)
 	return true, nil
+end
+
+---@private
+---@param e lockpickingStartEventData
+function this.onLockpickingStart(e)
+	this.helper = e.session.pick.helper
+	this.originalHelperRotation = e.session.pick.helper.rotation:copy()
+
+	this.start(e.session.pick, this.startAnimationKeyFrames)
+	this.enable()
+end
+
+---@private
+---@param _ lockpickingEndEventData
+function this.onLockpickingEnd(_)
+	this.blocked = true
+end
+
+---@private
+---@param _ lockpickingEndedEventData
+function this.onLockpickingEnded(_)
+	this.resetFields()
+	this.disable()
+end
+
+---@private
+---@param e pickCycledEventData
+function this.onPickCycled(e)
+	this.start(e.pick, this.cycleAnimationKeyFrames)
+end
+
+---@private
+function this.enable()
+	if not event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
+		event.register(tes3.event.enterFrame, this.onEnterFrame)
+	end
+end
+
+---@private
+function this.disable()
+	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
+		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
+	end
+end
+
+---@private
+function this.resetFields()
+	this.helper.rotation = this.originalHelperRotation:copy()
+	this.helper:update()
+	this.helper = nil
+
+	this.mesh = nil
+	this.blocked = false
+	this.originalHelperRotation = nil
+	this.originalPickRotation = nil
+	this.currentHelperAngle = 0
+	this.targetHelperAngle = 0
 end
 
 ---@private
@@ -86,12 +146,12 @@ function this.start(pick, keyframes)
 	nodeAnimator.start({
 		node = pick.mesh,
 		keyframes = keyframes,
-		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickChange },
+		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickCycled },
 	})
 
 	timerManager.start({
 		durationInSeconds = keyframes[#keyframes].time,
-		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickChange },
+		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickCycled },
 		finishedCallback = this.onStartTimerFinished,
 	})
 end
@@ -102,10 +162,6 @@ function this.onStartTimerFinished(_)
 	this.blocked = false
 	this.originalPickRotation = this.mesh.rotation:copy()
 end
-
----@private
----@type number
-this.targetHelperAngle = 0
 
 ---@private
 ---@param e enterFrameEventData
@@ -162,76 +218,6 @@ function this.rotatePick()
 
 	this.mesh.rotation = this.originalPickRotation * rotation
 	this.mesh:update()
-end
-
----@private
----@param e lockpickingStartEventData
-function this.onLockpickingStart(e)
-	this.helper = e.pick.helper
-	this.originalHelperRotation = e.pick.helper.rotation:copy()
-
-	this.start(e.pick, this.startAnimationKeyFrames)
-	this.registerEvents()
-end
-
----@private
----@param e pickSelectedEventData
-function this.onPickSelected(e)
-	this.start(e.pick, this.cycleAnimationKeyFrames)
-end
-
----@private
----@param _ lockpickingEndEventData
-function this.onLockpickingEnd(_)
-	this.blocked = true
-end
-
----@private
----@param _ lockpickingEndedEventData
-function this.onLockpickingEnded(_)
-	this.resetHelper()
-	this.resetFields()
-	this.unregisterEvents()
-end
-
-function this.resetHelper()
-	this.helper.rotation = this.originalHelperRotation:copy()
-	this.helper:update()
-end
-
----@private
-function this.resetFields()
-	this.mesh = nil
-	this.helper = nil
-	this.blocked = false
-	this.originalHelperRotation = nil
-	this.originalPickRotation = nil
-	this.currentHelperAngle = 0
-	this.targetHelperAngle = 0
-end
-
----@private
-function this.registerEvents()
-	event.register(tes3.event.enterFrame, this.onEnterFrame)
-	event.register(EVENTS.pickSelected, this.onPickSelected)
-	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
-end
-
----@private
-function this.unregisterEvents()
-	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
-	end
-	if event.isRegistered(EVENTS.pickSelected, this.onPickSelected) then
-		event.unregister(EVENTS.pickSelected, this.onPickSelected)
-	end
-	if event.isRegistered(EVENTS.lockpickingEnd, this.onLockpickingEnd) then
-		event.unregister(EVENTS.lockpickingEnd, this.onLockpickingEnd)
-	end
-	if event.isRegistered(EVENTS.lockpickingEnded, this.onLockpickingEnded) then
-		event.unregister(EVENTS.lockpickingEnded, this.onLockpickingEnded)
-	end
 end
 
 return this

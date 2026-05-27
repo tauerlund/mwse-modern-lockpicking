@@ -5,15 +5,20 @@ local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local COSNTANTS = require("tauer.modern-lockpicking.services.knives.enums.CONSTANTS")
 ---
 
----@class knifeSpawner
+---@class knifeSpawner : initializedService
 local this = {}
+
+---@public
+---@return boolean, string|nil
+function this.initialize()
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+	return true, nil
+end
 
 ---@public
 ---@param lock lock
 ---@return knife
 function this.spawn(lock)
-	this.registerEvents()
-
 	local knife = this.getMesh()
 	local helper = lock.mesh:getObjectByName(OBJECT_NAMES.knifeHelper) --[[@as niNode]]
 
@@ -26,6 +31,13 @@ function this.spawn(lock)
 	helper:update()
 
 	return knife
+end
+
+---@private
+---@param e lockpickingEndedEventData
+function this.onLockpickingEnded(e)
+	local knifeHelper = e.session.lock.mesh:getObjectByName(OBJECT_NAMES.knifeHelper) --[[@as niNode]]
+	knifeHelper:detachChild(e.session.knife)
 end
 
 ---@public
@@ -48,21 +60,6 @@ function this.getZBufferProperty()
 	property:setFlag(true, Z_BUFFER_INDEX.write)
 
 	return property
-end
-
----@private
----@param e lockpickingEndedEventData
-function this.onLockpickingEnded(e)
-	local lock = e.lock
-	local knife = e.knife
-
-	local knifeHelper = lock.mesh:getObjectByName(OBJECT_NAMES.knifeHelper) --[[@as niNode]]
-	knifeHelper:detachChild(knife)
-end
-
----@private
-function this.registerEvents()
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
 end
 
 return this

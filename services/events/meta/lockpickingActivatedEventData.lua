@@ -1,0 +1,3 @@
+---@meta
+---@class lockpickingActivatedEventData
+---@field public activator tes3containerInstance|tes3door

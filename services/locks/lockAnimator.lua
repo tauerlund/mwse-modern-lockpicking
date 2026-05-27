@@ -18,8 +18,10 @@ function this.initialize()
 end
 
 ---@private
----@param lock lock
-function this.start(lock)
+---@param e lockpickingStartEventData
+function this.onLockpickingStart(e)
+	local lock = e.session.lock
+
 	timerManager.start({
 		durationInSeconds = 0.8,
 		callback = this.onStartTimer,
@@ -59,12 +61,6 @@ function this.onStartTimer(callback)
 
 	lock.translation = this.getUpdatedTranslation(currentPhase, targetPhase, initialTranslation, targetTranslation)
 	lock:update()
-end
-
----@private
----@param e lockpickingStartEventData
-function this.onLockpickingStart(e)
-	this.start(e.lock)
 end
 
 function this.getUpdatedTranslation(currentPhase, targetPhase, initialTranslation, targetTranslation)

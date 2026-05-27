@@ -4,16 +4,23 @@ local OBJECT_NAMES = require("tauer.modern-lockpicking.services.nodes.enums.OBJE
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 ---
 
----@class pickSpawner
+---@class pickSpawner : initializedService
 local this = {}
+
+---@public
+---@return boolean,string|nil
+function this.initialize()
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+	event.register(EVENTS.pickCycled, this.onPickCycled)
+
+	return true, nil
+end
 
 ---@public
 ---@param lock lock
 ---@param pickItem tes3itemStack
 ---@return pick
 function this.spawn(lock, pickItem)
-	this.registerEvents()
-
 	local pick = this.getMesh(pickItem.object --[[@as tes3lockpick]])
 	local helper = lock.mesh:getObjectByName(OBJECT_NAMES.pickHelper) --[[@as niNode]]
 
@@ -30,6 +37,21 @@ function this.spawn(lock, pickItem)
 		item = pickItem,
 		helper = helper,
 	}
+end
+
+---@private
+---@param e lockpickingEndedEventData
+function this.onLockpickingEnded(e)
+	this.despawn(e.session.pick)
+end
+
+---@private
+---@param e pickCycledEventData
+function this.onPickCycled(e)
+	if not e.previousPick then
+		return
+	end
+	this.despawn(e.previousPick)
 end
 
 ---@public
@@ -56,38 +78,9 @@ function this.getZBufferProperty()
 end
 
 ---@private
----@param e lockpickingEndedEventData
-function this.onLockpickingEnded(e)
-	this.despawn(e.pick)
-end
-
----@private
----@param e pickChangeEventData
-function this.onPickChange(e)
-	this.despawn(e.pick)
-end
-
----@private
 ---@param pick pick
 function this.despawn(pick)
 	pick.helper:detachChild(pick.mesh)
-	this.unregisterEvents()
-end
-
----@private
-function this.registerEvents()
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
-	event.register(EVENTS.pickChange, this.onPickChange)
-end
-
----@private
-function this.unregisterEvents()
-	if event.isRegistered(EVENTS.lockpickingEnded, this.onLockpickingEnded) then
-		event.unregister(EVENTS.lockpickingEnded, this.onLockpickingEnded)
-	end
-	if event.isRegistered(EVENTS.pickChange, this.onPickChange) then
-		event.unregister(EVENTS.pickChange, this.onPickChange)
-	end
 end
 
 return this

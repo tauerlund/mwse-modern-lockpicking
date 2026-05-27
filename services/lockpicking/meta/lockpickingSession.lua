@@ -1,0 +1,7 @@
+---@meta
+---@class lockpickingSession
+---@field public activator tes3containerInstance|tes3door
+---@field public picks tes3itemStack[]
+---@field public lock lock
+---@field public knife knife
+---@field public pick pick?
