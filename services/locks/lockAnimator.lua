@@ -64,7 +64,7 @@ end
 ---@private
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
-	this.start(e.lock)
+	this.start(e.session.lock)
 end
 
 function this.getUpdatedTranslation(currentPhase, targetPhase, initialTranslation, targetTranslation)

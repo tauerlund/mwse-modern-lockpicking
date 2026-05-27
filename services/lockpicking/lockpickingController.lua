@@ -22,24 +22,8 @@ local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.
 local this = {}
 
 ---@private
----@type tes3containerInstance|tes3door
-this.activator = nil
-
----@private
----@type tes3itemStack[]
-this.picks = nil
-
----@private
----@type lock
-this.lock = nil
-
----@private
----@type knife
-this.knife = nil
-
----@private
----@type pick
-this.pick = nil
+---@type lockpickingSession|nil
+this.session = nil
 
 ---@private
 ---@type tes3.scanCode
@@ -90,20 +74,21 @@ function this.onLockPickingActivated(e)
 		return
 	end
 
-	this.picks = picks
-	this.activator = e.activator
+	local lock = lockSpawner.spawn(e.activator)
+	local knife = knifeSpawner.spawn(lock)
 
-	this.lock = lockSpawner.spawn(this.activator)
-	this.knife = knifeSpawner.spawn(this.lock)
-	this.pick = this.selectPick()
+	this.session = {
+		activator = e.activator,
+		picks = picks,
+		lock = lock,
+		knife = knife,
+	}
+
+	this.session.pick = this.selectPick()
 
 	---@type lockpickingStartEventData
 	local lockPickingStartEventData = {
-		activator = this.activator,
-		lock = this.lock,
-		knife = this.knife,
-		picks = picks,
-		pick = this.pick,
+		session = this.session,
 	}
 	event.trigger(EVENTS.lockpickingStart, lockPickingStartEventData)
 
@@ -160,7 +145,7 @@ end
 ---@param e keyDownEventData
 function this.onPickCycleKeyDown(e)
 	local direction = this.pickCycleDirections[e.keyCode]
-	this.pick = this.selectPick(direction)
+	this.session.pick = this.selectPick(direction)
 end
 
 ---@private
@@ -188,7 +173,7 @@ end
 ---@private
 ---@param _ enterFrameEventData
 function this.onEnterFrame(_)
-	local rotation = this.lock.cylinder.rotation:toEulerXYZ().y
+	local rotation = this.session.lock.cylinder.rotation:toEulerXYZ().y
 
 	if rotation <= CONSTANTS.targetRotationLeft or rotation >= CONSTANTS.targetRotationRight then
 		this.finish({ success = true })
@@ -200,16 +185,16 @@ end
 ---@param direction CYCLE_DIRECTION?
 ---@return pick
 function this.selectPick(direction)
-	if this.pick then
+	if this.session.pick then
 		---@type pickChangeEventData
 		local pickChangedEventData = {
-			pick = this.pick,
+			pick = this.session.pick,
 		}
 		event.trigger(EVENTS.pickChange, pickChangedEventData)
 	end
 
-	local item = pickSelector.select(this.picks, direction)
-	local pick = pickSpawner.spawn(this.lock, item)
+	local item = pickSelector.select(this.session.picks, direction)
+	local pick = pickSpawner.spawn(this.session.lock, item)
 
 	---@type pickSelectedEventData
 	local pickSelectedEventData = {
@@ -225,10 +210,7 @@ end
 function this.finish(parameters)
 	---@type lockpickingEndEventData
 	local data = {
-		lock = this.lock,
-		knife = this.knife,
-		pick = this.pick,
-		activator = this.activator,
+		session = this.session,
 		success = parameters.success,
 	}
 	event.trigger(EVENTS.lockpickingEnd, data)
@@ -254,15 +236,12 @@ end
 function this.stop(parameters)
 	---@type lockpickingEndedEventData
 	local data = {
-		lock = this.lock,
-		knife = this.knife,
-		pick = this.pick,
-		activator = this.activator,
+		session = this.session,
 		success = parameters.success,
 	}
 	event.trigger(EVENTS.lockpickingEnded, data)
 
-	local activator = this.activator
+	local activator = this.session and this.session.activator
 
 	if parameters.success then
 		tes3.unlock({
@@ -278,11 +257,7 @@ function this.stop(parameters)
 end
 
 function this.resetFields()
-	this.activator = nil
-	this.picks = nil
-	this.lock = nil
-	this.knife = nil
-	this.pick = nil
+	this.session = nil
 	this.currentDirectionKey = nil
 end
 

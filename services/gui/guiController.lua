@@ -46,7 +46,7 @@ function this.start(e)
 	end
 
 	if not this.picks then
-		this.picks = this.createPicks(e.pick, e.picks)
+		this.picks = this.createPicks(e.session.pick, e.session.picks)
 	end
 end
 
@@ -80,7 +80,7 @@ function this.createHeader(e)
 		:wuild()
 
 	gui.createLabel({ parent = block })
-		:withText(e.activator.baseObject.name)
+		:withText(e.session.activator.baseObject.name)
 		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:wuild()
 
@@ -89,7 +89,7 @@ function this.createHeader(e)
 		:wuild()
 
 	local lockLevel = tes3.getLockLevel({
-		reference = e.activator --[[@as tes3reference]],
+		reference = e.session.activator --[[@as tes3reference]],
 	})
 
 	local player = tes3.player.mobile --[[@as tes3mobileActor]]

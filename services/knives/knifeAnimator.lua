@@ -131,7 +131,7 @@ end
 ---@private
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
-	this.start(e.knife)
+	this.start(e.session.knife)
 end
 
 ---@private

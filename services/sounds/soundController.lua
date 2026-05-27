@@ -54,7 +54,7 @@ function this.onLockpickingStart(_)
 end
 
 ---@private
----@param e lockpickingEndedEventData
+---@param e lockpickingEndEventData
 function this.onLockpickingEnd(e)
 	if e.success then
 		tes3.playSound({

@@ -53,11 +53,8 @@ end
 ---@private
 ---@param e lockpickingEndedEventData
 function this.onLockpickingEnded(e)
-	local lock = e.lock
-	local knife = e.knife
-
-	local knifeHelper = lock.mesh:getObjectByName(OBJECT_NAMES.knifeHelper) --[[@as niNode]]
-	knifeHelper:detachChild(knife)
+	local knifeHelper = e.session.lock.mesh:getObjectByName(OBJECT_NAMES.knifeHelper) --[[@as niNode]]
+	knifeHelper:detachChild(e.session.knife)
 end
 
 ---@private

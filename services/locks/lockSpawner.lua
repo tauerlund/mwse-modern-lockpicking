@@ -90,7 +90,7 @@ end
 ---@param e lockpickingEndedEventData
 function this.onLockpickingEnded(e)
 	local root = this.getRootNode()
-	root:detachChild(e.lock.mesh)
+	root:detachChild(e.session.lock.mesh)
 end
 
 return this

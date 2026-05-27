@@ -167,10 +167,10 @@ end
 ---@private
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
-	this.helper = e.pick.helper
-	this.originalHelperRotation = e.pick.helper.rotation:copy()
+	this.helper = e.session.pick.helper
+	this.originalHelperRotation = e.session.pick.helper.rotation:copy()
 
-	this.start(e.pick, this.startAnimationKeyFrames)
+	this.start(e.session.pick, this.startAnimationKeyFrames)
 	this.registerEvents()
 end
 

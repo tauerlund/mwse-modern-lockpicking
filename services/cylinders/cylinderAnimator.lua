@@ -81,7 +81,7 @@ end
 ---@private
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
-	this.start(e.lock.cylinder)
+	this.start(e.session.lock.cylinder)
 end
 
 ---@private

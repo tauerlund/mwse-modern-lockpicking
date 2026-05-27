@@ -58,7 +58,7 @@ end
 ---@private
 ---@param e lockpickingEndedEventData
 function this.onLockpickingEnded(e)
-	this.despawn(e.pick)
+	this.despawn(e.session.pick)
 end
 
 ---@private
