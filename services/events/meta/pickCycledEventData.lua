@@ -1,3 +1,4 @@
 ---@meta
 ---@class pickCycledEventData
+---@field public previousPick? pick
 ---@field public pick pick

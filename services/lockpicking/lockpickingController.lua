@@ -93,6 +93,12 @@ function this.onCylinderTargetReached()
 end
 
 ---@private
+---@param e pickCycledEventData
+function this.onPickCycled(e)
+	this.session.pick = e.pick
+end
+
+---@private
 function this.onExitRequested()
 	---@type lockpickingEndEventData
 	local data = {
@@ -134,6 +140,7 @@ end
 function this.registerEvents()
 	event.register(EVENTS.lockpickingActivated, this.onLockPickingActivated)
 	event.register(EVENTS.cylinderTargetReached, this.onCylinderTargetReached)
+	event.register(EVENTS.pickCycled, this.onPickCycled)
 	event.register(EVENTS.exitRequested, this.onExitRequested)
 end
 

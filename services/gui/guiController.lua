@@ -286,7 +286,6 @@ function this.createPicks(activePick, picks)
 				right = horizontalBorder,
 			})
 			:withCallback(EVENTS.pickCycled, this.onPickCycled)
-			:withCallback(EVENTS.pickSelected, this.onPickSelected)
 			:wuild()
 
 		gui.createLabel({
@@ -301,7 +300,6 @@ function this.createPicks(activePick, picks)
 				bottom = verticalBorder,
 			})
 			:withCallback(EVENTS.pickCycled, this.onPickCycled)
-			:withCallback(EVENTS.pickSelected, this.onPickSelected)
 			:wuild()
 	end
 
@@ -380,18 +378,12 @@ end
 
 ---@private
 ---@param element tes3uiElement
----@param _ pickCycledEventData
-function this.onPickCycled(element, _)
-	element.color = tes3ui.getPalette(tes3.palette.normalColor)
-end
-
----@private
----@param element tes3uiElement
----@param e pickSelectedEventData
-function this.onPickSelected(element, e)
-	if element.name:endswith(e.pick.item.object.id) then
-		element.color = tes3ui.getPalette(tes3.palette.normalOverColor)
-	end
+---@param e pickCycledEventData
+function this.onPickCycled(element, e)
+	local isSelected = element.name:endswith(e.pick.item.object.id)
+	element.color = isSelected
+		and tes3ui.getPalette(tes3.palette.normalOverColor)
+		or tes3ui.getPalette(tes3.palette.normalColor)
 end
 
 ---@private

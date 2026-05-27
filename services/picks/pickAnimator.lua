@@ -175,8 +175,8 @@ function this.onLockpickingStart(e)
 end
 
 ---@private
----@param e pickSelectedEventData
-function this.onPickSelected(e)
+---@param e pickCycledEventData
+function this.onPickCycled(e)
 	this.start(e.pick, this.cycleAnimationKeyFrames)
 end
 
@@ -213,7 +213,7 @@ end
 ---@private
 function this.registerEvents()
 	event.register(tes3.event.enterFrame, this.onEnterFrame)
-	event.register(EVENTS.pickSelected, this.onPickSelected)
+	event.register(EVENTS.pickCycled, this.onPickCycled)
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 end
@@ -223,8 +223,8 @@ function this.unregisterEvents()
 	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
 		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
 	end
-	if event.isRegistered(EVENTS.pickSelected, this.onPickSelected) then
-		event.unregister(EVENTS.pickSelected, this.onPickSelected)
+	if event.isRegistered(EVENTS.pickCycled, this.onPickCycled) then
+		event.unregister(EVENTS.pickCycled, this.onPickCycled)
 	end
 	if event.isRegistered(EVENTS.lockpickingEnd, this.onLockpickingEnd) then
 		event.unregister(EVENTS.lockpickingEnd, this.onLockpickingEnd)

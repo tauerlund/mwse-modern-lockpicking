@@ -38,21 +38,17 @@ end
 ---@private
 ---@param e pickCycleRequestedEventData
 function this.onPickCycleRequested(e)
-	---@type pickCycledEventData
-	local cycledData = {
-		pick = this.session.pick,
-	}
-	event.trigger(EVENTS.pickCycled, cycledData)
+	local previousPick = this.session.pick
 
 	local item = pickSelector.select(this.session.picks, e.direction)
 	local pick = pickSpawner.spawn(this.session.lock, item)
-	this.session.pick = pick
 
-	---@type pickSelectedEventData
-	local selectedData = {
+	---@type pickCycledEventData
+	local eventData = {
+		previousPick = previousPick,
 		pick = pick,
 	}
-	event.trigger(EVENTS.pickSelected, selectedData)
+	event.trigger(EVENTS.pickCycled, eventData)
 end
 
 return this
