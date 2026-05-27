@@ -9,9 +9,12 @@ local soundController = require("tauer.modern-lockpicking.services.sounds.soundC
 local skillController = require("tauer.modern-lockpicking.services.skills.skillController")
 local guiController = require("tauer.modern-lockpicking.services.gui.guiController")
 local lockAnimator = require("tauer.modern-lockpicking.services.locks.lockAnimator")
+local lockController = require("tauer.modern-lockpicking.services.locks.lockController")
 local knifeAnimator = require("tauer.modern-lockpicking.services.knives.knifeAnimator")
 local cylinderAnimator = require("tauer.modern-lockpicking.services.cylinders.cylinderAnimator")
+local cylinderController = require("tauer.modern-lockpicking.services.cylinders.cylinderController")
 local pickAnimator = require("tauer.modern-lockpicking.services.picks.pickAnimator")
+local pickController = require("tauer.modern-lockpicking.services.picks.pickController")
 local renderingController = require("tauer.modern-lockpicking.services.rendering.renderingController")
 local soundFileResolver = require("tauer.modern-lockpicking.services.sounds.soundFileResolver")
 local mcm = require("tauer.modern-lockpicking.services.mcm.mcmInitializer")
@@ -40,9 +43,12 @@ function this.initializeMod(_)
 		soundController,
 		guiController,
 		lockAnimator,
+		lockController,
 		knifeAnimator,
 		cylinderAnimator,
+		cylinderController,
 		pickAnimator,
+		pickController,
 		renderingController,
 		skillController,
 		soundFileResolver,

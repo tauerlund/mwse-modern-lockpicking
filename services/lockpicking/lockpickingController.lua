@@ -1,7 +1,7 @@
 --- SERVICES
-local pickSelector = require("tauer.modern-lockpicking.services.picks.pickSelector")
 local lockSpawner = require("tauer.modern-lockpicking.services.locks.lockSpawner")
 local knifeSpawner = require("tauer.modern-lockpicking.services.knives.knifeSpawner")
+local pickSelector = require("tauer.modern-lockpicking.services.picks.pickSelector")
 local pickSpawner = require("tauer.modern-lockpicking.services.picks.pickSpawner")
 local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
 local inventoryManager = require("tauer.modern-lockpicking.services.inventory.inventoryManager")
@@ -9,7 +9,6 @@ local translations = require("tauer.modern-lockpicking.services.translations.tra
 ---
 
 --- ENUMS
-local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.CONSTANTS")
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
 ---
@@ -61,158 +60,80 @@ function this.createSession(activator)
 
 	local lock = lockSpawner.spawn(activator)
 	local knife = knifeSpawner.spawn(lock)
+	local item = pickSelector.select(picks, nil)
+	local pick = pickSpawner.spawn(lock, item)
 
-	local session = {
+	return {
 		activator = activator,
 		picks = picks,
 		lock = lock,
 		knife = knife,
+		pick = pick,
 	}
-
-	session.pick = this.selectPick({
-		session = session
-	})
-
-	return session
 end
 
 ---@private
 function this.onLockpickingReady()
-	this.enable()
-
 	---@type lockpickingStartedEventData
 	local eventData = {
 		session = this.session,
 	}
 	event.trigger(EVENTS.lockpickingStarted, eventData)
+	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd, { doOnce = true })
 end
 
 ---@private
----@param e pickCycleRequestedEventData
-function this.onPickCycleRequested(e)
-	this.session.pick = this.selectPick({
-		direction = e.direction
-	})
+function this.onCylinderTargetReached()
+	---@type lockpickingEndEventData
+	local data = {
+		session = this.session,
+		success = true,
+	}
+	event.trigger(EVENTS.lockpickingEnd, data)
 end
 
 ---@private
 function this.onExitRequested()
-	this.finish({ success = false })
-end
-
----@private
----@param _ enterFrameEventData
-function this.onEnterFrame(_)
-	local rotation = this.session.lock.cylinder.rotation:toEulerXYZ().y
-
-	if rotation <= CONSTANTS.targetRotationLeft or rotation >= CONSTANTS.targetRotationRight then
-		this.finish({ success = true })
-		return
-	end
-end
-
----@private
----@param params lockpickingController.selectPick.params
----@return pick|nil
-function this.selectPick(params)
-	local session = params.session or this.session
-	if not session then
-		return nil
-	end
-
-	if session.pick then
-		---@type pickCycledEventData
-		local pickChangedEventData = {
-			pick = this.session.pick,
-		}
-		event.trigger(EVENTS.pickCycled, pickChangedEventData)
-	end
-
-	local item = pickSelector.select(session.picks, params.direction)
-	local pick = pickSpawner.spawn(session.lock, item)
-
-	---@type pickSelectedEventData
-	local pickSelectedEventData = {
-		pick = pick,
-	}
-	event.trigger(EVENTS.pickSelected, pickSelectedEventData)
-
-	return pick
-end
-
----@private
----@param parameters stopLockpickingParameters
-function this.finish(parameters)
 	---@type lockpickingEndEventData
 	local data = {
 		session = this.session,
-		success = parameters.success,
+		success = false,
 	}
 	event.trigger(EVENTS.lockpickingEnd, data)
+end
 
+---@private
+---@param e lockpickingEndEventData
+function this.onLockpickingEnd(e)
 	timerManager.start({
 		durationInSeconds = 1,
 		finishedCallback = this.onEndTimerFinished,
-		data = data --[[@as timerData]],
+		data = e --[[@as timerData]],
 	})
-
-	this.disable()
 end
 
 ---@private
 ---@param data timerData
 function this.onEndTimerFinished(data)
-	---@cast data +lockpickingEndedEventData, -timerData
-	this.stop({ success = data.success })
-end
-
----@private
----@param parameters stopLockpickingParameters
-function this.stop(parameters)
+	---@cast data +lockpickingEndEventData, -timerData
 	---@type lockpickingEndedEventData
-	local data = {
+	local eventData = {
 		session = this.session,
-		success = parameters.success,
+		success = data.success,
 	}
-	event.trigger(EVENTS.lockpickingEnded, data)
-
-	local activator = this.session and this.session.activator
-
-	if parameters.success then
-		tes3.unlock({
-			reference = activator --[[@as tes3reference]],
-		})
-		timer.delayOneFrame(function ()
-			tes3.player:activate(activator --[[@as tes3reference]])
-		end)
-	end
-
-	this.disable()
+	event.trigger(EVENTS.lockpickingEnded, eventData)
 	this.resetFields()
 end
 
+---@private
 function this.resetFields()
 	this.session = nil
 end
 
 ---@private
-function this.enable()
-	if not event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.register(tes3.event.enterFrame, this.onEnterFrame)
-	end
-end
-
----@private
-function this.disable()
-	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
-	end
-end
-
----@private
 function this.registerEvents()
 	event.register(EVENTS.lockpickingActivated, this.onLockPickingActivated)
-	event.register(EVENTS.pickCycleRequested, this.onPickCycleRequested)
+	event.register(EVENTS.cylinderTargetReached, this.onCylinderTargetReached)
 	event.register(EVENTS.exitRequested, this.onExitRequested)
 end
 
