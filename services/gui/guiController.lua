@@ -28,8 +28,28 @@ this.picks = nil
 ---@public
 ---@return boolean,string|nil
 function this.initialize()
-	this.registerEvents()
+	event.register(tes3.event.load, this.onLoad)
+	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 	return true, nil
+end
+
+---@private
+---@param _ loadEventData
+function this.onLoad(_)
+	this.stop()
+end
+
+---@private
+---@param e lockpickingStartEventData
+function this.onLockpickingStart(e)
+	this.start(e)
+end
+
+---@private
+---@param _ lockpickingEndedEventData
+function this.onLockpickingEnded(_)
+	this.stop()
 end
 
 ---@private
@@ -345,24 +365,6 @@ function this.stop()
 end
 
 ---@private
----@param e lockpickingStartEventData
-function this.onLockpickingStart(e)
-	this.start(e)
-end
-
----@private
----@param _ lockpickingEndedEventData
-function this.onLockpickingEnded(_)
-	this.stop()
-end
-
----@private
----@param _ loadEventData
-function this.onLoad(_)
-	this.stop()
-end
-
----@private
 ---@param element tes3uiElement
 function this.onKeyBindsUpdated(element)
 	local texts = this.getControlTexts()
@@ -384,13 +386,6 @@ function this.onPickCycled(element, e)
 	element.color = isSelected
 		and tes3ui.getPalette(tes3.palette.normalOverColor)
 		or tes3ui.getPalette(tes3.palette.normalColor)
-end
-
----@private
-function this.registerEvents()
-	event.register(tes3.event.load, this.onLoad)
-	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 end
 
 return this

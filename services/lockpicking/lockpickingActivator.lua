@@ -30,8 +30,8 @@ function this.initialize()
 		return false, "Failed to load activation strategies"
 	end
 
-	this.applyStrategy()
 	event.register(EVENTS.settingsUpdated, this.onSettingsUpdated)
+	this.applyStrategy()
 
 	return true, nil
 end

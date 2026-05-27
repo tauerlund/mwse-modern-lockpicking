@@ -11,8 +11,16 @@ local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local this = {}
 
 ---@private
----@type lockpickingSession
-this.session = nil
+---@type tes3itemStack[]
+this.picks = nil
+
+---@private
+---@type lock
+this.lock = nil
+
+---@private
+---@type pick
+this.currentPick = nil
 
 ---@public
 ---@return boolean,string|nil
@@ -26,22 +34,27 @@ end
 ---@private
 ---@param e lockpickingStartedEventData
 function this.onLockpickingStarted(e)
-	this.session = e.session
+	this.picks = e.session.picks
+	this.lock = e.session.lock
+	this.currentPick = e.session.pick
 end
 
 ---@private
 ---@param _ lockpickingEndedEventData
 function this.onLockpickingEnded(_)
-	this.session = nil
+	this.picks = nil
+	this.lock = nil
+	this.currentPick = nil
 end
 
 ---@private
 ---@param e pickCycleRequestedEventData
 function this.onPickCycleRequested(e)
-	local previousPick = this.session.pick
+	local previousPick = this.currentPick
 
-	local item = pickSelector.select(this.session.picks, e.direction)
-	local pick = pickSpawner.spawn(this.session.lock, item)
+	local item = pickSelector.select(this.picks, e.direction)
+	local pick = pickSpawner.spawn(this.lock, item)
+	this.currentPick = pick
 
 	---@type pickCycledEventData
 	local eventData = {

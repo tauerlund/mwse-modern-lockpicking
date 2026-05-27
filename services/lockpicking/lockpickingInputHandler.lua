@@ -26,11 +26,11 @@ this.pickCycleDirections = nil
 ---@public
 ---@return boolean, string|nil
 function this.initialize()
-	this.applyKeybinds()
 	event.register(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
 	event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+	this.applyKeybinds()
 	return true, nil
 end
 

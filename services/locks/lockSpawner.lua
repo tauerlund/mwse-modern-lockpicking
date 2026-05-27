@@ -4,8 +4,15 @@ local Z_BUFFER_INDEX = require("tauer.modern-lockpicking.services.rendering.enum
 local OBJECT_NAMES = require("tauer.modern-lockpicking.services.nodes.enums.OBJECT_NAMES")
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 
----@class lockSpawner
+---@class lockSpawner : initializedService
 local this = {}
+
+---@public
+---@return boolean, string|nil
+function this.initialize()
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+	return true, nil
+end
 
 ---@public
 ---@param activator tes3containerInstance|tes3door
@@ -13,13 +20,18 @@ local this = {}
 function this.spawn(activator)
 	local mesh = this.spawnMesh(activator)
 
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded, { doOnce = true })
-
 	return {
 		mesh = mesh,
 		cylinder = mesh:getObjectByName(OBJECT_NAMES.cylinderHelper),
 		container = activator,
 	}
+end
+
+---@private
+---@param e lockpickingEndedEventData
+function this.onLockpickingEnded(e)
+	local root = this.getRootNode()
+	root:detachChild(e.session.lock.mesh)
 end
 
 ---@private
@@ -84,13 +96,6 @@ function this.getZBufferProperty()
 	property.testFunction = ni.zBufferPropertyTestFunction.always
 
 	return property
-end
-
----@private
----@param e lockpickingEndedEventData
-function this.onLockpickingEnded(e)
-	local root = this.getRootNode()
-	root:detachChild(e.session.lock.mesh)
 end
 
 return this

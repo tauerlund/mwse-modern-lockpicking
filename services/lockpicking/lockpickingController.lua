@@ -23,7 +23,11 @@ this.session = nil
 ---@public
 ---@return boolean,string|nil
 function this.initialize()
-	this.registerEvents()
+	event.register(EVENTS.lockpickingActivated, this.onLockPickingActivated)
+	event.register(EVENTS.cylinderTargetReached, this.onCylinderTargetReached)
+	event.register(EVENTS.pickCycled, this.onPickCycled)
+	event.register(EVENTS.exitRequested, this.onExitRequested)
+	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
 	return true, nil
 end
 
@@ -43,7 +47,7 @@ function this.onLockPickingActivated(e)
 
 	timerManager.start({
 		durationInSeconds = 1.3,
-		finishedCallback = this.onLockpickingReady,
+		finishedCallback = this.onStartTimerFinished,
 		cancelOn = EVENTS.lockpickingEnded,
 	})
 end
@@ -73,13 +77,12 @@ function this.createSession(activator)
 end
 
 ---@private
-function this.onLockpickingReady()
+function this.onStartTimerFinished()
 	---@type lockpickingStartedEventData
 	local eventData = {
 		session = this.session,
 	}
 	event.trigger(EVENTS.lockpickingStarted, eventData)
-	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd, { doOnce = true })
 end
 
 ---@private
@@ -128,20 +131,7 @@ function this.onEndTimerFinished(data)
 		success = data.success,
 	}
 	event.trigger(EVENTS.lockpickingEnded, eventData)
-	this.resetFields()
-end
-
----@private
-function this.resetFields()
 	this.session = nil
-end
-
----@private
-function this.registerEvents()
-	event.register(EVENTS.lockpickingActivated, this.onLockPickingActivated)
-	event.register(EVENTS.cylinderTargetReached, this.onCylinderTargetReached)
-	event.register(EVENTS.pickCycled, this.onPickCycled)
-	event.register(EVENTS.exitRequested, this.onExitRequested)
 end
 
 return this

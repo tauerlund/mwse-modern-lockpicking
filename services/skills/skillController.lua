@@ -9,7 +9,7 @@ local this = {}
 ---@public
 ---@return boolean,string|nil
 function this.initialize()
-	this.registerEvents()
+	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 	return true, nil
 end
 
@@ -28,11 +28,6 @@ function this.exerciseSkill()
 	local increase = skill.actions[CONSTANTS.action.lockpicking]
 
 	player:exerciseSkill(tes3.skill.security, increase)
-end
-
----@private
-function this.registerEvents()
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 end
 
 return this

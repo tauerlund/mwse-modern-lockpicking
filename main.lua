@@ -11,6 +11,8 @@ local guiController = require("tauer.modern-lockpicking.services.gui.guiControll
 local lockAnimator = require("tauer.modern-lockpicking.services.locks.lockAnimator")
 local lockController = require("tauer.modern-lockpicking.services.locks.lockController")
 local lockMeshResolver = require("tauer.modern-lockpicking.services.locks.lockMeshResolver")
+local lockSpawner = require("tauer.modern-lockpicking.services.locks.lockSpawner")
+local knifeSpawner = require("tauer.modern-lockpicking.services.knives.knifeSpawner")
 local knifeAnimator = require("tauer.modern-lockpicking.services.knives.knifeAnimator")
 local cylinderAnimator = require("tauer.modern-lockpicking.services.cylinders.cylinderAnimator")
 local cylinderController = require("tauer.modern-lockpicking.services.cylinders.cylinderController")
@@ -42,9 +44,11 @@ function this.initializeMod(_)
 		lockpickingActivator,
 		lockController,
 		lockMeshResolver,
+		lockSpawner,
 		lockAnimator,
 		cylinderController,
 		cylinderAnimator,
+		knifeSpawner,
 		knifeAnimator,
 		soundController,
 		soundFileResolver,
