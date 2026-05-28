@@ -6,7 +6,7 @@ local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local this = {}
 
 ---@private
----@type tes3containerInstance|tes3door
+---@type tes3reference
 this.activator = nil
 
 ---@public

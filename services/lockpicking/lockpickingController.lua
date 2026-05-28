@@ -53,7 +53,7 @@ function this.onLockPickingActivated(e)
 end
 
 ---@private
----@param activator tes3containerInstance|tes3door
+---@param activator tes3reference
 ---@return lockpickingSession|nil
 function this.createSession(activator)
 	local picks = inventoryManager.getLockpicks()

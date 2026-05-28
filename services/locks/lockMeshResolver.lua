@@ -21,7 +21,7 @@ function this.initialize()
 end
 
 ---@public
----@param activator tes3containerInstance|tes3door
+---@param activator tes3reference
 ---@return niNode
 function this.resolve(activator)
 	return this.meshes[activator.mesh] or this.defaultMesh

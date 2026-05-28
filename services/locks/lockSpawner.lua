@@ -15,7 +15,7 @@ function this.initialize()
 end
 
 ---@public
----@param activator tes3containerInstance|tes3door
+---@param activator tes3reference
 ---@return lock
 function this.spawn(activator)
 	local mesh = this.spawnMesh(activator)
@@ -35,7 +35,7 @@ function this.onLockpickingEnded(e)
 end
 
 ---@private
----@param activator tes3containerInstance|tes3door
+---@param activator tes3reference
 ---@return niNode
 function this.spawnMesh(activator)
 	local mesh = this.getMesh(activator)
@@ -53,7 +53,7 @@ function this.spawnMesh(activator)
 end
 
 ---@private
----@param activator tes3containerInstance|tes3door
+---@param activator tes3reference
 ---@return niNode
 function this.getMesh(activator)
 	local mesh = lockMeshResolver.resolve(activator)
