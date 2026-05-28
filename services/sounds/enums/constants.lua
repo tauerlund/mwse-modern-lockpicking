@@ -10,6 +10,7 @@ local enum = {
         unlock = "unlock",
         rotateLockpick = "rotate-lockpick",
         rotateCylinder = "rotate-cylinder",
+        jiggleLockpick = "jiggle-lockpick",
     },
     lockpickRotationMaxDelta = 0.1,
     wav = {

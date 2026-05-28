@@ -15,24 +15,24 @@ local this = {}
 this.lastCursorPosition = 0
 
 ---@private
----@type number
-this.lockpickRotationTimeCounter = 0
-
----@private
----@type number
-this.cylinderRotationTimeCounter = 0
-
----@private
 ---@type boolean
 this.rotatingCylinder = false
 
 ---@private
----@type number
-this.lockpickRotationTimeCooldown = 0
+---@type boolean
+this.jiggling = false
 
 ---@private
----@type number
-this.cylinderRotationTimeCooldown = 0
+---@type soundCooldownState
+this.lockpickRotationState = { counter = 0, cooldown = 0 }
+
+---@private
+---@type soundCooldownState
+this.cylinderRotationState = { counter = 0, cooldown = 0 }
+
+---@private
+---@type soundCooldownState
+this.jiggleState = { counter = 0, cooldown = 0 }
 
 ---@public
 ---@return boolean,string|nil
@@ -89,43 +89,55 @@ end
 function this.onEnterFrame(e)
 	this.playLockpickRotationSound(e.delta)
 	this.playCylinderRotationSound(e.delta)
+	this.playJiggleSound(e.delta)
 end
 
 ---@private
 ---@param delta number
 function this.playLockpickRotationSound(delta)
 	local currentCursorPosition = tes3.getCursorPosition().x
-	local cursorPositionDelta = currentCursorPosition - this.lastCursorPosition
-
-	if math.abs(cursorPositionDelta) > CONSTANTS.lockpickRotationMaxDelta and this.lockpickRotationTimeCounter >= this.lockpickRotationTimeCooldown then
-		local soundFile = soundFileResolver.resolve(CONSTANTS.templates.rotateLockpick)
-		tes3.playSound({
-			reference = tes3.player,
-			soundPath = soundFile.path,
-		})
-		this.lockpickRotationTimeCooldown = soundFile.duration
-		this.lastCursorPosition = currentCursorPosition
-		this.lockpickRotationTimeCounter = 0
-	end
-
-	this.lockpickRotationTimeCounter = this.lockpickRotationTimeCounter + delta
+	local moved = math.abs(currentCursorPosition - this.lastCursorPosition) > CONSTANTS.lockpickRotationMaxDelta
+	this.playOnCooldown({
+		state = this.lockpickRotationState,
+		template = CONSTANTS.templates.rotateLockpick,
+		delta = delta,
+		condition = moved,
+	})
 	this.lastCursorPosition = currentCursorPosition
 end
 
 ---@private
 ---@param delta number
 function this.playCylinderRotationSound(delta)
-	if this.rotatingCylinder and this.cylinderRotationTimeCounter >= this.cylinderRotationTimeCooldown then
-		local soundFile = soundFileResolver.resolve(CONSTANTS.templates.rotateCylinder)
-		tes3.playSound({
-			reference = tes3.player,
-			soundPath = soundFile.path,
-		})
-		this.cylinderRotationTimeCounter = 0
-		this.cylinderRotationTimeCooldown = soundFile.duration
-	end
+	this.playOnCooldown({
+		state = this.cylinderRotationState,
+		template = CONSTANTS.templates.rotateCylinder,
+		delta = delta,
+		condition = this.rotatingCylinder,
+	})
+end
 
-	this.cylinderRotationTimeCounter = this.cylinderRotationTimeCounter + delta
+---@private
+---@param delta number
+function this.playJiggleSound(delta)
+	this.playOnCooldown({
+		state = this.jiggleState,
+		template = CONSTANTS.templates.jiggleLockpick,
+		delta = delta,
+		condition = this.jiggling,
+	})
+end
+
+---@private
+---@param e soundController.playOnCooldown.params
+function this.playOnCooldown(e)
+	if e.condition and e.state.counter >= e.state.cooldown then
+		local soundFile = soundFileResolver.resolve(e.template)
+		tes3.playSound({ reference = tes3.player, soundPath = soundFile.path })
+		e.state.counter = 0
+		e.state.cooldown = soundFile.duration
+	end
+	e.state.counter = e.state.counter + e.delta
 end
 
 ---@private
@@ -138,11 +150,15 @@ end
 ---@param _ rotationEventData
 function this.onRotationEnded(_)
 	this.rotatingCylinder = false
+	this.jiggling = false
 end
 
 ---@private
 function this.onCylinderBlocked()
 	this.rotatingCylinder = false
+	this.jiggling = true
+	this.jiggleState.counter = 0
+	this.jiggleState.cooldown = 0
 end
 
 return this

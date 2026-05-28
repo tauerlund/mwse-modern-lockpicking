@@ -1,0 +1,4 @@
+---@meta
+---@class soundCooldownState
+---@field public counter number
+---@field public cooldown number

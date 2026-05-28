@@ -1,0 +1,6 @@
+---@meta
+---@class soundController.playOnCooldown.params
+---@field public state soundCooldownState
+---@field public template string
+---@field public delta number
+---@field public condition boolean
