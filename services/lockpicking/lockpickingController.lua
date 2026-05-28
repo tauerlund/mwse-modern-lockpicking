@@ -5,7 +5,7 @@ local knifeSpawner = require("tauer.modern-lockpicking.services.knives.knifeSpaw
 local pickSelector = require("tauer.modern-lockpicking.services.picks.pickSelector")
 local pickSpawner = require("tauer.modern-lockpicking.services.picks.pickSpawner")
 local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
-local inventoryManager = require("tauer.modern-lockpicking.services.inventory.inventoryManager")
+local inventoryController = require("tauer.modern-lockpicking.services.inventory.inventoryController")
 local translations = require("tauer.modern-lockpicking.services.translations.translations")
 ---
 
@@ -56,7 +56,7 @@ end
 ---@param activator tes3reference
 ---@return lockpickingSession|nil
 function this.createSession(activator)
-	local picks = inventoryManager.getLockpicks()
+	local picks = inventoryController.getLockpicks()
 	if not picks then
 		tes3.messageBox(translations.get(TRANSLATION_KEY.messageBoxNoLockpicks))
 		return nil

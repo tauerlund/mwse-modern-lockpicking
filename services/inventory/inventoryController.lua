@@ -1,4 +1,4 @@
----@class inventoryManager
+---@class inventoryController
 local this = {}
 
 ---@public
