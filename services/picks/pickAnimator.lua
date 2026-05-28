@@ -24,6 +24,18 @@ this.helper = nil
 this.blocked = false
 
 ---@private
+---@type boolean
+this.jiggling = false
+
+---@private
+---@type number
+this.jigglePhase = 0
+
+---@private
+---@type number
+this.jiggleOffset = 0
+
+---@private
 ---@type tes3matrix33
 this.originalHelperRotation = nil
 
@@ -78,6 +90,7 @@ function this.initialize()
 	event.register(EVENTS.pickCycled, this.onPickCycled)
 	event.register(EVENTS.rotationStarted, this.onRotationStarted)
 	event.register(EVENTS.rotationEnded, this.onRotationEnded)
+	event.register(EVENTS.cylinderBlocked, this.onCylinderBlocked)
 	return true, nil
 end
 
@@ -120,6 +133,15 @@ end
 ---@param _ rotationEventData
 function this.onRotationEnded(_)
 	this.blocked = false
+	this.jiggling = false
+	this.jigglePhase = 0
+	this.jiggleOffset = 0
+end
+
+---@private
+function this.onCylinderBlocked()
+	this.blocked = true
+	this.jiggling = true
 end
 
 ---@private
@@ -144,6 +166,9 @@ function this.resetFields()
 
 	this.mesh = nil
 	this.blocked = false
+	this.jiggling = false
+	this.jigglePhase = 0
+	this.jiggleOffset = 0
 	this.originalHelperRotation = nil
 	this.originalPickRotation = nil
 	this.currentHelperAngle = 0
@@ -180,6 +205,11 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
+	if this.jiggling then
+		this.updateJiggle(e.delta)
+		return
+	end
+
 	if this.blocked then
 		return
 	end
@@ -217,9 +247,17 @@ function this.updateAngle(delta)
 end
 
 ---@private
+function this.updateJiggle(delta)
+	this.jigglePhase = this.jigglePhase + CONSTANTS.animation.jiggleSpeed * delta
+	this.jiggleOffset = math.sin(this.jigglePhase) * CONSTANTS.animation.jiggleAmplitude
+	this.rotateHelper()
+	this.rotatePick()
+end
+
+---@private
 function this.rotateHelper()
 	local rotation = this.helper.rotation:copy()
-	rotation:toRotationY(this.currentHelperAngle)
+	rotation:toRotationY(this.currentHelperAngle + this.jiggleOffset)
 
 	this.helper.rotation = rotation
 	this.helper:update()
@@ -228,7 +266,7 @@ end
 ---@private
 function this.rotatePick()
 	local rotation = this.mesh.rotation:copy()
-	rotation:toRotationY(this.currentHelperAngle)
+	rotation:toRotationY(this.currentHelperAngle + this.jiggleOffset)
 
 	this.mesh.rotation = this.originalPickRotation * rotation
 	this.mesh:update()
