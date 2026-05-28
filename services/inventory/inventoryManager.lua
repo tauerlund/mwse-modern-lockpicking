@@ -17,17 +17,17 @@ function this.getLockpicks()
 		return nil
 	end
 
-	table.sort(lockpicks, this.sortByLowestPrice)
+	table.sort(lockpicks, this.sortByLowestQuality)
 
 	return lockpicks
 end
 
 ---@private
 ---@param a tes3itemStack
-function this.sortByLowestPrice(a, b)
+function this.sortByLowestQuality(a, b)
 	local pickA = a.object --[[@as tes3lockpick]]
 	local pickB = b.object --[[@as tes3lockpick]]
-	return pickA.value < pickB.value
+	return pickA.quality < pickB.quality
 end
 
 return this
