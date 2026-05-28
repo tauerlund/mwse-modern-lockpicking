@@ -31,6 +31,7 @@ function this.initialize()
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 	event.register(EVENTS.rotationStarted, this.onRotationStarted)
 	event.register(EVENTS.rotationEnded, this.onRotationEnded)
+	event.register(EVENTS.cylinderBlocked, this.onCylinderBlocked)
 	return true, nil
 end
 
@@ -65,6 +66,12 @@ end
 ---@private
 function this.onRotationEnded()
 	this.rotationDirection = nil
+	this.blocked = false
+end
+
+---@private
+function this.onCylinderBlocked()
+	this.blocked = true
 end
 
 ---@private

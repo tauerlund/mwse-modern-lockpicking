@@ -73,7 +73,29 @@ function this.createSession(activator)
 		lock = lock,
 		knife = knife,
 		pick = pick,
+		sweetSpotCenter = math.random() * math.pi - (math.pi / 2),
 	}
+end
+
+---@private
+---@return number
+function this.computeSweetSpotRadius()
+	local security = tes3.mobilePlayer.skills[tes3.skill.security].current
+	local lockLevel = this.session.activator.lockNode and this.session.activator.lockNode.level or 1
+	local quality = this.session.pick.item.object.quality
+	return math.pi * quality * security / (security + lockLevel * 2)
+end
+
+---@private
+function this.triggerSweetSpotUpdated()
+	local radius = this.computeSweetSpotRadius()
+	---@type sweetSpotUpdatedEventData
+	local eventData = {
+		center = this.session.sweetSpotCenter,
+		radius = radius,
+		gradientWidth = radius,
+	}
+	event.trigger(EVENTS.sweetSpotUpdated, eventData)
 end
 
 ---@private
@@ -84,6 +106,7 @@ function this.onStartTimerFinished()
 	}
 	event.trigger(EVENTS.lockpickingStarted, eventData)
 	this.enableInput()
+	this.triggerSweetSpotUpdated()
 end
 
 ---@private
@@ -100,6 +123,7 @@ end
 ---@param e pickCycledEventData
 function this.onPickCycled(e)
 	this.session.pick = e.pick
+	this.triggerSweetSpotUpdated()
 end
 
 ---@private

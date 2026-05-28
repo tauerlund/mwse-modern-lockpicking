@@ -36,7 +36,7 @@ function this.onLockPick(e)
 
     ---@type lockpickingActivatedEventData
     local eventData = {
-        activator = e.reference --[[@as tes3containerInstance|tes3door]]
+        activator = e.reference
     }
     event.trigger(EVENTS.lockpickingActivated, eventData)
 end

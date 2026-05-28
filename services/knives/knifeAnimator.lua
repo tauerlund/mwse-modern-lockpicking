@@ -74,6 +74,7 @@ function this.initialize()
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 	event.register(EVENTS.rotationStarted, this.onRotationStarted)
 	event.register(EVENTS.rotationEnded, this.onRotationEnded)
+	event.register(EVENTS.cylinderBlocked, this.onCylinderBlocked)
 	return true, nil
 end
 
@@ -112,10 +113,16 @@ end
 ---@private
 ---@param _ rotationEventData
 function this.onRotationEnded(_)
+	this.blocked = false
 	this.targetAngle = 0
 	this.sourceAngle = this.currentAngle
 	this.phaseSpeed = this.getRelativePhaseSpeed()
 	this.phase = 0
+end
+
+---@private
+function this.onCylinderBlocked()
+	this.blocked = true
 end
 
 ---@private

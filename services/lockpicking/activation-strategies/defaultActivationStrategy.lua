@@ -50,21 +50,21 @@ end
 
 ---@private
 ---@param target tes3reference
----@return tes3containerInstance|tes3door|nil
+---@return tes3reference|nil
 function this.validateActivator(target)
     local type = target.object.objectType
     if type == tes3.objectType.container or type == tes3.objectType.door then
-        return target --[[@as tes3containerInstance|tes3door]]
+        return target
     end
     return nil
 end
 
 ---@private
----@param activator tes3containerInstance|tes3door
+---@param activator tes3reference
 ---@return boolean
 function this.isLocked(activator)
     return tes3.getLocked({
-        reference = activator --[[@as tes3reference]],
+        reference = activator,
     })
 end
 

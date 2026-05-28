@@ -24,7 +24,7 @@ this.cylinderRotationTimeCounter = 0
 
 ---@private
 ---@type boolean
-this.isRotatingCylinder = false
+this.rotatingCylinder = false
 
 ---@private
 ---@type number
@@ -42,6 +42,7 @@ function this.initialize()
 	event.register(EVENTS.pickCycled, this.onPickCycled)
 	event.register(EVENTS.rotationStarted, this.onRotationStarted)
 	event.register(EVENTS.rotationEnded, this.onRotationEnded)
+	event.register(EVENTS.cylinderBlocked, this.onCylinderBlocked)
 	return true, nil
 end
 
@@ -114,7 +115,7 @@ end
 ---@private
 ---@param delta number
 function this.playCylinderRotationSound(delta)
-	if this.isRotatingCylinder and this.cylinderRotationTimeCounter >= this.cylinderRotationTimeCooldown then
+	if this.rotatingCylinder and this.cylinderRotationTimeCounter >= this.cylinderRotationTimeCooldown then
 		local soundFile = soundFileResolver.resolve(CONSTANTS.templates.rotateCylinder)
 		tes3.playSound({
 			reference = tes3.player,
@@ -130,13 +131,18 @@ end
 ---@private
 ---@param _ rotationEventData
 function this.onRotationStarted(_)
-	this.isRotatingCylinder = true
+	this.rotatingCylinder = true
 end
 
 ---@private
 ---@param _ rotationEventData
 function this.onRotationEnded(_)
-	this.isRotatingCylinder = false
+	this.rotatingCylinder = false
+end
+
+---@private
+function this.onCylinderBlocked()
+	this.rotatingCylinder = false
 end
 
 return this

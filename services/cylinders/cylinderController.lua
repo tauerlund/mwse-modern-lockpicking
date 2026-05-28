@@ -16,6 +16,30 @@ local this = {}
 this.cylinder = nil
 
 ---@private
+---@type niNode
+this.pickHelper = nil
+
+---@private
+---@type number
+this.sweetSpotCenter = nil
+
+---@private
+---@type number
+this.sweetSpotRadius = nil
+
+---@private
+---@type number
+this.gradientWidth = nil
+
+---@private
+---@type boolean
+this.rotating = false
+
+---@private
+---@type number
+this.maxAngle = 0
+
+---@private
 ---@type tes3.scanCode
 this.currentDirectionKey = nil
 
@@ -30,6 +54,8 @@ function this.initialize()
 	event.register(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
 	event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
+	event.register(EVENTS.sweetSpotUpdated, this.onSweetSpotUpdated)
+	event.register(EVENTS.pickCycled, this.onPickCycled)
 	return true, nil
 end
 
@@ -42,7 +68,22 @@ end
 ---@param e lockpickingStartedEventData
 function this.onLockpickingStarted(e)
 	this.cylinder = e.session.lock.cylinder
+	this.pickHelper = e.session.pick.helper
 	this.enable()
+end
+
+---@private
+---@param e sweetSpotUpdatedEventData
+function this.onSweetSpotUpdated(e)
+	this.sweetSpotCenter = e.center
+	this.sweetSpotRadius = e.radius
+	this.gradientWidth = e.gradientWidth
+end
+
+---@private
+---@param e pickCycledEventData
+function this.onPickCycled(e)
+	this.pickHelper = e.pick.helper
 end
 
 ---@private
@@ -50,6 +91,10 @@ end
 function this.onLockpickingEnd(_)
 	this.disable()
 	this.cylinder = nil
+	this.pickHelper = nil
+	this.sweetSpotCenter = nil
+	this.sweetSpotRadius = nil
+	this.gradientWidth = nil
 end
 
 ---@private
@@ -77,6 +122,8 @@ function this.disable()
 		event.unregister(tes3.event.keyUp, this.onKeyUp)
 	end
 	this.currentDirectionKey = nil
+	this.rotating = false
+	this.maxAngle = 0
 end
 
 ---@private
@@ -86,7 +133,36 @@ function this.onEnterFrame(_)
 
 	if rotation <= CONSTANTS.targetRotationLeft or rotation >= CONSTANTS.targetRotationRight then
 		event.trigger(EVENTS.cylinderTargetReached)
+		return
 	end
+
+	if this.rotating and math.abs(rotation) >= this.maxAngle then
+		this.rotating = false
+		event.trigger(EVENTS.cylinderBlocked)
+	end
+end
+
+---@private
+---@return number
+function this.computeMaxAngle()
+	if not this.pickHelper or not this.sweetSpotCenter or not this.sweetSpotRadius then
+		return 0
+	end
+
+	local pickAngle = this.pickHelper.rotation:toEulerXYZ().y
+	local distance = math.abs(pickAngle - this.sweetSpotCenter)
+	if distance <= this.sweetSpotRadius then
+		return math.huge
+	end
+
+	if not this.gradientWidth or this.gradientWidth == 0 then
+		return 0
+	end
+
+	local overshoot = distance - this.sweetSpotRadius
+	local fraction = math.max(0, 1 - overshoot / this.gradientWidth)
+
+	return CONSTANTS.targetRotationRight * fraction
 end
 
 ---@private
@@ -108,12 +184,21 @@ end
 ---@private
 ---@param e keyDownEventData
 function this.onRotationKeyDown(e)
+	this.currentDirectionKey = e.keyCode
+
+	this.maxAngle = this.computeMaxAngle()
+	if this.maxAngle == 0 then
+		event.trigger(EVENTS.cylinderBlocked)
+		return
+	end
+
 	---@type rotationEventData
-	local data = {
+	local eventData = {
 		direction = this.rotationDirections[e.keyCode],
 	}
-	event.trigger(EVENTS.rotationStarted, data)
-	this.currentDirectionKey = e.keyCode
+	event.trigger(EVENTS.rotationStarted, eventData)
+
+	this.rotating = true
 end
 
 ---@private
@@ -124,10 +209,12 @@ function this.onRotationKeyUp(e)
 	end
 
 	---@type rotationEventData
-	local data = {
+	local eventData = {
 		direction = this.rotationDirections[e.keyCode],
 	}
-	event.trigger(EVENTS.rotationEnded, data)
+	event.trigger(EVENTS.rotationEnded, eventData)
+
+	this.rotating = false
 	this.currentDirectionKey = nil
 end
 

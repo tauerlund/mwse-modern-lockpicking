@@ -76,6 +76,8 @@ function this.initialize()
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 	event.register(EVENTS.pickCycled, this.onPickCycled)
+	event.register(EVENTS.rotationStarted, this.onRotationStarted)
+	event.register(EVENTS.rotationEnded, this.onRotationEnded)
 	return true, nil
 end
 
@@ -106,6 +108,18 @@ end
 ---@param e pickCycledEventData
 function this.onPickCycled(e)
 	this.start(e.pick, this.cycleAnimationKeyFrames)
+end
+
+---@private
+---@param _ rotationEventData
+function this.onRotationStarted(_)
+	this.blocked = true
+end
+
+---@private
+---@param _ rotationEventData
+function this.onRotationEnded(_)
+	this.blocked = false
 end
 
 ---@private

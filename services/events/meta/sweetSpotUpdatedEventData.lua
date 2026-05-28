@@ -1,0 +1,5 @@
+---@meta
+---@class sweetSpotUpdatedEventData
+---@field public center number
+---@field public radius number
+---@field public gradientWidth number
