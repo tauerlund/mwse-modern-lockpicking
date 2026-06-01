@@ -7,7 +7,6 @@ local pickSpawner = require("tauer.modern-lockpicking.services.picks.pickSpawner
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local CYCLE = require("tauer.modern-lockpicking.services.lockpicking.enums.CYCLE_DIRECTION")
-local CONSTANTS = require("tauer.modern-lockpicking.services.picks.enums.CONSTANTS")
 ---
 
 ---@class pickController : initializedService
@@ -202,7 +201,11 @@ end
 ---@private
 ---@return number
 function this.computeDamageRate()
-	return CONSTANTS.damage.baseRate
+	if not this.sweetSpotRadius or this.sweetSpotRadius <= 0 then
+		return settings.difficulty.baseRate
+	end
+	local maxRadius = math.rad(settings.difficulty.maxSweetSpotRadius)
+	return settings.difficulty.baseRate * math.sqrt(maxRadius / this.sweetSpotRadius)
 end
 
 ---@private

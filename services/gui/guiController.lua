@@ -431,6 +431,12 @@ function this.onUiObjectTooltip(e)
 		end
 	end
 
+	local conditionRatio = itemData and math.max(0, itemData.condition / e.object.maxCondition) or 1
+	usesTooltip.text = string.format(
+		"%s: %d%%",
+		translations.get(TRANSLATION_KEY.tooltipPickHealth),
+		math.round(conditionRatio * 100))
+
 	e.tooltip:updateLayout()
 end
 

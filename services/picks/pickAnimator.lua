@@ -36,6 +36,10 @@ this.jigglePhase = 0
 this.jiggleOffset = 0
 
 ---@private
+---@type tes3itemStack
+this.item = nil
+
+---@private
 ---@type tes3matrix33
 this.originalHelperRotation = nil
 
@@ -111,6 +115,7 @@ end
 function this.onLockpickingStart(e)
 	this.helper = e.session.pick.helper
 	this.originalHelperRotation = e.session.pick.helper.rotation:copy()
+	this.item = e.session.pick.item
 
 	this.start(e.session.pick, this.startAnimationKeyFrames)
 	this.enable()
@@ -132,6 +137,7 @@ end
 ---@private
 ---@param e pickCycledEventData
 function this.onPickCycled(e)
+	this.item = e.pick.item
 	this.start(e.pick, this.cycleAnimationKeyFrames)
 end
 
@@ -177,6 +183,7 @@ function this.resetFields()
 	this.helper = nil
 
 	this.mesh = nil
+	this.item = nil
 	this.blocked = false
 	this.jiggling = false
 	this.jigglePhase = 0
@@ -263,9 +270,31 @@ function this.updateAngle(delta)
 end
 
 ---@private
+---@return number
+function this.computeJiggleAmplitude()
+	local base = CONSTANTS.animation.jiggleAmplitude
+	if not this.item then
+		return base
+	end
+
+	local itemData = this.item.variables and this.item.variables[1]
+	if itemData then
+		for _, variable in ipairs(this.item.variables) do
+			if variable.condition < itemData.condition then
+				itemData = variable
+			end
+		end
+	end
+
+	local conditionRatio = itemData and math.max(0, itemData.condition / this.item.object.maxCondition) or 1
+	return base * (1 + CONSTANTS.animation.jiggleDamageFactor * (1 - conditionRatio))
+end
+
+---@private
 function this.updateJiggle(delta)
 	this.jigglePhase = this.jigglePhase + CONSTANTS.animation.jiggleSpeed * delta
-	this.jiggleOffset = math.sin(this.jigglePhase) * CONSTANTS.animation.jiggleAmplitude
+	local wave = math.sin(this.jigglePhase) + math.sin(this.jigglePhase * 1.7 + 1.3) * CONSTANTS.animation.jiggleNoise
+	this.jiggleOffset = wave * this.computeJiggleAmplitude()
 	this.rotateHelper()
 	this.rotatePick()
 end

@@ -38,8 +38,12 @@ local this = {
     mcmDifficultyDescMaxRadius = "mcm.difficulty.desc.maxRadius",
     mcmDifficultyLabelGradientFactor = "mcm.difficulty.label.gradientFactor",
     mcmDifficultyDescGradientFactor = "mcm.difficulty.desc.gradientFactor",
+    mcmDifficultyCategoryPickDamage = "mcm.difficulty.category.pickDamage",
+    mcmDifficultyLabelBaseRate = "mcm.difficulty.label.baseRate",
+    mcmDifficultyDescBaseRate = "mcm.difficulty.desc.baseRate",
     mcmDifficultyLabelResetToDefaults = "mcm.difficulty.label.resetToDefaults",
-    mcmDifficultyDescResetToDefaults = "mcm.difficulty.desc.resetToDefaults"
+    mcmDifficultyDescResetToDefaults = "mcm.difficulty.desc.resetToDefaults",
+    tooltipPickHealth = "tooltip.pick.health"
 }
 
 return this

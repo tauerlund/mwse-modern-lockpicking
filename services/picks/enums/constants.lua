@@ -15,7 +15,9 @@ local enum = {
 		cycleAnimationDuration = 0.5,
 		lerpSpeed = 9,
 		jiggleSpeed = 65,
-		jiggleAmplitude = math.rad(4),
+		jiggleAmplitude = math.rad(1),
+		jiggleDamageFactor = 2.5,
+		jiggleNoise = 0.5,
 	},
 
 	damage = {

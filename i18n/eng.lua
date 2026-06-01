@@ -39,6 +39,10 @@ return {
 	[TRANSLATION_KEY.mcmDifficultyDescMaxRadius] = "Caps the sweet spot size regardless of skill or pick quality.",
 	[TRANSLATION_KEY.mcmDifficultyLabelGradientFactor] = "Gradient Factor",
 	[TRANSLATION_KEY.mcmDifficultyDescGradientFactor] = "Width of the gradient zone as a multiplier of the sweet spot radius.",
+	[TRANSLATION_KEY.mcmDifficultyCategoryPickDamage] = "Pick Damage",
+	[TRANSLATION_KEY.mcmDifficultyLabelBaseRate] = "Base Damage Rate",
+	[TRANSLATION_KEY.mcmDifficultyDescBaseRate] = "Pick damage per second when the sweet spot is at maximum size. Scales up as the sweet spot shrinks.",
 	[TRANSLATION_KEY.mcmDifficultyLabelResetToDefaults] = "Reset to Defaults",
 	[TRANSLATION_KEY.mcmDifficultyDescResetToDefaults] = "Reset all difficulty settings to their default values.",
+	[TRANSLATION_KEY.tooltipPickHealth] = "Health",
 }

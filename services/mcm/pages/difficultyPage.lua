@@ -68,6 +68,22 @@ function this.initialize(template)
 		}),
 	})
 
+	local pickDamageCategory = page:createCategory({ label = translations.get(TRANSLATION_KEY.mcmDifficultyCategoryPickDamage) })
+
+	pickDamageCategory:createSlider({
+		label = translations.get(TRANSLATION_KEY.mcmDifficultyLabelBaseRate),
+		description = translations.get(TRANSLATION_KEY.mcmDifficultyDescBaseRate),
+		min = 0.1,
+		max = 5.0,
+		step = 0.1,
+		jump = 0.5,
+		decimalPlaces = 1,
+		variable = mwse.mcm.createTableVariable({
+			id = "baseRate",
+			table = mcmSettings.mcm.difficulty,
+		}),
+	})
+
 	local gradientCategory = page:createCategory({ label = translations.get(TRANSLATION_KEY.mcmDifficultyCategoryGradient) })
 
 	gradientCategory:createSlider({

@@ -16,6 +16,7 @@
 ---@field public qualityFactor number
 ---@field public gradientFactor number
 ---@field public maxSweetSpotRadius number
+---@field public baseRate number
 
 ---@class debuggingSettings
 ---@field public showSweetSpotRenderer boolean
