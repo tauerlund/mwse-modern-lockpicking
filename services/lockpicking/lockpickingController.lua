@@ -11,11 +11,8 @@ local translations = require("tauer.modern-lockpicking.services.translations.tra
 
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.CONSTANTS")
 local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
 ---
-
-local logger = mwse.Logger.new()
 
 ---@class lockpickingController : initializedService
 local this = {}

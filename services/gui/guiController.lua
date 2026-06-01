@@ -10,8 +10,6 @@ local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.
 local CONSTANTS = require("tauer.modern-lockpicking.services.gui.enums.CONSTANTS")
 ---
 
-local logger = mwse.Logger.new()
-
 ---@class guiController : initializedService
 local this = {}
 
