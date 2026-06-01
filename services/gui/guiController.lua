@@ -37,6 +37,7 @@ function this.initialize()
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 	event.register(EVENTS.pickBroken, this.onPickBroken)
 	event.register(tes3.event.uiObjectTooltip, this.onUiObjectTooltip)
+	event.register(tes3.event.uiActivated, this.uiActivated, { filter = "MenuOptions" })
 	return true, nil
 end
 
@@ -431,6 +432,21 @@ function this.onUiObjectTooltip(e)
 	end
 
 	e.tooltip:updateLayout()
+end
+
+---@private
+---@param e uiActivatedEventData
+function this.uiActivated(e)
+	e.element:getContentElement():registerAfter(
+		tes3.uiEvent.destroy,
+		this.onOptionsMenuClosed
+	)
+	event.trigger(EVENTS.optionsMenuOpened)
+end
+
+---@private
+function this.onOptionsMenuClosed()
+	event.trigger(EVENTS.optionsMenuClosed)
 end
 
 return this

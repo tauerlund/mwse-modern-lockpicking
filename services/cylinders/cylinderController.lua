@@ -51,6 +51,10 @@ this.currentDirectionKey = nil
 ---@type { [tes3.scanCode]: ROTATION_DIRECTION }
 this.rotationDirections = nil
 
+---@private
+---@type boolean
+this.paused = false
+
 ---@public
 ---@return boolean,string|nil
 function this.initialize()
@@ -60,7 +64,19 @@ function this.initialize()
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
 	event.register(EVENTS.sweetSpotUpdated, this.onSweetSpotUpdated)
 	event.register(EVENTS.pickCycled, this.onPickCycled)
+	event.register(EVENTS.optionsMenuOpened, this.onOptionsMenuOpened)
+	event.register(EVENTS.optionsMenuClosed, this.onOptionsMenuClosed)
 	return true, nil
+end
+
+---@private
+function this.onOptionsMenuOpened()
+	this.paused = true
+end
+
+---@private
+function this.onOptionsMenuClosed()
+	this.paused = false
 end
 
 ---@private
@@ -134,7 +150,7 @@ end
 ---@private
 ---@param _ enterFrameEventData
 function this.onEnterFrame(_)
-	if this.blocked or not this.rotating then
+	if this.paused or this.blocked or not this.rotating then
 		return
 	end
 

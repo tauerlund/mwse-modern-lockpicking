@@ -34,6 +34,10 @@ this.cylinderRotationState = { counter = 0, cooldown = 0 }
 ---@type soundCooldownState
 this.jiggleState = { counter = 0, cooldown = 0 }
 
+---@private
+---@type boolean
+this.paused = false
+
 ---@public
 ---@return boolean,string|nil
 function this.initialize()
@@ -44,7 +48,19 @@ function this.initialize()
 	event.register(EVENTS.rotationEnded, this.onRotationEnded)
 	event.register(EVENTS.cylinderBlocked, this.onCylinderBlocked)
 	event.register(EVENTS.pickBroken, this.onPickBroken)
+	event.register(EVENTS.optionsMenuOpened, this.onOptionsMenuOpened)
+	event.register(EVENTS.optionsMenuClosed, this.onOptionsMenuClosed)
 	return true, nil
+end
+
+---@private
+function this.onOptionsMenuOpened()
+	this.paused = true
+end
+
+---@private
+function this.onOptionsMenuClosed()
+	this.paused = false
 end
 
 ---@private
@@ -96,6 +112,10 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
+	if this.paused then
+		return
+	end
+
 	this.playLockpickRotationSound(e.delta)
 	this.playCylinderRotationSound(e.delta)
 	this.playJiggleSound(e.delta)

@@ -91,7 +91,19 @@ function this.initialize()
 	event.register(EVENTS.rotationStarted, this.onRotationStarted)
 	event.register(EVENTS.rotationEnded, this.onRotationEnded)
 	event.register(EVENTS.cylinderBlocked, this.onCylinderBlocked)
+	event.register(EVENTS.optionsMenuOpened, this.onOptionsMenuOpened)
+	event.register(EVENTS.optionsMenuClosed, this.onOptionsMenuClosed)
 	return true, nil
+end
+
+---@private
+function this.onOptionsMenuOpened()
+	this.paused = true
+end
+
+---@private
+function this.onOptionsMenuClosed()
+	this.paused = false
 end
 
 ---@private
@@ -205,6 +217,10 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
+	if this.paused then
+		return
+	end
+
 	if this.jiggling then
 		this.updateJiggle(e.delta)
 		return

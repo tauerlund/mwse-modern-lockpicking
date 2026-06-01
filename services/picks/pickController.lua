@@ -2,7 +2,6 @@
 local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
 local pickSelector = require("tauer.modern-lockpicking.services.picks.pickSelector")
 local pickSpawner = require("tauer.modern-lockpicking.services.picks.pickSpawner")
-local inventoryController = require("tauer.modern-lockpicking.services.inventory.inventoryController")
 ---
 
 --- ENUMS
@@ -10,8 +9,6 @@ local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local CYCLE = require("tauer.modern-lockpicking.services.lockpicking.enums.CYCLE_DIRECTION")
 local CONSTANTS = require("tauer.modern-lockpicking.services.picks.enums.CONSTANTS")
 ---
-
-local logger = mwse.Logger.new()
 
 ---@class pickController : initializedService
 local this = {}
@@ -62,7 +59,19 @@ function this.initialize()
 	event.register(EVENTS.sweetSpotUpdated, this.onSweetSpotUpdated)
 	event.register(EVENTS.cylinderBlocked, this.onCylinderBlocked)
 	event.register(EVENTS.rotationEnded, this.onRotationEnded)
+	event.register(EVENTS.optionsMenuOpened, this.onOptionsMenuOpened)
+	event.register(EVENTS.optionsMenuClosed, this.onOptionsMenuClosed)
 	return true, nil
+end
+
+---@private
+function this.onOptionsMenuOpened()
+	this.paused = true
+end
+
+---@private
+function this.onOptionsMenuClosed()
+	this.paused = false
 end
 
 ---@private
@@ -129,6 +138,10 @@ end
 ---@private
 ---@param e keyDownEventData
 function this.onKeyDown(e)
+	if this.paused then
+		return
+	end
+
 	if this.pickCycleDirections[e.keyCode] then
 		this.cyclePick(this.pickCycleDirections[e.keyCode])
 	end
@@ -147,6 +160,10 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
+	if this.paused then
+		return
+	end
+
 	if this.damaging then
 		this.damagePick(e.delta)
 	end

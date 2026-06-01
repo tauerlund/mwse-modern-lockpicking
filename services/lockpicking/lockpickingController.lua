@@ -30,7 +30,19 @@ function this.initialize()
 	event.register(EVENTS.pickBroken, this.onPickBroken)
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
 	event.register(EVENTS.settingsUpdated, this.onSettingsUpdated)
+	event.register(EVENTS.optionsMenuOpened, this.onOptionsMenuOpened)
+	event.register(EVENTS.optionsMenuClosed, this.onOptionsMenuClosed)
 	return true, nil
+end
+
+---@private
+function this.onOptionsMenuOpened()
+	this.paused = true
+end
+
+---@private
+function this.onOptionsMenuClosed()
+	this.paused = false
 end
 
 ---@private
@@ -152,6 +164,10 @@ end
 ---@private
 ---@param e keyUpEventData
 function this.onKeyUp(e)
+	if this.paused then
+		return
+	end
+
 	if e.keyCode == settings.keyBinds.exit.keyCode then
 		---@type lockpickingEndEventData
 		local data = {
