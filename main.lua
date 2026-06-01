@@ -26,7 +26,7 @@ local mcm = require("tauer.modern-lockpicking.services.mcm.mcmInitializer")
 ---
 
 --- DEBUGGING
-local debuggingSweetSpotDrawer = require("tauer.modern-lockpicking.debugging.debuggingSweetSpotDrawer")
+local debuggingRenderer = require("tauer.modern-lockpicking.services.debugging.debuggingRenderer")
 ---
 
 ---@class ModernLockpicking
@@ -66,7 +66,7 @@ function this.initializeMod(_)
 		renderingController,
 		inventoryController,
 		eventLogger,
-		debuggingSweetSpotDrawer,
+		debuggingRenderer,
 	}
 
 	for _, service in pairs(services) do

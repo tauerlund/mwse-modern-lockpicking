@@ -17,8 +17,12 @@
 ---@field public gradientFactor number
 ---@field public maxSweetSpotRadius number
 
+---@class debuggingSettings
+---@field public showSweetSpotRenderer boolean
+
 ---@class settings
 ---@field public keyBinds keybindSettings
 ---@field public logLevel string
 ---@field public activationStrategy string
 ---@field public difficulty difficultySettings
+---@field public debugging debuggingSettings

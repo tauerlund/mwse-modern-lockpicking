@@ -28,6 +28,9 @@ this.defaults = {
         gradientFactor = 2.0,
         maxSweetSpotRadius = 45,
     },
+    debugging = {
+        showSweetSpotRenderer = false,
+    },
 }
 
 ---@type settings

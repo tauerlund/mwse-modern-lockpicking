@@ -11,6 +11,15 @@ local this = {}
 function this.initialize(template)
     local page = template:createSideBarPage { label = translations.get(TRANSLATION_KEY.mcmHeaderDebugging) }
 
+    page:createOnOffButton({
+        label = translations.get(TRANSLATION_KEY.mcmDebuggingLabelShowRenderer),
+        description = translations.get(TRANSLATION_KEY.mcmDebuggingDescShowRenderer),
+        variable = mwse.mcm.createTableVariable({
+            id = "showSweetSpotRenderer",
+            table = settings.mcm.debugging,
+        }),
+    })
+
     page:createLogLevelOptions({
         config = settings.mcm,
         configKey = "logLevel",

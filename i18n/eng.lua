@@ -24,6 +24,8 @@ return {
 	[TRANSLATION_KEY.mcmDescriptionExit] = "Set the key to exit the lockpicking interface.",
 	[TRANSLATION_KEY.mcmDescriptionOther] = "Other keybinds.",
 	[TRANSLATION_KEY.mcmHeaderDebugging] = "Debugging",
+	[TRANSLATION_KEY.mcmDebuggingLabelShowRenderer] = "Show Sweet Spot Renderer",
+	[TRANSLATION_KEY.mcmDebuggingDescShowRenderer] = "Visualizes the sweet spot and gradient as colored lines on the lock. Intended for debugging only.",
 	[TRANSLATION_KEY.mcmHeaderDifficulty] = "Difficulty",
 	[TRANSLATION_KEY.mcmDifficultyCategorySweetSpot] = "Sweet Spot",
 	[TRANSLATION_KEY.mcmDifficultyCategoryGradient] = "Gradient",
