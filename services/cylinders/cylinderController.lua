@@ -36,6 +36,10 @@ this.gradientWidth = nil
 this.rotating = false
 
 ---@private
+---@type boolean
+this.blocked = false
+
+---@private
 ---@type number
 this.maxAngle = 0
 
@@ -51,7 +55,7 @@ this.rotationDirections = nil
 ---@return boolean,string|nil
 function this.initialize()
 	this.applyKeybinds()
-	event.register(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
+	event.register(EVENTS.settingsUpdated, this.onSettingsUpdated)
 	event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
 	event.register(EVENTS.sweetSpotUpdated, this.onSweetSpotUpdated)
@@ -60,7 +64,7 @@ function this.initialize()
 end
 
 ---@private
-function this.onKeyBindsUpdated()
+function this.onSettingsUpdated()
 	this.applyKeybinds()
 end
 
@@ -123,12 +127,17 @@ function this.disable()
 	end
 	this.currentDirectionKey = nil
 	this.rotating = false
+	this.blocked = false
 	this.maxAngle = 0
 end
 
 ---@private
 ---@param _ enterFrameEventData
 function this.onEnterFrame(_)
+	if this.blocked or not this.rotating then
+		return
+	end
+
 	local rotation = this.cylinder.rotation:toEulerXYZ().y
 
 	if rotation <= CONSTANTS.targetRotationLeft or rotation >= CONSTANTS.targetRotationRight then
@@ -136,8 +145,9 @@ function this.onEnterFrame(_)
 		return
 	end
 
-	if this.rotating and math.abs(rotation) >= this.maxAngle then
+	if this.maxAngle == 0 or math.abs(rotation) >= this.maxAngle then
 		this.rotating = false
+		this.blocked = true
 		event.trigger(EVENTS.cylinderBlocked)
 	end
 end
@@ -184,21 +194,19 @@ end
 ---@private
 ---@param e keyDownEventData
 function this.onRotationKeyDown(e)
-	this.currentDirectionKey = e.keyCode
-
-	this.maxAngle = this.computeMaxAngle()
-	if this.maxAngle == 0 then
-		event.trigger(EVENTS.cylinderBlocked)
+	if this.rotating or this.blocked then
 		return
 	end
+
+	this.currentDirectionKey = e.keyCode
+	this.maxAngle = this.computeMaxAngle()
+	this.rotating = true
 
 	---@type rotationEventData
 	local eventData = {
 		direction = this.rotationDirections[e.keyCode],
 	}
 	event.trigger(EVENTS.rotationStarted, eventData)
-
-	this.rotating = true
 end
 
 ---@private
@@ -208,14 +216,15 @@ function this.onRotationKeyUp(e)
 		return
 	end
 
+	this.blocked = false
+	this.rotating = false
+	this.currentDirectionKey = nil
+
 	---@type rotationEventData
 	local eventData = {
 		direction = this.rotationDirections[e.keyCode],
 	}
 	event.trigger(EVENTS.rotationEnded, eventData)
-
-	this.rotating = false
-	this.currentDirectionKey = nil
 end
 
 ---@private

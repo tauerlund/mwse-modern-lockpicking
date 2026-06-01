@@ -18,8 +18,15 @@ local cylinderController = require("tauer.modern-lockpicking.services.cylinders.
 local renderingController = require("tauer.modern-lockpicking.services.rendering.renderingController")
 local pickAnimator = require("tauer.modern-lockpicking.services.picks.pickAnimator")
 local pickController = require("tauer.modern-lockpicking.services.picks.pickController")
+local pickSelector = require("tauer.modern-lockpicking.services.picks.pickSelector")
 local pickSpawner = require("tauer.modern-lockpicking.services.picks.pickSpawner")
+local inventoryController = require("tauer.modern-lockpicking.services.inventory.inventoryController")
+local eventLogger = require("tauer.modern-lockpicking.services.events.eventLogger")
 local mcm = require("tauer.modern-lockpicking.services.mcm.mcmInitializer")
+---
+
+--- DEBUGGING
+local debuggingSweetSpotDrawer = require("tauer.modern-lockpicking.debugging.debuggingSweetSpotDrawer")
 ---
 
 ---@class ModernLockpicking
@@ -51,11 +58,15 @@ function this.initializeMod(_)
 		soundController,
 		soundFileResolver,
 		pickController,
+		pickSelector,
 		pickSpawner,
 		pickAnimator,
 		skillController,
 		guiController,
 		renderingController,
+		inventoryController,
+		eventLogger,
+		debuggingSweetSpotDrawer,
 	}
 
 	for _, service in pairs(services) do

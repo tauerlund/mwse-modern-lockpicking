@@ -7,12 +7,13 @@ local enum = {
 	lockpickingEnded = "tauer.modern-lockpicking.lockpickingEnded",
 	rotationStarted = "tauer.modern-lockpicking.rotationStarted",
 	rotationEnded = "tauer.modern-lockpicking.rotationEnded",
-	keyBindsUpdated = "tauer.modern-lockpicking.keyBindsUpdated",
-	pickCycled = "tauer.modern-lockpicking.pickCycled",
 	settingsUpdated = "tauer.modern-lockpicking.settingsUpdated",
+	pickCycled = "tauer.modern-lockpicking.pickCycled",
 	cylinderTargetReached = "tauer.modern-lockpicking.cylinderTargetReached",
 	sweetSpotUpdated = "tauer.modern-lockpicking.sweetSpotUpdated",
-	cylinderBlocked = "tauer.modern-lockpicking.cylinderBlocked"
+	cylinderBlocked = "tauer.modern-lockpicking.cylinderBlocked",
+	pickBroken = "tauer.modern-lockpicking.pickBroken",
+	pickBreak = "tauer.modern-lockpicking.pickBreak"
 }
 
 return enum

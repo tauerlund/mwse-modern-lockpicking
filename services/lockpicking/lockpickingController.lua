@@ -11,8 +11,11 @@ local translations = require("tauer.modern-lockpicking.services.translations.tra
 
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
+local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.CONSTANTS")
 local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
 ---
+
+local logger = mwse.Logger.new()
 
 ---@class lockpickingController : initializedService
 local this = {}
@@ -27,8 +30,28 @@ function this.initialize()
 	event.register(EVENTS.lockpickingActivated, this.onLockPickingActivated)
 	event.register(EVENTS.cylinderTargetReached, this.onCylinderTargetReached)
 	event.register(EVENTS.pickCycled, this.onPickCycled)
+	event.register(EVENTS.pickBroken, this.onPickBroken)
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
+	event.register(EVENTS.settingsUpdated, this.onSettingsUpdated)
 	return true, nil
+end
+
+---@private
+function this.onSettingsUpdated()
+	if this.session then
+		this.triggerSweetSpotUpdated()
+	end
+end
+
+---@private
+---@param _ pickBrokenEventData
+function this.onPickBroken(_)
+	local picks = inventoryController.getLockpicks()
+	if not picks then
+		return
+	end
+
+	this.session.picks = picks
 end
 
 ---@private
@@ -80,10 +103,13 @@ end
 ---@private
 ---@return number
 function this.computeSweetSpotRadius()
-	local security = tes3.mobilePlayer.skills[tes3.skill.security].current
+	local difficulty = settings.difficulty
+	local security = tes3.mobilePlayer:getSkillValue(tes3.skill.security)
 	local lockLevel = this.session.activator.lockNode and this.session.activator.lockNode.level or 1
 	local quality = this.session.pick.item.object.quality
-	return math.pi * quality * security / (security + lockLevel * 2)
+	local radius = math.pi * quality * difficulty.qualityFactor * security * difficulty.securityFactor /
+		(math.max(1, lockLevel) * difficulty.lockLevelFactor)
+	return math.min(radius, math.rad(difficulty.maxSweetSpotRadius))
 end
 
 ---@private
@@ -93,7 +119,7 @@ function this.triggerSweetSpotUpdated()
 	local eventData = {
 		center = this.session.sweetSpotCenter,
 		radius = radius,
-		gradientWidth = radius,
+		gradientWidth = radius * settings.difficulty.gradientFactor,
 	}
 	event.trigger(EVENTS.sweetSpotUpdated, eventData)
 end

@@ -1,13 +1,26 @@
 --- ENUMS
 local CYCLE = require("tauer.modern-lockpicking.services.lockpicking.enums.CYCLE_DIRECTION")
+local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 ---
 
----@class pickSelector
+---@class pickSelector : initializedService
 local this = {}
 
 ---@private
 ---@type integer
 this.currentIndex = 1
+
+---@public
+---@return boolean, string|nil
+function this.initialize()
+    event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+    return true, nil
+end
+
+---@private
+function this.onLockpickingEnded()
+    this.currentIndex = this.getInitialIndex()
+end
 
 ---@public
 ---@param picks tes3itemStack[]
@@ -16,11 +29,17 @@ this.currentIndex = 1
 function this.select(picks, direction)
     if not direction then
         this.currentIndex = this.getInitialIndex()
-    elseif direction == CYCLE.next then
-        this.currentIndex = this.incrementIndex(picks)
-    else
-        this.currentIndex = this.decrementIndex(picks)
+        return picks[this.currentIndex]
     end
+
+    local startIndex = this.currentIndex
+    repeat
+        if direction == CYCLE.next then
+            this.currentIndex = this.incrementIndex(picks)
+        else
+            this.currentIndex = this.decrementIndex(picks)
+        end
+    until picks[this.currentIndex].count > 0 or this.currentIndex == startIndex
 
     return picks[this.currentIndex]
 end

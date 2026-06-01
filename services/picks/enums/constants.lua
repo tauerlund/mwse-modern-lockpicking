@@ -17,6 +17,10 @@ local enum = {
 		jiggleSpeed = 65,
 		jiggleAmplitude = math.rad(4),
 	},
+
+	damage = {
+		baseRate = 20,
+	},
 }
 
 return enum

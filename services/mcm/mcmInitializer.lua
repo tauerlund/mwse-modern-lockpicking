@@ -5,6 +5,7 @@ local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings")
 
 --- PAGES
 local controlsPage = require("tauer.modern-lockpicking.services.mcm.pages.controlsPage")
+local difficultyPage = require("tauer.modern-lockpicking.services.mcm.pages.difficultyPage")
 local debuggingPage = require("tauer.modern-lockpicking.services.mcm.pages.debuggingPage")
 ---
 
@@ -20,6 +21,7 @@ local this = {}
 --- @type mcmPage[]
 this.pages = {
     controlsPage,
+    difficultyPage,
     debuggingPage
 }
 
@@ -48,7 +50,7 @@ end
 ---@private
 function this.onClose()
     settings.save()
-    event.trigger(EVENTS.keyBindsUpdated)
+    event.trigger(EVENTS.settingsUpdated)
 end
 
 return this

@@ -10,6 +10,8 @@ local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.
 local CONSTANTS = require("tauer.modern-lockpicking.services.gui.enums.CONSTANTS")
 ---
 
+local logger = mwse.Logger.new()
+
 ---@class guiController : initializedService
 local this = {}
 
@@ -25,12 +27,18 @@ this.controls = nil
 ---@type tes3uiElement
 this.picks = nil
 
+---@private
+---@type number
+this.usesTooltipId = -1217
+
 ---@public
 ---@return boolean,string|nil
 function this.initialize()
 	event.register(tes3.event.load, this.onLoad)
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+	event.register(EVENTS.pickBroken, this.onPickBroken)
+	event.register(tes3.event.uiObjectTooltip, this.onUiObjectTooltip)
 	return true, nil
 end
 
@@ -183,7 +191,7 @@ function this.createControls()
 			x = 0.5,
 			y = 0.5,
 		})
-		:withCallback(EVENTS.keyBindsUpdated, this.onKeyBindsUpdated)
+		:withCallback(EVENTS.settingsUpdated, this.onKeyBindsUpdated)
 		:wuild()
 
 	local controlTexts = this.getControlTexts()
@@ -313,7 +321,7 @@ function this.createPicks(activePick, picks)
 			id = string.format(CONSTANTS.picksCountLabelId,
 				pick.object.id)
 		})
-			:withText(string.format("%d", this.getLockpickCount(pick)))
+			:withText(string.format("%d", pick.count))
 			:withColor(color)
 			:withBorder({
 				top = verticalBorder,
@@ -324,24 +332,6 @@ function this.createPicks(activePick, picks)
 	end
 
 	return picksMenu
-end
-
----@private
----@param pick tes3itemStack
----@return integer
-function this.getLockpickCount(pick)
-	local totalPicks = 0
-	local newPicks = pick.count
-
-	local variables = pick.variables
-	if variables then
-		for _, variable in pairs(variables) do
-			totalPicks = totalPicks + variable.condition
-			newPicks = newPicks - 1
-		end
-	end
-
-	return totalPicks + (newPicks * pick.object.maxCondition)
 end
 
 ---@private
@@ -386,6 +376,63 @@ function this.onPickCycled(element, e)
 	element.color = isSelected
 		and tes3ui.getPalette(tes3.palette.normalOverColor)
 		or tes3ui.getPalette(tes3.palette.normalColor)
+end
+
+---@private
+---@param e pickBrokenEventData
+function this.onPickBroken(e)
+	if not this.picks then return end
+
+	local objectId = e.pick.item.object.id
+	local countLabel = this.picks:findChild(string.format(CONSTANTS.picksCountLabelId, objectId))
+	if not countLabel then return end
+
+	local newCount = math.max(0, (tonumber(countLabel.text) or 1) - 1)
+
+	if newCount == 0 then
+		local nameLabel = this.picks:findChild(string.format(CONSTANTS.picksLabelId, objectId))
+		if nameLabel then nameLabel:destroy() end
+		countLabel:destroy()
+	else
+		countLabel.text = string.format("%d", newCount)
+	end
+
+	this.picks:updateLayout()
+end
+
+---@private
+---@param e uiObjectTooltipEventData
+function this.onUiObjectTooltip(e)
+	if e.object.objectType ~= tes3.objectType.lockpick then
+		return
+	end
+
+	if not e.tooltip then
+		return
+	end
+
+	local usesTooltip = e.tooltip:findChild(this.usesTooltipId)
+	if not usesTooltip then
+		return
+	end
+
+	local itemData = e.itemData
+
+	if not itemData then
+		for _, stack in pairs(tes3.player.object.inventory.items) do
+			if stack.object == e.object and stack.variables then
+				for _, v in ipairs(stack.variables) do
+					if v.data and v.data.modernLockpicking then
+						itemData = v
+						break
+					end
+				end
+			end
+			if itemData then break end
+		end
+	end
+
+	e.tooltip:updateLayout()
 end
 
 return this

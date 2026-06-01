@@ -43,6 +43,7 @@ function this.initialize()
 	event.register(EVENTS.rotationStarted, this.onRotationStarted)
 	event.register(EVENTS.rotationEnded, this.onRotationEnded)
 	event.register(EVENTS.cylinderBlocked, this.onCylinderBlocked)
+	event.register(EVENTS.pickBroken, this.onPickBroken)
 	return true, nil
 end
 
@@ -85,6 +86,14 @@ function this.onPickCycled(_)
 end
 
 ---@private
+function this.onPickBroken()
+	tes3.playSound({
+		reference = tes3.player,
+		soundPath = soundFileResolver.resolve(CONSTANTS.templates.breakLockpick).path,
+	})
+end
+
+---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
 	this.playLockpickRotationSound(e.delta)
@@ -101,7 +110,7 @@ function this.playLockpickRotationSound(delta)
 		state = this.lockpickRotationState,
 		template = CONSTANTS.templates.rotateLockpick,
 		delta = delta,
-		condition = moved,
+		condition = not this.rotatingCylinder and moved,
 	})
 	this.lastCursorPosition = currentCursorPosition
 end

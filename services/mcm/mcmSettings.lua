@@ -20,7 +20,14 @@ this.defaults = {
         exit = { keyCode = tes3.scanCode.tab },
     },
     logLevel = "INFO",
-    activationStrategy = ACTIVATION_STRATEGY_NAMES.default
+    activationStrategy = ACTIVATION_STRATEGY_NAMES.default,
+    difficulty = {
+        securityFactor = 1.0,
+        lockLevelFactor = 5.0,
+        qualityFactor = 1.0,
+        gradientFactor = 2.0,
+        maxSweetSpotRadius = 45,
+    },
 }
 
 ---@type settings

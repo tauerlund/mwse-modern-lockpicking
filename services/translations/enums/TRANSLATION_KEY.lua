@@ -22,7 +22,22 @@ local this = {
     mcmDescriptionCycleNextPick = "mcm.description.cycleNextPick",
     mcmDescriptionExit = "mcm.description.exit",
     mcmDescriptionOther = "mcm.description.other",
-    mcmHeaderDebugging = "mcm.header.debugging"
+    mcmHeaderDebugging = "mcm.header.debugging",
+    mcmHeaderDifficulty = "mcm.header.difficulty",
+    mcmDifficultyCategorySweetSpot = "mcm.difficulty.category.sweetSpot",
+    mcmDifficultyCategoryGradient = "mcm.difficulty.category.gradient",
+    mcmDifficultyLabelSecurityFactor = "mcm.difficulty.label.securityFactor",
+    mcmDifficultyDescSecurityFactor = "mcm.difficulty.desc.securityFactor",
+    mcmDifficultyLabelLockLevelFactor = "mcm.difficulty.label.lockLevelFactor",
+    mcmDifficultyDescLockLevelFactor = "mcm.difficulty.desc.lockLevelFactor",
+    mcmDifficultyLabelQualityFactor = "mcm.difficulty.label.qualityFactor",
+    mcmDifficultyDescQualityFactor = "mcm.difficulty.desc.qualityFactor",
+    mcmDifficultyLabelMaxRadius = "mcm.difficulty.label.maxRadius",
+    mcmDifficultyDescMaxRadius = "mcm.difficulty.desc.maxRadius",
+    mcmDifficultyLabelGradientFactor = "mcm.difficulty.label.gradientFactor",
+    mcmDifficultyDescGradientFactor = "mcm.difficulty.desc.gradientFactor",
+    mcmDifficultyLabelResetToDefaults = "mcm.difficulty.label.resetToDefaults",
+    mcmDifficultyDescResetToDefaults = "mcm.difficulty.desc.resetToDefaults"
 }
 
 return this
