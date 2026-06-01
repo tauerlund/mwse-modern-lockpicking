@@ -25,24 +25,39 @@ return {
 	[TRANSLATION_KEY.mcmDescriptionOther] = "Other keybinds.",
 	[TRANSLATION_KEY.mcmHeaderDebugging] = "Debugging",
 	[TRANSLATION_KEY.mcmDebuggingLabelShowRenderer] = "Show Sweet Spot Renderer",
-	[TRANSLATION_KEY.mcmDebuggingDescShowRenderer] = "Visualizes the sweet spot and gradient as colored lines on the lock. Intended for debugging only.",
+	[TRANSLATION_KEY.mcmDebuggingDescShowRenderer] =
+	"Visualizes the sweet spot and gradient as colored lines on the lock. Intended for debugging only.",
 	[TRANSLATION_KEY.mcmHeaderDifficulty] = "Difficulty",
 	[TRANSLATION_KEY.mcmDifficultyCategorySweetSpot] = "Sweet Spot",
 	[TRANSLATION_KEY.mcmDifficultyCategoryGradient] = "Gradient",
 	[TRANSLATION_KEY.mcmDifficultyLabelSecurityFactor] = "Security Factor",
-	[TRANSLATION_KEY.mcmDifficultyDescSecurityFactor] = "How much the security skill contributes to the sweet spot size. Higher values reward skill more.",
+	[TRANSLATION_KEY.mcmDifficultyDescSecurityFactor] =
+	"How much the security skill contributes to the sweet spot size. Higher values reward skill more.",
 	[TRANSLATION_KEY.mcmDifficultyLabelLockLevelFactor] = "Lock Level Factor",
-	[TRANSLATION_KEY.mcmDifficultyDescLockLevelFactor] = "How much the lock level shrinks the sweet spot. Higher values make locks harder.",
+	[TRANSLATION_KEY.mcmDifficultyDescLockLevelFactor] =
+	"How much the lock level shrinks the sweet spot. Higher values make locks harder.",
 	[TRANSLATION_KEY.mcmDifficultyLabelQualityFactor] = "Quality Factor",
-	[TRANSLATION_KEY.mcmDifficultyDescQualityFactor] = "How much pick quality contributes to the sweet spot size. Higher values make pick choice matter more.",
+	[TRANSLATION_KEY.mcmDifficultyDescQualityFactor] =
+	"How much pick quality contributes to the sweet spot size. Higher values make pick choice matter more.",
 	[TRANSLATION_KEY.mcmDifficultyLabelMaxRadius] = "Max Sweet Spot Radius (degrees)",
 	[TRANSLATION_KEY.mcmDifficultyDescMaxRadius] = "Caps the sweet spot size regardless of skill or pick quality.",
 	[TRANSLATION_KEY.mcmDifficultyLabelGradientFactor] = "Gradient Factor",
-	[TRANSLATION_KEY.mcmDifficultyDescGradientFactor] = "Width of the gradient zone as a multiplier of the sweet spot radius.",
+	[TRANSLATION_KEY.mcmDifficultyDescGradientFactor] =
+	"Width of the gradient zone as a multiplier of the sweet spot radius.",
 	[TRANSLATION_KEY.mcmDifficultyCategoryPickDamage] = "Pick Damage",
 	[TRANSLATION_KEY.mcmDifficultyLabelBaseRate] = "Base Damage Rate",
-	[TRANSLATION_KEY.mcmDifficultyDescBaseRate] = "Pick damage per second when the sweet spot is at maximum size. Scales up as the sweet spot shrinks.",
+	[TRANSLATION_KEY.mcmDifficultyDescBaseRate] =
+	"Pick damage per second when the sweet spot is at maximum size. Scales up as the sweet spot shrinks.",
 	[TRANSLATION_KEY.mcmDifficultyLabelResetToDefaults] = "Reset to Defaults",
 	[TRANSLATION_KEY.mcmDifficultyDescResetToDefaults] = "Reset all difficulty settings to their default values.",
 	[TRANSLATION_KEY.tooltipPickHealth] = "Health",
+	[TRANSLATION_KEY.mcmActivationMethodCategory] = "Activation",
+	[TRANSLATION_KEY.mcmActivationMethodLabel] = "Mode",
+	[TRANSLATION_KEY.mcmActivationMethodDesc] =
+	"How lockpicking is activated.\n'Activate' opens the interface when interacting with a locked object.\n'Attack' intercepts the vanilla lockpick attack and opens the interface instead.",
+	[TRANSLATION_KEY.mcmActivationMethodDefault] = "Activate",
+	[TRANSLATION_KEY.mcmActivationMethodAttack] = "Attack",
+	[TRANSLATION_KEY.mcmAllowEquipPicksLabel] = "Allow Equipping Picks",
+	[TRANSLATION_KEY.mcmAllowEquipPicksDesc] =
+	"When enabled, lockpicks can be equipped from the inventory like in the vanilla game.",
 }

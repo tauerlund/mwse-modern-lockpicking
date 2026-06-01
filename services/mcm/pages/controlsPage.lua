@@ -1,6 +1,8 @@
 local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
 local translations = require("tauer.modern-lockpicking.services.translations.translations")
 local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
+local ACTIVATION_STRATEGY_NAMES = require(
+    "tauer.modern-lockpicking.services.lockpicking.activation-strategies.enums.ACTIVATION_STRATEGY_NAMES")
 
 ---@class controlsPage : mcmPage
 local this = {}
@@ -59,6 +61,32 @@ function this.initialize(template)
         variable = mwse.mcm.createTableVariable({
             id = "cycleNextPick",
             table = settings.keyBinds,
+        }),
+    })
+
+    local activationCategory = controlsPage:createCategory({
+        label = translations.get(TRANSLATION_KEY.mcmActivationMethodCategory),
+    })
+
+    activationCategory:createCycleButton({
+        label = translations.get(TRANSLATION_KEY.mcmActivationMethodLabel),
+        description = translations.get(TRANSLATION_KEY.mcmActivationMethodDesc),
+        options = {
+            { text = translations.get(TRANSLATION_KEY.mcmActivationMethodDefault), value = ACTIVATION_STRATEGY_NAMES.default },
+            { text = translations.get(TRANSLATION_KEY.mcmActivationMethodAttack), value = ACTIVATION_STRATEGY_NAMES.attack },
+        },
+        variable = mwse.mcm.createTableVariable({
+            id = "activationStrategy",
+            table = settings,
+        }),
+    })
+
+    activationCategory:createOnOffButton({
+        label = translations.get(TRANSLATION_KEY.mcmAllowEquipPicksLabel),
+        description = translations.get(TRANSLATION_KEY.mcmAllowEquipPicksDesc),
+        variable = mwse.mcm.createTableVariable({
+            id = "allowEquipPicks",
+            table = settings,
         }),
     })
 

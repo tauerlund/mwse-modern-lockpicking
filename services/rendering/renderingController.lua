@@ -44,6 +44,10 @@ function this.onLockpickingStart(_)
         this.depthOfField["focal_length"] = CONSTANTS.focalLength
         this.depthOfField.enabled = true
     end
+
+    if not tes3.mobilePlayer.is3rdPerson then
+        tes3.player1stPerson.sceneNode.appCulled = true
+    end
 end
 
 ---@privates
@@ -53,6 +57,10 @@ function this.onLockpickingEnded(_)
 
     if this.depthOfField then
         this.depthOfField.enabled = false
+    end
+
+    if not tes3.mobilePlayer.is3rdPerson then
+        tes3.player1stPerson.sceneNode.appCulled = false
     end
 end
 

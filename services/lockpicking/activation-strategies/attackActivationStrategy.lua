@@ -1,3 +1,5 @@
+local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
+
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local ACTIVATION_STRATEGY_NAMES = require(
@@ -34,9 +36,22 @@ function this.onLockPick(e)
 
     e.block = true
 
+    timerManager.start({
+        finishedCallback = this.onStartTimerFinished,
+        durationInSeconds = 0.5,
+        ---@class attackActivationStrategy.startTimer.data
+        data = {
+            activator = e.reference
+        }
+    })
+end
+
+---@private
+---@param data attackActivationStrategy.startTimer.data
+function this.onStartTimerFinished(data)
     ---@type lockpickingActivatedEventData
     local eventData = {
-        activator = e.reference
+        activator = data.activator
     }
     event.trigger(EVENTS.lockpickingActivated, eventData)
 end

@@ -1,3 +1,3 @@
 ---@class strategy
 ---@field public name string
----@field public registerEvents fun()?
+---@field public registerEvents? fun()

@@ -21,6 +21,7 @@ this.defaults = {
     },
     logLevel = "INFO",
     activationStrategy = ACTIVATION_STRATEGY_NAMES.default,
+    allowEquipPicks = true,
     difficulty = {
         securityFactor = 1.0,
         lockLevelFactor = 5.0,

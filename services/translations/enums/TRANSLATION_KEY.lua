@@ -43,7 +43,14 @@ local this = {
     mcmDifficultyDescBaseRate = "mcm.difficulty.desc.baseRate",
     mcmDifficultyLabelResetToDefaults = "mcm.difficulty.label.resetToDefaults",
     mcmDifficultyDescResetToDefaults = "mcm.difficulty.desc.resetToDefaults",
-    tooltipPickHealth = "tooltip.pick.health"
+    tooltipPickHealth = "tooltip.pick.health",
+    mcmActivationMethodCategory = "mcm.activationMethod.category",
+    mcmActivationMethodLabel = "mcm.activationMethod.label",
+    mcmActivationMethodDesc = "mcm.activationMethod.desc",
+    mcmActivationMethodDefault = "mcm.activationMethod.default",
+    mcmActivationMethodAttack = "mcm.activationMethod.attack",
+    mcmAllowEquipPicksLabel = "mcm.allowEquipPicks.label",
+    mcmAllowEquipPicksDesc = "mcm.allowEquipPicks.desc",
 }
 
 return this

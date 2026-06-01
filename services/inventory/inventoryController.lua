@@ -1,3 +1,5 @@
+local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
+
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 ---
@@ -11,6 +13,8 @@ local this = {}
 ---@return boolean, string|nil
 function this.initialize()
 	event.register(EVENTS.pickBreak, this.onPickBroken)
+	event.register(EVENTS.settingsUpdated, this.onSettingsUpdated)
+	this.applySettings()
 	return true, nil
 end
 
@@ -54,6 +58,43 @@ function this.onPickBroken(e)
 		itemData = e.itemData,
 		updateGUI = true,
 	})
+end
+
+---@private
+function this.onSettingsUpdated()
+	this.applySettings()
+end
+
+---@private
+function this.applySettings()
+	if settings.allowEquipPicks then
+		this.enableLockpickEquip()
+	else
+		this.disableLockpickEquip()
+	end
+end
+
+---@private
+function this.disableLockpickEquip()
+	if not event.isRegistered(tes3.event.equip, this.onEquip) then
+		event.register(tes3.event.equip, this.onEquip)
+	end
+end
+
+---@private
+function this.enableLockpickEquip()
+	if event.isRegistered(tes3.event.equip, this.onEquip) then
+		event.unregister(tes3.event.equip, this.onEquip)
+	end
+end
+
+---@private
+---@param e equipEventData
+function this.onEquip(e)
+	if e.item.objectType ~= tes3.objectType.lockpick then
+		return
+	end
+	e.block = true
 end
 
 return this
