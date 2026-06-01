@@ -1,10 +1,10 @@
+-- SERVICES
 local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
+---
 
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 ---
-
-local logger = mwse.Logger.new()
 
 ---@class inventoryController : initializedService
 local this = {}
@@ -26,7 +26,6 @@ function this.getLockpicks()
 
 	for _, item in pairs(tes3.player.object.inventory.items) do
 		if item.object.objectType == tes3.objectType.lockpick then
-			logger:info("Found %s", item.object.name)
 			table.insert(lockpicks, item)
 		end
 	end
