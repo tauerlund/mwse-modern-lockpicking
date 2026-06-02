@@ -98,6 +98,9 @@ function this.onLockpickingEnd(e)
 		})
 	end
 
+	this.rotatingCylinder = false
+	this.jiggling = false
+
 	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
 		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
 	end
