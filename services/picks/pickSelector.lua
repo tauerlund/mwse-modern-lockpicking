@@ -119,14 +119,14 @@ end
 ---@return string|nil
 function this.tryResolvePickId()
     if this.settings.activationStrategy == ACTIVATION_STRATEGY_NAMES.attack then
-        return this.resolveEquippedPickId()
+        return this.tryResolveEquippedPickId()
     end
     return this.tryResolveLastPickId()
 end
 
 ---@private
 ---@return string|nil
-function this.resolveEquippedPickId()
+function this.tryResolveEquippedPickId()
     local pick = this.inventoryController.tryGetEquippedPick()
     return pick and pick.id
 end
