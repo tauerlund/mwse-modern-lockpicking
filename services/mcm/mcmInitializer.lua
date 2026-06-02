@@ -9,9 +9,9 @@ local this = {}
 --- @private
 --- @type mcmPage[]
 this.pages = {
-    controlsPage = require("tauer.modern-lockpicking.services.mcm.pages.controlsPage"),
-    difficultyPage = require("tauer.modern-lockpicking.services.mcm.pages.difficultyPage"),
-    debuggingPage = require("tauer.modern-lockpicking.services.mcm.pages.debuggingPage")
+    require("tauer.modern-lockpicking.services.mcm.pages.controlsPage"),
+    require("tauer.modern-lockpicking.services.mcm.pages.difficultyPage"),
+    require("tauer.modern-lockpicking.services.mcm.pages.debuggingPage")
 }
 
 ---@private
