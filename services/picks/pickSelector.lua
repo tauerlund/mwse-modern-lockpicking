@@ -67,7 +67,7 @@ end
 ---@param picks tes3itemStack[]
 ---@return integer
 function this.incrementIndex(picks)
-    if this.currentIndex >= #picks then
+    if this.currentIndex >= table.size(picks) then
         return 1
     else
         return this.currentIndex + 1
@@ -79,7 +79,7 @@ end
 ---@return integer
 function this.decrementIndex(picks)
     if this.currentIndex <= 1 then
-        return #picks
+        return table.size(picks)
     else
         return this.currentIndex - 1
     end
