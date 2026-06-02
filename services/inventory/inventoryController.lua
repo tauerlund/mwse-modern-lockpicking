@@ -42,6 +42,17 @@ function this.getLockpicks()
 	return lockpicks
 end
 
+---@public
+---@return tes3lockpick|nil
+function this.tryGetEquippedPick()
+	for _, item in ipairs(tes3.player.object.equipment) do
+		if item.object.objectType == tes3.objectType.lockpick then
+			return item.object --[[@as tes3lockpick]]
+		end
+	end
+	return nil
+end
+
 ---@private
 ---@param a tes3itemStack
 ---@param b tes3itemStack

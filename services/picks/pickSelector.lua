@@ -1,6 +1,8 @@
 --- ENUMS
 local CYCLE = require("tauer.modern-lockpicking.services.lockpicking.enums.CYCLE_DIRECTION")
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
+local ACTIVATION_STRATEGY_NAMES = require(
+    "tauer.modern-lockpicking.services.lockpicking.activation-strategies.enums.ACTIVATION_STRATEGY_NAMES")
 ---
 
 ---@class pickSelector : initializedService
@@ -18,11 +20,21 @@ this.picks = nil
 ---@type playerDataController
 this.playerDataController = nil
 
+---@private
+---@type inventoryController
+this.inventoryController = nil
+
+---@private
+---@type settings
+this.settings = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean, string|nil
 function this.initialize(services)
     this.playerDataController = services.playerDataController
+    this.inventoryController = services.inventoryController
+    this.settings = services.mcmSettings.mcm
 
     event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
     event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
@@ -89,19 +101,41 @@ end
 ---@param picks tes3itemStack[]
 ---@return integer
 function this.resolveInitialIndex(picks)
-    local data = this.playerDataController.resolve()
-    local lastPickId = data.lastPickId
-    if not lastPickId then
+    local pickId = this.tryResolvePickId()
+    if not pickId then
         return 1
     end
 
     for i, pick in ipairs(picks) do
-        if pick.object.id == lastPickId then
+        if pick.object.id == pickId then
             return i
         end
     end
 
     return 1
+end
+
+---@private
+---@return string|nil
+function this.tryResolvePickId()
+    if this.settings.activationStrategy == ACTIVATION_STRATEGY_NAMES.attack then
+        return this.resolveEquippedPickId()
+    end
+    return this.tryResolveLastPickId()
+end
+
+---@private
+---@return string|nil
+function this.resolveEquippedPickId()
+    local pick = this.inventoryController.tryGetEquippedPick()
+    return pick and pick.id
+end
+
+---@private
+---@return string|nil
+function this.tryResolveLastPickId()
+    local data = this.playerDataController.resolve()
+    return data.lastPickId
 end
 
 return this
