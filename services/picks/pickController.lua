@@ -1,9 +1,3 @@
---- SERVICES
-local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
-local pickSelector = require("tauer.modern-lockpicking.services.picks.pickSelector")
-local pickSpawner = require("tauer.modern-lockpicking.services.picks.pickSpawner")
----
-
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local CYCLE = require("tauer.modern-lockpicking.services.lockpicking.enums.CYCLE_DIRECTION")
@@ -47,9 +41,26 @@ this.pickCycleDirections = nil
 ---@type tes3itemData|nil
 this.currentPickItemData = nil
 
+---@private
+---@type settings
+this.settings = nil
+
+---@private
+---@type pickSelector
+this.pickSelector = nil
+
+---@private
+---@type pickSpawner
+this.pickSpawner = nil
+
 ---@public
+---@param services serviceCollection
 ---@return boolean,string|nil
-function this.initialize()
+function this.initialize(services)
+	this.settings = services.settings
+	this.pickSelector = services.pickSelector
+	this.pickSpawner = services.pickSpawner
+
 	this.applyKeybinds()
 	event.register(EVENTS.settingsUpdated, this.onKeyBindsUpdated)
 	event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
@@ -201,6 +212,8 @@ end
 ---@private
 ---@return number
 function this.computeDamageRate()
+	local settings = this.settings
+
 	if not this.sweetSpotRadius or this.sweetSpotRadius <= 0 then
 		return settings.difficulty.baseRate
 	end
@@ -228,10 +241,10 @@ function this.cyclePick(direction)
 	local previousPick = this.currentPick
 
 	local item = direction
-		and pickSelector.select(this.picks, direction)
+		and this.pickSelector.select(this.picks, direction)
 		or previousPick.item
 
-	local pick = pickSpawner.spawn(this.lock, item)
+	local pick = this.pickSpawner.spawn(this.lock, item)
 
 	this.damageAccumulator = 0
 	this.currentPick = pick
@@ -265,8 +278,8 @@ end
 ---@private
 function this.applyKeybinds()
 	this.pickCycleDirections = {
-		[settings.keyBinds.cycleNextPick.keyCode] = CYCLE.next,
-		[settings.keyBinds.cyclePreviousPick.keyCode] = CYCLE.previous,
+		[this.settings.keyBinds.cycleNextPick.keyCode] = CYCLE.next,
+		[this.settings.keyBinds.cyclePreviousPick.keyCode] = CYCLE.previous,
 	}
 end
 

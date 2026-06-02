@@ -1,6 +1,5 @@
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.CONSTANTS")
-local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
 
 local LINE_LENGTH = 0.5
 local DEFAULT_MESH_LENGTH = 1000
@@ -16,9 +15,16 @@ this.root = nil
 ---@type niNode|nil
 this.linesContainer = nil
 
+---@private
+---@type settings
+this.settings = nil
+
 ---@public
+---@param services serviceCollection
 ---@return boolean, string|nil
-function this.initialize()
+function this.initialize(services)
+	this.settings = services.settings
+
 	event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
 	event.register(EVENTS.sweetSpotUpdated, this.onSweetSpotUpdated)
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
@@ -35,7 +41,7 @@ end
 ---@param e sweetSpotUpdatedEventData
 function this.onSweetSpotUpdated(e)
 	this.clearLines()
-	if not this.root or not settings.debugging.showSweetSpotRenderer then
+	if not this.root or not this.settings.debugging.showSweetSpotRenderer then
 		return
 	end
 

@@ -1,7 +1,3 @@
--- SERVICES
-local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
----
-
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 ---
@@ -9,9 +5,16 @@ local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 ---@class inventoryController : initializedService
 local this = {}
 
+---@private
+---@type settings
+this.settings = nil
+
 ---@public
+---@param services serviceCollection
 ---@return boolean, string|nil
-function this.initialize()
+function this.initialize(services)
+	this.settings = services.settings
+
 	event.register(EVENTS.pickBreak, this.onPickBroken)
 	event.register(EVENTS.settingsUpdated, this.onSettingsUpdated)
 	this.applySettings()
@@ -66,7 +69,7 @@ end
 
 ---@private
 function this.applySettings()
-	if settings.allowEquipPicks then
+	if this.settings.allowEquipPicks then
 		this.enableLockpickEquip()
 	else
 		this.disableLockpickEquip()

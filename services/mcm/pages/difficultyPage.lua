@@ -1,5 +1,3 @@
-local mcmSettings = require("tauer.modern-lockpicking.services.mcm.mcmSettings")
-local translations = require("tauer.modern-lockpicking.services.translations.translations")
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
 
@@ -8,10 +6,19 @@ local this = {}
 
 ---@public
 ---@param template mwseMCMTemplate
-function this.initialize(template)
-	local page = template:createSideBarPage({ label = translations.get(TRANSLATION_KEY.mcmHeaderDifficulty) })
+---@param services serviceCollection
+function this.initialize(template, services)
+	local translations = services.translations
+	local settings = services.mcmSettings
 
-	local sweetSpotCategory = page:createCategory({ label = translations.get(TRANSLATION_KEY.mcmDifficultyCategorySweetSpot) })
+	local page = template:createSideBarPage({
+		label = translations.get(TRANSLATION_KEY.mcmHeaderDifficulty)
+	})
+
+	local sweetSpotCategory = page:createCategory({
+		label = translations.get(TRANSLATION_KEY
+			.mcmDifficultyCategorySweetSpot)
+	})
 
 	sweetSpotCategory:createSlider({
 		label = translations.get(TRANSLATION_KEY.mcmDifficultyLabelSecurityFactor),
@@ -23,7 +30,7 @@ function this.initialize(template)
 		decimalPlaces = 1,
 		variable = mwse.mcm.createTableVariable({
 			id = "securityFactor",
-			table = mcmSettings.mcm.difficulty,
+			table = settings.mcm.difficulty,
 		}),
 	})
 
@@ -37,7 +44,7 @@ function this.initialize(template)
 		decimalPlaces = 1,
 		variable = mwse.mcm.createTableVariable({
 			id = "lockLevelFactor",
-			table = mcmSettings.mcm.difficulty,
+			table = settings.mcm.difficulty,
 		}),
 	})
 
@@ -51,7 +58,7 @@ function this.initialize(template)
 		decimalPlaces = 1,
 		variable = mwse.mcm.createTableVariable({
 			id = "qualityFactor",
-			table = mcmSettings.mcm.difficulty,
+			table = settings.mcm.difficulty,
 		}),
 	})
 
@@ -64,11 +71,14 @@ function this.initialize(template)
 		jump = 5,
 		variable = mwse.mcm.createTableVariable({
 			id = "maxSweetSpotRadius",
-			table = mcmSettings.mcm.difficulty,
+			table = settings.mcm.difficulty,
 		}),
 	})
 
-	local pickDamageCategory = page:createCategory({ label = translations.get(TRANSLATION_KEY.mcmDifficultyCategoryPickDamage) })
+	local pickDamageCategory = page:createCategory({
+		label = translations.get(TRANSLATION_KEY
+			.mcmDifficultyCategoryPickDamage)
+	})
 
 	pickDamageCategory:createSlider({
 		label = translations.get(TRANSLATION_KEY.mcmDifficultyLabelBaseRate),
@@ -80,11 +90,14 @@ function this.initialize(template)
 		decimalPlaces = 1,
 		variable = mwse.mcm.createTableVariable({
 			id = "baseRate",
-			table = mcmSettings.mcm.difficulty,
+			table = settings.mcm.difficulty,
 		}),
 	})
 
-	local gradientCategory = page:createCategory({ label = translations.get(TRANSLATION_KEY.mcmDifficultyCategoryGradient) })
+	local gradientCategory = page:createCategory({
+		label = translations.get(TRANSLATION_KEY
+			.mcmDifficultyCategoryGradient)
+	})
 
 	gradientCategory:createSlider({
 		label = translations.get(TRANSLATION_KEY.mcmDifficultyLabelGradientFactor),
@@ -96,19 +109,19 @@ function this.initialize(template)
 		decimalPlaces = 1,
 		variable = mwse.mcm.createTableVariable({
 			id = "gradientFactor",
-			table = mcmSettings.mcm.difficulty,
+			table = settings.mcm.difficulty,
 		}),
 	})
 
 	gradientCategory:createButton({
 		label = translations.get(TRANSLATION_KEY.mcmDifficultyLabelResetToDefaults),
 		description = translations.get(TRANSLATION_KEY.mcmDifficultyDescResetToDefaults),
-		callback = function()
-			local defaults = mcmSettings.defaults.difficulty
+		callback = function ()
+			local defaults = settings.defaults.difficulty
 			for k, v in pairs(defaults) do
-				mcmSettings.mcm.difficulty[k] = v
+				settings.mcm.difficulty[k] = v
 			end
-			mcmSettings.save()
+			settings.save()
 			event.trigger(EVENTS.settingsUpdated)
 		end,
 	})

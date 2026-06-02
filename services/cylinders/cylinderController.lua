@@ -1,7 +1,3 @@
---- SERVICES
-local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
----
-
 --- ENUMS
 local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.CONSTANTS")
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
@@ -55,9 +51,16 @@ this.rotationDirections = nil
 ---@type boolean
 this.paused = false
 
+---@private
+---@type settings
+this.settings = nil
+
 ---@public
+---@param services serviceCollection
 ---@return boolean,string|nil
-function this.initialize()
+function this.initialize(services)
+	this.settings = services.settings
+
 	this.applyKeybinds()
 	event.register(EVENTS.settingsUpdated, this.onSettingsUpdated)
 	event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
@@ -246,8 +249,8 @@ end
 ---@private
 function this.applyKeybinds()
 	this.rotationDirections = {
-		[settings.keyBinds.rotateLockClockwise.keyCode] = DIRECTION.clockwise,
-		[settings.keyBinds.rotateLockCounterclockwise.keyCode] = DIRECTION.counterClockwise,
+		[this.settings.keyBinds.rotateLockClockwise.keyCode] = DIRECTION.clockwise,
+		[this.settings.keyBinds.rotateLockCounterclockwise.keyCode] = DIRECTION.counterClockwise,
 	}
 end
 

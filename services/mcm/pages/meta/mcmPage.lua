@@ -1,3 +1,3 @@
 ---@meta
 ---@class mcmPage
----@field public initialize fun(template: mwseMCMTemplate)
+---@field public initialize fun(template: mwseMCMTemplate, services:serviceCollection)

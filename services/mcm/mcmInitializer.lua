@@ -1,14 +1,3 @@
---- SERVICES
-local translations = require("tauer.modern-lockpicking.services.translations.translations")
-local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings")
----
-
---- PAGES
-local controlsPage = require("tauer.modern-lockpicking.services.mcm.pages.controlsPage")
-local difficultyPage = require("tauer.modern-lockpicking.services.mcm.pages.difficultyPage")
-local debuggingPage = require("tauer.modern-lockpicking.services.mcm.pages.debuggingPage")
----
-
 --- ENUMS
 local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
@@ -20,26 +9,33 @@ local this = {}
 --- @private
 --- @type mcmPage[]
 this.pages = {
-    controlsPage,
-    difficultyPage,
-    debuggingPage
+    controlsPage = require("tauer.modern-lockpicking.services.mcm.pages.controlsPage"),
+    difficultyPage = require("tauer.modern-lockpicking.services.mcm.pages.difficultyPage"),
+    debuggingPage = require("tauer.modern-lockpicking.services.mcm.pages.debuggingPage")
 }
 
 ---@private
 ---@type string
 this.headerImagePath = "textures\\tauer\\modern-lockpicking\\logo.tga"
 
+---@private
+---@type mcmSettings
+this.settings = nil
+
 ---@public
+---@param services serviceCollection
 ---@return boolean, string|nil
-function this.initialize()
+function this.initialize(services)
+    this.settings = services.mcmSettings
+
     local template = mwse.mcm.createTemplate({
-        name = translations.get(TRANSLATION_KEY.modName),
+        name = services.translations.get(TRANSLATION_KEY.modName),
         headerImagePath = this.headerImagePath,
         onClose = this.onClose
     })
 
     for _, page in ipairs(this.pages) do
-        page.initialize(template)
+        page.initialize(template, services)
     end
 
     template:register()
@@ -49,7 +45,7 @@ end
 
 ---@private
 function this.onClose()
-    settings.save()
+    this.settings.save()
     event.trigger(EVENTS.settingsUpdated)
 end
 

@@ -8,8 +8,9 @@ local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local this = {}
 
 ---@public
+---@param _ serviceCollection
 ---@return boolean,string|nil
-function this.initialize()
+function this.initialize(_)
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 	event.register(EVENTS.pickCycled, this.onPickCycled)
 

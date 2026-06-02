@@ -14,8 +14,9 @@ this.defaultMesh = nil
 this.meshes = {}
 
 ---@public
+---@param _ serviceCollection
 ---@return boolean,string|nil
-function this.initialize()
+function this.initialize(_)
 	this.defaultMesh = tes3.loadMesh(CONSTANTS.paths.defaultLockMesh, true):clone() --[[@as niNode]]
 	return true, nil
 end

@@ -1,8 +1,3 @@
---- SERVICES
-local nodeAnimator = require("tauer.modern-lockpicking.services.nodes.nodeAnimator")
-local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
----
-
 --- ENUMS
 local CONSTANTS = require("tauer.modern-lockpicking.services.picks.enums.CONSTANTS")
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
@@ -85,9 +80,21 @@ this.cycleAnimationKeyFrames = {
 	}
 }
 
+---@private
+---@type nodeAnimator
+this.nodeAnimator = nil
+
+---@private
+---@type timerManager
+this.timerManager = nil
+
 ---@public
+---@param services serviceCollection
 ---@return boolean,string|nil
-function this.initialize()
+function this.initialize(services)
+	this.nodeAnimator = services.nodeAnimator
+	this.timerManager = services.timerManager
+
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
@@ -201,13 +208,13 @@ function this.start(pick, keyframes)
 	this.mesh = pick.mesh
 	this.blocked = true
 
-	nodeAnimator.start({
+	this.nodeAnimator.start({
 		node = pick.mesh,
 		keyframes = keyframes,
 		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickCycled },
 	})
 
-	timerManager.start({
+	this.timerManager.start({
 		durationInSeconds = keyframes[#keyframes].time,
 		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickCycled },
 		finishedCallback = this.onStartTimerFinished,

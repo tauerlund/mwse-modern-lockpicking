@@ -1,9 +1,3 @@
---- SERVICES
-local gui = require("tauer.modern-lockpicking.services.gui.guiBuilder")
-local translations = require("tauer.modern-lockpicking.services.translations.translations")
-local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
----
-
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
@@ -12,6 +6,18 @@ local CONSTANTS = require("tauer.modern-lockpicking.services.gui.enums.CONSTANTS
 
 ---@class guiController : initializedService
 local this = {}
+
+---@private
+---@type guiBuilder
+this.guiBuilder = nil
+
+---@private
+---@type translations
+this.translations = nil
+
+---@private
+---@type settings
+this.settings = nil
 
 ---@private
 ---@type tes3uiElement
@@ -30,8 +36,13 @@ this.picks = nil
 this.usesTooltipId = -1217
 
 ---@public
+---@param services serviceCollection
 ---@return boolean,string|nil
-function this.initialize()
+function this.initialize(services)
+	this.guiBuilder   = services.guiBuilder
+	this.translations = services.translations
+	this.settings     = services.settings
+
 	event.register(tes3.event.load, this.onLoad)
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
@@ -81,7 +92,7 @@ end
 ---@param e lockpickingStartEventData
 ---@return tes3uiElement
 function this.createHeader(e)
-	local header = gui.createMenu({
+	local header = this.guiBuilder.createMenu({
 			id = CONSTANTS.headerId,
 			dragFrame = false,
 			fixedFrame = true,
@@ -93,8 +104,7 @@ function this.createHeader(e)
 		:withAutoSize()
 		:wuild()
 
-	local block = gui
-		.createBlock({ parent = header })
+	local block = this.guiBuilder.createBlock({ parent = header })
 		:withFlowDirection(tes3.flowDirection.topToBottom)
 		:withAutoSize()
 		:withMinSize({ width = 300 })
@@ -106,12 +116,12 @@ function this.createHeader(e)
 		})
 		:wuild()
 
-	gui.createLabel({ parent = block })
+	this.guiBuilder.createLabel({ parent = block })
 		:withText(e.session.activator.baseObject.name)
 		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:wuild()
 
-	gui.createDivider({ parent = block })
+	this.guiBuilder.createDivider({ parent = block })
 		:withProportional({ width = 1.0 })
 		:wuild()
 
@@ -122,7 +132,7 @@ function this.createHeader(e)
 	local player = tes3.player.mobile --[[@as tes3mobileActor]]
 	local securitySkill = player:getSkillValue(tes3.skill.security)
 
-	gui.createLabel({ parent = block })
+	this.guiBuilder.createLabel({ parent = block })
 		:withText(this.createLockLevelText(lockLevel))
 		:withColor(this.getLockLevelColor(lockLevel, securitySkill))
 		:wuild()
@@ -154,7 +164,7 @@ end
 ---@private
 ---@return tes3uiElement
 function this.createControls()
-	local controls = gui.createMenu({
+	local controls = this.guiBuilder.createMenu({
 			id = CONSTANTS.controlsId,
 			dragFrame = false,
 			fixedFrame = true,
@@ -164,7 +174,7 @@ function this.createControls()
 		:withAutoSize()
 		:wuild()
 
-	local outerBlock = gui.createBlock({ parent = controls })
+	local outerBlock = this.guiBuilder.createBlock({ parent = controls })
 		:withAutoSize()
 		:withFlowDirection(tes3.flowDirection.topToBottom)
 		:withChildAlignment({
@@ -172,12 +182,12 @@ function this.createControls()
 		})
 		:wuild()
 
-	gui.createLabel({ parent = outerBlock })
-		:withText(translations.get(TRANSLATION_KEY.interfaceControlsHeader))
+	this.guiBuilder.createLabel({ parent = outerBlock })
+		:withText(this.translations.get(TRANSLATION_KEY.interfaceControlsHeader))
 		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:wuild()
 
-	local innerBlock = gui.createThinBorder({ parent = outerBlock })
+	local innerBlock = this.guiBuilder.createThinBorder({ parent = outerBlock })
 		:withFlowDirection(tes3.flowDirection.leftToRight)
 		:withAutoSize()
 		:withPadding({
@@ -196,13 +206,13 @@ function this.createControls()
 	local controlTexts = this.getControlTexts()
 
 	for i, text in ipairs(controlTexts) do
-		gui.createLabel({ parent = innerBlock, id = string.format(CONSTANTS.controlsLabelId, i) })
+		this.guiBuilder.createLabel({ parent = innerBlock, id = string.format(CONSTANTS.controlsLabelId, i) })
 			:withText(text)
 			:withColor(tes3ui.getPalette(tes3.palette.normalColor))
 			:wuild()
 
 		if i < #controlTexts then
-			gui.createThinBorder({ parent = innerBlock })
+			this.guiBuilder.createThinBorder({ parent = innerBlock })
 				:withSize({ width = 1, height = 24 })
 				:withBorder({
 					left = 12,
@@ -220,21 +230,22 @@ end
 function this.getControlTexts()
 	local mouse = tes3.findGMST(tes3.gmst.sMouse).value
 
-	local rotateLockCounterclockwise = this.getKeyName(settings.keyBinds.rotateLockCounterclockwise)
-	local rotateLockClockwise = this.getKeyName(settings.keyBinds.rotateLockClockwise)
+	local rotateLockCounterclockwise = this.getKeyName(this.settings.keyBinds.rotateLockCounterclockwise)
+	local rotateLockClockwise = this.getKeyName(this.settings.keyBinds.rotateLockClockwise)
 
-	local cyclePreviousPick = this.getKeyName(settings.keyBinds.cyclePreviousPick)
-	local cycleNextPick = this.getKeyName(settings.keyBinds.cycleNextPick)
+	local cyclePreviousPick = this.getKeyName(this.settings.keyBinds.cyclePreviousPick)
+	local cycleNextPick = this.getKeyName(this.settings.keyBinds.cycleNextPick)
 
-	local exit = this.getKeyName(settings.keyBinds.exit)
+	local exit = this.getKeyName(this.settings.keyBinds.exit)
 
 	return {
-		string.format("%s: %s", translations.get(TRANSLATION_KEY.interfaceControlsRotatePick), mouse),
-		string.format("%s: %s / %s", translations.get(TRANSLATION_KEY.interfaceControlsRotateLock),
+		string.format("%s: %s", this.translations.get(TRANSLATION_KEY.interfaceControlsRotatePick), mouse),
+		string.format("%s: %s / %s", this.translations.get(TRANSLATION_KEY.interfaceControlsRotateLock),
 			rotateLockCounterclockwise, rotateLockClockwise),
-		string.format("%s: %s / %s", translations.get(TRANSLATION_KEY.interfaceControlsCyclePicks), cyclePreviousPick,
+		string.format("%s: %s / %s", this.translations.get(TRANSLATION_KEY.interfaceControlsCyclePicks),
+			cyclePreviousPick,
 			cycleNextPick),
-		string.format("%s: %s", translations.get(TRANSLATION_KEY.interfaceControlsExit), exit),
+		string.format("%s: %s", this.translations.get(TRANSLATION_KEY.interfaceControlsExit), exit),
 	}
 end
 
@@ -250,7 +261,7 @@ end
 ---@param picks tes3itemStack[]
 ---@return tes3uiElement
 function this.createPicks(activePick, picks)
-	local picksMenu = gui.createMenu({
+	local picksMenu = this.guiBuilder.createMenu({
 			id = CONSTANTS.picksId,
 			dragFrame = false,
 			fixedFrame = true,
@@ -261,7 +272,7 @@ function this.createPicks(activePick, picks)
 		:withAutoSize()
 		:wuild()
 
-	local upperBlock = gui.createBlock({ parent = picksMenu })
+	local upperBlock = this.guiBuilder.createBlock({ parent = picksMenu })
 		:withFlowDirection(tes3.flowDirection.topToBottom)
 		:withAutoSize()
 		:withPadding({
@@ -269,12 +280,12 @@ function this.createPicks(activePick, picks)
 		})
 		:wuild()
 
-	gui.createLabel({ parent = upperBlock })
-		:withText(translations.get(TRANSLATION_KEY.interfacePicksHeader))
+	this.guiBuilder.createLabel({ parent = upperBlock })
+		:withText(this.translations.get(TRANSLATION_KEY.interfacePicksHeader))
 		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:wuild()
 
-	local lowerBlock = gui.createThinBorder({ parent = picksMenu })
+	local lowerBlock = this.guiBuilder.createThinBorder({ parent = picksMenu })
 		:withFlowDirection(tes3.flowDirection.leftToRight)
 		:withPadding({
 			all = 8,
@@ -282,12 +293,12 @@ function this.createPicks(activePick, picks)
 		:withAutoSize()
 		:wuild()
 
-	local pickLabelContainer = gui.createBlock({ parent = lowerBlock })
+	local pickLabelContainer = this.guiBuilder.createBlock({ parent = lowerBlock })
 		:withFlowDirection(tes3.flowDirection.topToBottom)
 		:withAutoSize()
 		:wuild()
 
-	local pickCountLabelContainer = gui.createBlock({ parent = lowerBlock })
+	local pickCountLabelContainer = this.guiBuilder.createBlock({ parent = lowerBlock })
 		:withFlowDirection(tes3.flowDirection.topToBottom)
 		:withAutoSize()
 		:wuild()
@@ -300,7 +311,7 @@ function this.createPicks(activePick, picks)
 		local verticalBorder = 8
 		local horizontalBorder = 16
 
-		gui.createLabel({
+		this.guiBuilder.createLabel({
 			parent = pickLabelContainer,
 			id = string.format(CONSTANTS.picksLabelId,
 				pick.object.id)
@@ -315,7 +326,7 @@ function this.createPicks(activePick, picks)
 			:withCallback(EVENTS.pickCycled, this.onPickCycled)
 			:wuild()
 
-		gui.createLabel({
+		this.guiBuilder.createLabel({
 			parent = pickCountLabelContainer,
 			id = string.format(CONSTANTS.picksCountLabelId,
 				pick.object.id)
@@ -434,7 +445,7 @@ function this.onUiObjectTooltip(e)
 	local conditionRatio = itemData and math.max(0, itemData.condition / e.object.maxCondition) or 1
 	usesTooltip.text = string.format(
 		"%s: %d%%",
-		translations.get(TRANSLATION_KEY.tooltipPickHealth),
+		this.translations.get(TRANSLATION_KEY.tooltipPickHealth),
 		math.round(conditionRatio * 100))
 
 	e.tooltip:updateLayout()

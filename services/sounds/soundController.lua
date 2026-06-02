@@ -1,7 +1,3 @@
---- SERVICES
-local soundFileResolver = require("tauer.modern-lockpicking.services.sounds.soundFileResolver")
----
-
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local CONSTANTS = require("tauer.modern-lockpicking.services.sounds.enums.CONSTANTS")
@@ -38,9 +34,24 @@ this.jiggleState = { counter = 0, cooldown = 0 }
 ---@type boolean
 this.paused = false
 
+---@private
+---@type soundFileResolver
+this.soundFileResolver = nil
+
+---@private
+---@type integer
+this.debounceInFrames = 3
+
+---@private
+---@type integer
+this.frameCounter = 0
+
 ---@public
+---@param services serviceCollection
 ---@return boolean,string|nil
-function this.initialize()
+function this.initialize(services)
+	this.soundFileResolver = services.soundFileResolver
+
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
 	event.register(EVENTS.pickCycled, this.onPickCycled)
@@ -68,7 +79,7 @@ end
 function this.onLockpickingStart(_)
 	tes3.playSound({
 		reference = tes3.player,
-		soundPath = soundFileResolver.resolve(CONSTANTS.templates.lockpickingStart).path,
+		soundPath = this.soundFileResolver.resolve(CONSTANTS.templates.lockpickingStart).path,
 	})
 	this.lastCursorPosition = tes3.getCursorPosition().x
 
@@ -83,7 +94,7 @@ function this.onLockpickingEnd(e)
 	if e.success then
 		tes3.playSound({
 			reference = tes3.player,
-			soundPath = soundFileResolver.resolve(CONSTANTS.templates.unlock).path,
+			soundPath = this.soundFileResolver.resolve(CONSTANTS.templates.unlock).path,
 		})
 	end
 
@@ -97,7 +108,7 @@ end
 function this.onPickCycled(_)
 	tes3.playSound({
 		reference = tes3.player,
-		soundPath = soundFileResolver.resolve(CONSTANTS.templates.changeLockpick).path,
+		soundPath = this.soundFileResolver.resolve(CONSTANTS.templates.changeLockpick).path,
 	})
 end
 
@@ -105,7 +116,7 @@ end
 function this.onPickBroken()
 	tes3.playSound({
 		reference = tes3.player,
-		soundPath = soundFileResolver.resolve(CONSTANTS.templates.breakLockpick).path,
+		soundPath = this.soundFileResolver.resolve(CONSTANTS.templates.breakLockpick).path,
 	})
 end
 
@@ -113,6 +124,11 @@ end
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
 	if this.paused then
+		return
+	end
+
+	this.frameCounter = (this.frameCounter + 1) % this.debounceInFrames
+	if this.frameCounter ~= 0 then
 		return
 	end
 
@@ -161,12 +177,12 @@ end
 ---@param e soundController.playOnCooldown.params
 function this.playOnCooldown(e)
 	if e.condition and e.state.counter >= e.state.cooldown then
-		local soundFile = soundFileResolver.resolve(e.template)
+		local soundFile = this.soundFileResolver.resolve(e.template)
 		tes3.playSound({ reference = tes3.player, soundPath = soundFile.path })
 		e.state.counter = 0
 		e.state.cooldown = soundFile.duration
 	end
-	e.state.counter = e.state.counter + e.delta
+	e.state.counter = e.state.counter + (e.delta * this.debounceInFrames)
 end
 
 ---@private

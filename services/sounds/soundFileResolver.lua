@@ -1,11 +1,12 @@
-local logger = mwse.Logger.new()
-
 --- ENUMS
 local CONSTANTS = require("tauer.modern-lockpicking.services.sounds.enums.CONSTANTS")
 ---
 
 ---@class soundFileResolver : initializedService
 local this = {}
+
+---@private
+this.logger = mwse.Logger.new()
 
 ---@private
 ---@type { [string]: soundFile[] }
@@ -19,8 +20,9 @@ this.empty = {
 }
 
 ---@public
+---@param _ serviceCollection
 ---@return boolean,string|nil
-function this.initialize()
+function this.initialize(_)
     for file in lfs.dir(string.format("%s/%s", CONSTANTS.paths.sound, CONSTANTS.paths.mod)) do
         if file:match("%.wav$") then
             local name = file:match("^(.*)%.wav$")
@@ -47,13 +49,13 @@ end
 ---@return soundFile
 function this.resolve(template)
     if not this.sounds[template] then
-        logger:error("Sound template '%s' not found.", template)
+        this.logger:error("Sound template '%s' not found.", template)
         return this.empty
     end
 
     local sound = table.choice(this.sounds[template])
     if not sound then
-        logger:error("No sound files found for '%s'.", template)
+        this.logger:error("No sound files found for '%s'.", template)
         return this.empty
     end
 

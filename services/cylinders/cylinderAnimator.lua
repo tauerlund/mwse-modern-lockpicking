@@ -1,7 +1,6 @@
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local DIRECTION = require("tauer.modern-lockpicking.services.lockpicking.enums.ROTATION_DIRECTION")
-local CONSTANTS = require("tauer.modern-lockpicking.services.cylinders.enums.CONSTANTS")
 ---
 
 ---@class cylinderAnimator : initializedService
@@ -23,9 +22,16 @@ this.rotationDirection = nil
 ---@type boolean
 this.blocked = false
 
+---@private
+this.constants = {
+	rotateSpeed = 1.5,
+	resetSpeed = 1.8,
+}
+
 ---@public
+---@param _ serviceCollection
 ---@return boolean,string|nil
-function this.initialize()
+function this.initialize(_)
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
 	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
@@ -113,10 +119,10 @@ function this.onEnterFrame(e)
 			return
 		end
 		local multiplier = rotation <= 0 and 1 or -1
-		this.updatePhase(multiplier, CONSTANTS.resetSpeed, e.delta)
+		this.updatePhase(multiplier, this.constants.resetSpeed, e.delta)
 	else
 		local multiplier = this.rotationDirection == DIRECTION.counterClockwise and 1 or -1
-		this.updatePhase(multiplier, CONSTANTS.rotateSpeed, e.delta)
+		this.updatePhase(multiplier, this.constants.rotateSpeed, e.delta)
 	end
 
 	this.rotate()

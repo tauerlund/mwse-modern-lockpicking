@@ -1,9 +1,17 @@
---- SERVICES
-local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
----
-
----@class nodeAnimator
+---@class nodeAnimator : initializedService
 local this = {}
+
+---@private
+---@type timerManager
+this.timerManager = nil
+
+---@public
+---@param services serviceCollection
+---@return boolean,string|nil
+function this.initialize(services)
+	this.timerManager = services.timerManager
+	return true, nil
+end
 
 ---@public
 ---@param parameters nodeAnimator.start.params
@@ -17,7 +25,7 @@ function this.start(parameters)
 	local lastKeyframe = parameters.keyframes[keyFramesLength]
 
 	this.initializeTransforms(parameters.node, firstKeyframe.translation, firstKeyframe.rotation)
-	timerManager.start({
+	this.timerManager.start({
 		durationInSeconds = lastKeyframe.time,
 		callback = this.onStartTimer,
 		cancelOn = parameters.cancelOn or nil,

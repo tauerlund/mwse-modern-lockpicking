@@ -12,7 +12,7 @@ this.logger = mwse.Logger.new()
 ---@package
 ---@param _ modConfigReadyEventData
 function this.initializeMcm(_)
-	this.services.mcmInitializer.initialize()
+	this.services.mcmInitializer.initialize(this.services)
 end
 
 ---@package
@@ -46,10 +46,11 @@ function this.initializeMod(_)
 		services.inventoryController,
 		services.eventLogger,
 		services.debuggingRenderer,
+		services.nodeAnimator
 	}
 
 	for _, service in pairs(initializedServices) do
-		local initialized, reason = service.initialize()
+		local initialized, reason = service.initialize(services)
 		if not initialized then
 			this.logger:error("Initialization failed. Reason: %s", reason)
 			return

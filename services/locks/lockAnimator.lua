@@ -1,7 +1,3 @@
---- SERVICES
-local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
----
-
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local CONSTANTS = require("tauer.modern-lockpicking.services.locks.enums.CONSTANTS")
@@ -10,9 +6,16 @@ local CONSTANTS = require("tauer.modern-lockpicking.services.locks.enums.CONSTAN
 ---@class lockAnimator : initializedService
 local this = {}
 
+---@private
+---@type timerManager
+this.timerManager = nil
+
 ---@public
+---@param services serviceCollection
 ---@return boolean,string|nil
-function this.initialize()
+function this.initialize(services)
+	this.timerManager = services.timerManager
+
 	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
 	return true, nil
 end
@@ -22,7 +25,7 @@ end
 function this.onLockpickingStart(e)
 	local lock = e.session.lock
 
-	timerManager.start({
+	this.timerManager.start({
 		durationInSeconds = 0.8,
 		callback = this.onStartTimer,
 		cancelOn = EVENTS.lockpickingEnded,

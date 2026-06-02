@@ -10,8 +10,9 @@ local this = {}
 this.activator = nil
 
 ---@public
+---@param _ serviceCollection
 ---@return boolean,string|nil
-function this.initialize()
+function this.initialize(_)
 	event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 	return true, nil

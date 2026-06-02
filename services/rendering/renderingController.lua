@@ -15,8 +15,9 @@ this.pauseRenderingInMenus = false
 this.depthOfField = nil
 
 ---@public
+---@param _ serviceCollection
 ---@return boolean,string|nil
-function this.initialize()
+function this.initialize(_)
     this.registerEvents()
 
     this.depthOfField = mge.shaders.load({ name = "modern-lockpicking/Bokeh" })

@@ -1,5 +1,3 @@
-local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
-local translations = require("tauer.modern-lockpicking.services.translations.translations")
 local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
 local ACTIVATION_STRATEGY_NAMES = require(
     "tauer.modern-lockpicking.services.lockpicking.activation-strategies.enums.ACTIVATION_STRATEGY_NAMES")
@@ -9,7 +7,11 @@ local this = {}
 
 ---@public
 ---@param template mwseMCMTemplate
-function this.initialize(template)
+---@param services serviceCollection
+function this.initialize(template, services)
+    local translations = services.translations
+    local settings = services.mcmSettings.mcm
+
     local controlsPage = template:createSideBarPage { label = translations.get(TRANSLATION_KEY.interfaceControlsHeader) }
 
     local rotateLockCategory = controlsPage:createCategory({
@@ -73,7 +75,7 @@ function this.initialize(template)
         description = translations.get(TRANSLATION_KEY.mcmActivationMethodDesc),
         options = {
             { text = translations.get(TRANSLATION_KEY.mcmActivationMethodDefault), value = ACTIVATION_STRATEGY_NAMES.default },
-            { text = translations.get(TRANSLATION_KEY.mcmActivationMethodAttack), value = ACTIVATION_STRATEGY_NAMES.attack },
+            { text = translations.get(TRANSLATION_KEY.mcmActivationMethodAttack),  value = ACTIVATION_STRATEGY_NAMES.attack },
         },
         variable = mwse.mcm.createTableVariable({
             id = "activationStrategy",

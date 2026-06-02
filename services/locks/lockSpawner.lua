@@ -1,5 +1,3 @@
-local lockMeshResolver = require("tauer.modern-lockpicking.services.locks.lockMeshResolver")
-
 local Z_BUFFER_INDEX = require("tauer.modern-lockpicking.services.rendering.enums.Z_BUFFER_INDEX")
 local OBJECT_NAMES = require("tauer.modern-lockpicking.services.nodes.enums.OBJECT_NAMES")
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
@@ -7,9 +5,16 @@ local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 ---@class lockSpawner : initializedService
 local this = {}
 
+---@private
+---@type lockMeshResolver
+this.lockMeshResolver = nil
+
 ---@public
+---@param services serviceCollection
 ---@return boolean, string|nil
-function this.initialize()
+function this.initialize(services)
+	this.lockMeshResolver = services.lockMeshResolver
+
 	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
 	return true, nil
 end
@@ -56,7 +61,7 @@ end
 ---@param activator tes3reference
 ---@return niNode
 function this.getMesh(activator)
-	local mesh = lockMeshResolver.resolve(activator)
+	local mesh = this.lockMeshResolver.resolve(activator)
 
 	mesh.name = "ModernLockpicking:Root"
 	mesh.translation = tes3.getCameraPosition():copy()

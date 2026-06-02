@@ -1,14 +1,3 @@
---- SERVICES
-local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
-local lockSpawner = require("tauer.modern-lockpicking.services.locks.lockSpawner")
-local knifeSpawner = require("tauer.modern-lockpicking.services.knives.knifeSpawner")
-local pickSelector = require("tauer.modern-lockpicking.services.picks.pickSelector")
-local pickSpawner = require("tauer.modern-lockpicking.services.picks.pickSpawner")
-local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
-local inventoryController = require("tauer.modern-lockpicking.services.inventory.inventoryController")
-local translations = require("tauer.modern-lockpicking.services.translations.translations")
----
-
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
@@ -18,12 +7,54 @@ local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.
 local this = {}
 
 ---@private
+---@type settings
+this.settings = nil
+
+---@private
+---@type lockSpawner
+this.lockSpawner = nil
+
+---@private
+---@type knifeSpawner
+this.knifeSpawner = nil
+
+---@private
+---@type pickSelector
+this.pickSelector = nil
+
+---@private
+---@type pickSpawner
+this.pickSpawner = nil
+
+---@private
+---@type timerManager
+this.timerManager = nil
+
+---@private
+---@type inventoryController
+this.inventoryController = nil
+
+---@private
+---@type translations
+this.translations = nil
+
+---@private
 ---@type lockpickingSession|nil
 this.session = nil
 
 ---@public
+---@param services serviceCollection
 ---@return boolean,string|nil
-function this.initialize()
+function this.initialize(services)
+	this.settings = services.settings
+	this.lockSpawner = services.lockSpawner
+	this.knifeSpawner = services.knifeSpawner
+	this.pickSelector = services.pickSelector
+	this.pickSpawner = services.pickSpawner
+	this.timerManager = services.timerManager
+	this.inventoryController = services.inventoryController
+	this.translations = services.translations
+
 	event.register(EVENTS.lockpickingActivated, this.onLockPickingActivated)
 	event.register(EVENTS.cylinderTargetReached, this.onCylinderTargetReached)
 	event.register(EVENTS.pickCycled, this.onPickCycled)
@@ -55,7 +86,7 @@ end
 ---@private
 ---@param _ pickBrokenEventData
 function this.onPickBroken(_)
-	local picks = inventoryController.getLockpicks()
+	local picks = this.inventoryController.getLockpicks()
 	if not picks then
 		return
 	end
@@ -77,7 +108,7 @@ function this.onLockPickingActivated(e)
 	}
 	event.trigger(EVENTS.lockpickingStart, eventData)
 
-	timerManager.start({
+	this.timerManager.start({
 		durationInSeconds = 1.3,
 		finishedCallback = this.onStartTimerFinished,
 		cancelOn = EVENTS.lockpickingEnded,
@@ -88,16 +119,16 @@ end
 ---@param activator tes3reference
 ---@return lockpickingSession|nil
 function this.createSession(activator)
-	local picks = inventoryController.getLockpicks()
+	local picks = this.inventoryController.getLockpicks()
 	if not picks then
-		tes3.messageBox(translations.get(TRANSLATION_KEY.messageBoxNoLockpicks))
+		tes3.messageBox(this.translations.get(TRANSLATION_KEY.messageBoxNoLockpicks))
 		return nil
 	end
 
-	local lock = lockSpawner.spawn(activator)
-	local knife = knifeSpawner.spawn(lock)
-	local item = pickSelector.select(picks, nil)
-	local pick = pickSpawner.spawn(lock, item)
+	local lock = this.lockSpawner.spawn(activator)
+	local knife = this.knifeSpawner.spawn(lock)
+	local item = this.pickSelector.select(picks, nil)
+	local pick = this.pickSpawner.spawn(lock, item)
 
 	return {
 		activator = activator,
@@ -112,7 +143,7 @@ end
 ---@private
 ---@return number
 function this.computeSweetSpotRadius()
-	local difficulty = settings.difficulty
+	local difficulty = this.settings.difficulty
 	local security = tes3.mobilePlayer:getSkillValue(tes3.skill.security)
 	local lockLevel = this.session.activator.lockNode and this.session.activator.lockNode.level or 1
 	local quality = this.session.pick.item.object.quality
@@ -128,7 +159,7 @@ function this.triggerSweetSpotUpdated()
 	local eventData = {
 		center = this.session.sweetSpotCenter,
 		radius = radius,
-		gradientWidth = radius * settings.difficulty.gradientFactor,
+		gradientWidth = radius * this.settings.difficulty.gradientFactor,
 	}
 	event.trigger(EVENTS.sweetSpotUpdated, eventData)
 end
@@ -168,7 +199,7 @@ function this.onKeyUp(e)
 		return
 	end
 
-	if e.keyCode == settings.keyBinds.exit.keyCode then
+	if e.keyCode == this.settings.keyBinds.exit.keyCode then
 		---@type lockpickingEndEventData
 		local data = {
 			session = this.session,
@@ -182,7 +213,7 @@ end
 ---@param e lockpickingEndEventData
 function this.onLockpickingEnd(e)
 	this.disableInput()
-	timerManager.start({
+	this.timerManager.start({
 		durationInSeconds = 1,
 		finishedCallback = this.onEndTimerFinished,
 		data = e --[[@as timerData]],

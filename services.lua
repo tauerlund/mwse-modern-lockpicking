@@ -27,6 +27,7 @@ local this = {
 
     mcmInitializer = require("tauer.modern-lockpicking.services.mcm.mcmInitializer"),
     mcmSettings = require("tauer.modern-lockpicking.services.mcm.mcmSettings"),
+    settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm,
 
     nodeAnimator = require("tauer.modern-lockpicking.services.nodes.nodeAnimator"),
 

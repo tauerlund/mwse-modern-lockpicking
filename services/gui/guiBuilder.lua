@@ -1,68 +1,70 @@
-local logger = mwse.Logger.new()
-
 ---@class guiBuilder
 ---@field private element tes3uiElement
 ---@field private callbacks { [string]: function }
-local guiBuilder = {}
-guiBuilder.__index = guiBuilder
+local this = {}
+this.__index = this
+
+---@private
+---@type mwseLogger
+this.logger = mwse.Logger.new()
 
 ---@public
 ---@param parameters createMenuParameters
 ---@return guiBuilder
-function guiBuilder.createMenu(parameters)
+function this.createMenu(parameters)
 	local element = tes3ui.createMenu({
 		id = parameters.id,
 		dragFrame = parameters.dragFrame,
 		fixedFrame = parameters.fixedFrame,
 		modal = parameters.modal,
 	})
-	return guiBuilder.create(element)
+	return this.create(element)
 end
 
 ---@public
 ---@param parameters createParameters
 ---@return guiBuilder
-function guiBuilder.createLabel(parameters)
+function this.createLabel(parameters)
 	local element = parameters.parent:createLabel({
 		id = parameters.id,
 	})
-	return guiBuilder.create(element)
+	return this.create(element)
 end
 
 ---@public
 ---@param parameters createParameters
 ---@return guiBuilder
-function guiBuilder.createThinBorder(parameters)
+function this.createThinBorder(parameters)
 	local element = parameters.parent:createThinBorder({
 		id = parameters.id,
 	})
-	return guiBuilder.create(element)
+	return this.create(element)
 end
 
 ---@public
 ---@param parameters createParameters
 ---@return guiBuilder
-function guiBuilder.createBlock(parameters)
+function this.createBlock(parameters)
 	local element = parameters.parent:createBlock({
 		id = parameters.id,
 	})
-	return guiBuilder.create(element)
+	return this.create(element)
 end
 
 ---@public
 ---@param parameters createParameters
 ---@return guiBuilder
-function guiBuilder.createDivider(parameters)
+function this.createDivider(parameters)
 	local element = parameters.parent:createDivider({
 		id = parameters.id,
 	})
-	return guiBuilder.create(element)
+	return this.create(element)
 end
 
 ---@public
 ---@param text string
 ---@return guiBuilder
-function guiBuilder:withText(text)
+function this:withText(text)
 	self.element.text = text
 	return self
 end
@@ -70,14 +72,14 @@ end
 ---@public
 ---@param color number[]
 ---@return guiBuilder
-function guiBuilder:withColor(color)
+function this:withColor(color)
 	self.element.color = color
 	return self
 end
 
 ---@public
 ---@return guiBuilder
-function guiBuilder:withAutoSize()
+function this:withAutoSize()
 	self.element.autoHeight = true
 	self.element.autoWidth = true
 	return self
@@ -86,7 +88,7 @@ end
 ---@public
 ---@param parameters sizeParameters
 ---@return guiBuilder
-function guiBuilder:withMinSize(parameters)
+function this:withMinSize(parameters)
 	if parameters.width then
 		self.element.minWidth = parameters.width
 	end
@@ -99,7 +101,7 @@ end
 ---@public
 ---@param parameters vector2Parameters
 ---@return guiBuilder
-function guiBuilder:withPositionAlign(parameters)
+function this:withPositionAlign(parameters)
 	if parameters.x then
 		self.element.absolutePosAlignX = parameters.x
 	end
@@ -112,7 +114,7 @@ end
 ---@public
 ---@param flowDirection string
 ---@return guiBuilder
-function guiBuilder:withFlowDirection(flowDirection)
+function this:withFlowDirection(flowDirection)
 	self.element.flowDirection = flowDirection
 	return self
 end
@@ -120,7 +122,7 @@ end
 ---@public
 ---@param parameters borderPaddingParameters
 ---@return guiBuilder
-function guiBuilder:withBorder(parameters)
+function this:withBorder(parameters)
 	if parameters.all then
 		self.element.borderAllSides = parameters.all
 	end
@@ -142,7 +144,7 @@ end
 ---@public
 ---@param parameters borderPaddingParameters
 ---@return guiBuilder
-function guiBuilder:withPadding(parameters)
+function this:withPadding(parameters)
 	if parameters.all then
 		self.element.paddingAllSides = parameters.all
 	end
@@ -164,7 +166,7 @@ end
 ---@public
 ---@param parameters vector2Parameters
 ---@return guiBuilder
-function guiBuilder:withChildAlignment(parameters)
+function this:withChildAlignment(parameters)
 	if parameters.x then
 		self.element.childAlignX = parameters.x
 	end
@@ -177,7 +179,7 @@ end
 ---@public
 ---@param parameters sizeParameters
 ---@return guiBuilder
-function guiBuilder:withProportional(parameters)
+function this:withProportional(parameters)
 	if parameters.width then
 		self.element.widthProportional = parameters.width
 	end
@@ -189,7 +191,7 @@ end
 
 ---@public
 ---@param parameters sizeParameters
-function guiBuilder:withSize(parameters)
+function this:withSize(parameters)
 	if parameters.width then
 		self.element.width = parameters.width
 	end
@@ -202,10 +204,10 @@ end
 ---@public
 ---@param evt string
 ---@param callback fun(element: tes3uiElement, e: table|nil)
-function guiBuilder:withCallback(evt, callback)
+function this:withCallback(evt, callback)
 	self.callbacks = self.callbacks or {}
 	if self.callbacks[evt] then
-		logger:warn("Callback for event '%s' already registered", evt)
+		this.logger:warn("Callback for event '%s' already registered", evt)
 		return
 	end
 
@@ -219,7 +221,7 @@ end
 
 ---@public
 ---@return tes3uiElement
-function guiBuilder:wuild()
+function this:wuild()
 	if self.callbacks then
 		for evt, callback in pairs(self.callbacks) do
 			self:registerCallback(evt, callback)
@@ -232,7 +234,7 @@ end
 ---@private
 ---@param evt string
 ---@param callback fun(element: tes3uiElement, e: table|nil)
-function guiBuilder:registerCallback(evt, callback)
+function this:registerCallback(evt, callback)
 	if not event.isRegistered(evt, callback) then
 		event.register(evt, callback)
 	end
@@ -247,9 +249,9 @@ end
 ---@private
 ---@param element tes3uiElement
 ---@return guiBuilder
-function guiBuilder.create(element)
-	local instance = setmetatable({ element = element }, guiBuilder)
+function this.create(element)
+	local instance = setmetatable({ element = element }, this)
 	return instance
 end
 
-return guiBuilder
+return this

@@ -1,14 +1,17 @@
---- SERVICES
-local settings = require("tauer.modern-lockpicking.services.mcm.mcmSettings").mcm
-local strategyLoader = require("tauer.modern-lockpicking.services.strategies.strategyLoader")
----
-
 --- ENUMS
 local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
 ---
 
 ---@class lockpickingActivator : initializedService
 local this = {}
+
+---@private
+---@type settings
+this.settings = nil
+
+---@private
+---@type strategyLoader
+this.strategyLoader = nil
 
 ---@private
 ---@type { [string]: activationStrategy }
@@ -19,9 +22,12 @@ this.activationStrategies = nil
 this.currentActivationStrategy = nil
 
 ---@public
+---@param services serviceCollection
 ---@return boolean, string|nil
-function this.initialize()
-	this.activationStrategies = strategyLoader.loadAll({
+function this.initialize(services)
+	this.settings = services.settings
+
+	this.activationStrategies = services.strategyLoader.loadAll({
 		directory = "tauer\\modern-lockpicking\\services\\lockpicking\\activation-strategies",
 		requireNotEmpty = true,
 	}) --[[@as { [string]: activationStrategy }]]
@@ -42,7 +48,7 @@ function this.applyStrategy()
 		this.currentActivationStrategy.disable()
 	end
 
-	this.currentActivationStrategy = this.activationStrategies[settings.activationStrategy]
+	this.currentActivationStrategy = this.activationStrategies[this.settings.activationStrategy]
 	this.currentActivationStrategy.enable()
 end
 
