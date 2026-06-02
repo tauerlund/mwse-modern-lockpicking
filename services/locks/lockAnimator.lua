@@ -147,17 +147,19 @@ function this.onEnterFrame(e)
 	local currentRotX = this.currentRotX
 	local currentRotY = this.currentRotY
 
-	local targetRotX = ((this.startCursorY - cursor.y) / viewportHeight) * constants.amplitude
-	local targetRotY = ((cursor.x - this.startCursorX) / viewportWidth) * constants.amplitude
+	local targetRotX = ((cursor.y - this.startCursorY) / viewportHeight) * constants.amplitude
+	local targetRotY = ((this.startCursorX - cursor.x) / viewportWidth) * constants.amplitude
 
 	local t = math.min(1, constants.lerpSpeed * e.delta)
 	this.currentRotX = currentRotX + (targetRotX - currentRotX) * t
 	this.currentRotY = currentRotY + (targetRotY - currentRotY) * t
 
-	this.rotationBufferX:toRotationX(this.currentRotX)
+	this.rotationBufferX:toRotationZ(this.currentRotX)
 	this.rotationBufferY:toRotationY(this.currentRotY)
 
-	this.lock.mesh.rotation = this.rotationBufferX * this.rotationBufferY * this.initialRotation
+	local camRot = tes3.getCamera().worldTransform.rotation
+	this.lock.mesh.rotation = camRot * this.rotationBufferX * this.rotationBufferY * camRot:transpose() *
+		this.initialRotation
 	this.lock.mesh:update()
 end
 
