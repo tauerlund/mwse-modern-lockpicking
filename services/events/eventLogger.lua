@@ -1,8 +1,3 @@
---- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local DIRECTION = require("tauer.modern-lockpicking.services.lockpicking.enums.ROTATION_DIRECTION")
----
-
 ---@class eventLogger : initializedService
 local this = {}
 
@@ -10,19 +5,27 @@ local this = {}
 ---@type mwseLogger
 this.logger = mwse.Logger.new()
 
+---@private
+---@type enums
+this.enums = nil
+
 ---@public
----@param _ serviceCollection
+---@param services serviceCollection
 ---@return boolean, string|nil
-function this.initialize(_)
-    event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
-    event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
-    event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
-    event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
-    event.register(EVENTS.rotationStarted, this.onRotationStarted)
-    event.register(EVENTS.rotationEnded, this.onRotationEnded)
-    event.register(EVENTS.cylinderBlocked, this.onCylinderBlocked)
-    event.register(EVENTS.pickCycled, this.onPickCycled)
-    event.register(EVENTS.pickBroken, this.onPickBroken)
+function this.initialize(services)
+    this.enums = services.enums
+
+    local events = services.enums.events
+
+    event.register(events.lockpickingStart, this.onLockpickingStart)
+    event.register(events.lockpickingStarted, this.onLockpickingStarted)
+    event.register(events.lockpickingEnd, this.onLockpickingEnd)
+    event.register(events.lockpickingEnded, this.onLockpickingEnded)
+    event.register(events.rotationStarted, this.onRotationStarted)
+    event.register(events.rotationEnded, this.onRotationEnded)
+    event.register(events.cylinderBlocked, this.onCylinderBlocked)
+    event.register(events.pickCycled, this.onPickCycled)
+    event.register(events.pickBroken, this.onPickBroken)
     return true, nil
 end
 
@@ -53,7 +56,8 @@ end
 ---@private
 ---@param e rotationEventData
 function this.onRotationStarted(e)
-    this.logger:debug("Rotation %s started", e.direction == DIRECTION.clockwise and "clockwise" or "counter-clockwise")
+    local direction = e.direction == this.enums.rotationDirections.clockwise and "clockwise" or "counter-clockwise"
+    this.logger:debug("Rotation %s started", direction)
 end
 
 ---@private

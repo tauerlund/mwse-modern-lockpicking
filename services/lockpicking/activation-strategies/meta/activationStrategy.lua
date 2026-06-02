@@ -1,4 +1,5 @@
 ---@meta
 ---@class activationStrategy : strategy
+---@field public initialize fun(services:serviceCollection)
 ---@field public enable function
 ---@field public disable function

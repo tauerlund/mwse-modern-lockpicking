@@ -1,8 +1,3 @@
---- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local CYCLE = require("tauer.modern-lockpicking.services.lockpicking.enums.CYCLE_DIRECTION")
----
-
 ---@class pickController : initializedService
 local this = {}
 
@@ -35,7 +30,7 @@ this.damaging = false
 this.damageAccumulator = 0
 
 ---@private
----@type { [tes3.scanCode]: CYCLE_DIRECTION }
+---@type { [tes3.scanCode]: cycleDirections }
 this.pickCycleDirections = nil
 
 ---@type tes3itemData|nil
@@ -53,6 +48,10 @@ this.pickSelector = nil
 ---@type pickSpawner
 this.pickSpawner = nil
 
+---@private
+---@type enums
+this.enums = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
@@ -60,17 +59,19 @@ function this.initialize(services)
 	this.settings = services.settings
 	this.pickSelector = services.pickSelector
 	this.pickSpawner = services.pickSpawner
+	this.enums = services.enums
+	local events = services.enums.events
 
 	this.applyKeybinds()
-	event.register(EVENTS.settingsUpdated, this.onKeyBindsUpdated)
-	event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
-	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
-	event.register(EVENTS.sweetSpotUpdated, this.onSweetSpotUpdated)
-	event.register(EVENTS.cylinderBlocked, this.onCylinderBlocked)
-	event.register(EVENTS.rotationEnded, this.onRotationEnded)
-	event.register(EVENTS.optionsMenuOpened, this.onOptionsMenuOpened)
-	event.register(EVENTS.optionsMenuClosed, this.onOptionsMenuClosed)
+	event.register(events.settingsUpdated, this.onKeyBindsUpdated)
+	event.register(events.lockpickingStarted, this.onLockpickingStarted)
+	event.register(events.lockpickingEnd, this.onLockpickingEnd)
+	event.register(events.lockpickingEnded, this.onLockpickingEnded)
+	event.register(events.sweetSpotUpdated, this.onSweetSpotUpdated)
+	event.register(events.cylinderBlocked, this.onCylinderBlocked)
+	event.register(events.rotationEnded, this.onRotationEnded)
+	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
+	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
 	return true, nil
 end
 
@@ -228,15 +229,15 @@ function this.breakPick()
 		pick = this.currentPick,
 		itemData = this.currentPickItemData
 	}
-	event.trigger(EVENTS.pickBreak, eventData)
-	event.trigger(EVENTS.pickBroken, eventData)
+	event.trigger(this.enums.events.pickBreak, eventData)
+	event.trigger(this.enums.events.pickBroken, eventData)
 
-	local direction = this.currentPick.item.count <= 0 and CYCLE.next or nil
+	local direction = this.currentPick.item.count <= 0 and this.enums.cycleDirections.next or nil
 	this.cyclePick(direction)
 end
 
 ---@private
----@param direction? CYCLE_DIRECTION
+---@param direction? cycleDirections
 function this.cyclePick(direction)
 	local previousPick = this.currentPick
 
@@ -255,7 +256,7 @@ function this.cyclePick(direction)
 		previousPick = previousPick,
 		pick = pick,
 	}
-	event.trigger(EVENTS.pickCycled, eventData)
+	event.trigger(this.enums.events.pickCycled, eventData)
 end
 
 ---@private
@@ -278,8 +279,8 @@ end
 ---@private
 function this.applyKeybinds()
 	this.pickCycleDirections = {
-		[this.settings.keyBinds.cycleNextPick.keyCode] = CYCLE.next,
-		[this.settings.keyBinds.cyclePreviousPick.keyCode] = CYCLE.previous,
+		[this.settings.keyBinds.cycleNextPick.keyCode] = this.enums.cycleDirections.next,
+		[this.settings.keyBinds.cyclePreviousPick.keyCode] = this.enums.cycleDirections.previous,
 	}
 end
 

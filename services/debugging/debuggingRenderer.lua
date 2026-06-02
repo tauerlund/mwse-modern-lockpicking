@@ -1,9 +1,3 @@
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.CONSTANTS")
-
-local LINE_LENGTH = 0.5
-local DEFAULT_MESH_LENGTH = 1000
-
 ---@class debuggingRenderer : initializedService
 local this = {}
 
@@ -19,15 +13,30 @@ this.linesContainer = nil
 ---@type settings
 this.settings = nil
 
+---@private
+---@type enums
+this.enums = nil
+
+---@private
+---@type number
+this.lineLength = 0.5
+
+---@private
+---@type number
+this.defaultMeshLength = 1000
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean, string|nil
 function this.initialize(services)
 	this.settings = services.settings
+	this.enums = services.enums
 
-	event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
-	event.register(EVENTS.sweetSpotUpdated, this.onSweetSpotUpdated)
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+	local events = services.enums.events
+
+	event.register(events.lockpickingStarted, this.onLockpickingStarted)
+	event.register(events.sweetSpotUpdated, this.onSweetSpotUpdated)
+	event.register(events.lockpickingEnded, this.onLockpickingEnded)
 	return true, nil
 end
 
@@ -48,8 +57,9 @@ function this.onSweetSpotUpdated(e)
 	this.linesContainer = niNode.new()
 	this.root:attachChild(this.linesContainer)
 
+	local constants = this.enums.constants.lockpicking
 	local function clamp(angle)
-		return math.max(CONSTANTS.targetRotationLeft, math.min(CONSTANTS.targetRotationRight, angle))
+		return math.max(constants.targetRotationLeft, math.min(constants.targetRotationRight, angle))
 	end
 
 	this.addLine(clamp(e.center - e.radius), false)
@@ -78,7 +88,7 @@ function this.addLine(angle, yellow)
 	local rotation = tes3matrix33.new()
 	rotation:fromEulerXYZ(0, angle, 0)
 	line.rotation = rotation
-	line.scale = LINE_LENGTH / DEFAULT_MESH_LENGTH
+	line.scale = this.lineLength / this.defaultMeshLength
 
 	local translation = line.translation:copy()
 	local yaw = line.rotation:toEulerXYZ().y

@@ -9,7 +9,7 @@ this.logger = mwse.Logger.new()
 --- Gets all files of the specified type in the given directory
 ---@public
 ---@param dir string The directory to search in
----@param fileType FILE_TYPE The file type/extension to filter by
+---@param fileType fileType The file type/extension to filter by
 ---@return string[]|nil files An array of file names matching the specified type, or nil if the directory is invalid
 function this.getAllFilesInDirectory(dir, fileType)
     if not this.isDirectory(dir) then

@@ -1,4 +1,4 @@
----@enum EVENTS
+---@enum events
 local enum = {
 	lockpickingActivated = "tauer.modern-lockpicking.lockpickingActivated",
 	lockpickingStart = "tauer.modern-lockpicking.lockpickingStart",

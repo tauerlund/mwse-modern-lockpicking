@@ -1,4 +1,4 @@
----@enum TRANSLATION_KEY
+---@enum translationKeys
 local this = {
     modName = "modName",
     messageBoxNoLockpicks = "messageBox.noLockpicks",

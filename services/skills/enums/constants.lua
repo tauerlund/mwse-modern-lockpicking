@@ -1,4 +1,4 @@
----@enum SKILL_CONSTANTS
+---@enum skillConstants
 local this = {
 	action = {
 		trapDisarm = 1,

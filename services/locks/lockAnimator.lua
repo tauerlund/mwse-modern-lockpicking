@@ -1,14 +1,13 @@
---- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local CONSTANTS = require("tauer.modern-lockpicking.services.locks.enums.constants")
----
-
 ---@class lockAnimator : initializedService
 local this = {}
 
 ---@private
 ---@type timerManager
 this.timerManager = nil
+
+---@private
+---@type enums
+this.enums = nil
 
 ---@private
 ---@type lock|nil
@@ -57,12 +56,14 @@ this.rotationBufferY = tes3matrix33.new()
 ---@return boolean,string|nil
 function this.initialize(services)
 	this.timerManager = services.timerManager
+	this.enums = services.enums
+	local events = services.enums.events
 
-	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
-	event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
-	event.register(EVENTS.optionsMenuOpened, this.onOptionsMenuOpened)
-	event.register(EVENTS.optionsMenuClosed, this.onOptionsMenuClosed)
+	event.register(events.lockpickingStart, this.onLockpickingStart)
+	event.register(events.lockpickingStarted, this.onLockpickingStarted)
+	event.register(events.lockpickingEnded, this.onLockpickingEnded)
+	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
+	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
 	return true, nil
 end
 
@@ -84,7 +85,7 @@ function this.onLockpickingStart(e)
 	this.timerManager.start({
 		durationInSeconds = 0.8,
 		callback = this.onStartTimer,
-		cancelOn = EVENTS.lockpickingEnded,
+		cancelOn = this.enums.events.lockpickingEnded,
 		---@type onStartLockAnimationData
 		data = {
 			mesh = lock.mesh,
@@ -165,7 +166,7 @@ end
 ---@return tes3vector3
 function this.getTargetTranslation(lock)
 	local direction = tes3.getCameraVector()
-	local forward = direction:normalized() * CONSTANTS.targetDistance
+	local forward = direction:normalized() * this.enums.constants.locks.targetDistance
 
 	local translation = lock.mesh.translation + forward
 

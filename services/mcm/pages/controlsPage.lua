@@ -1,7 +1,3 @@
-local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
-local ACTIVATION_STRATEGY_NAMES = require(
-    "tauer.modern-lockpicking.services.lockpicking.activation-strategies.enums.ACTIVATION_STRATEGY_NAMES")
-
 ---@class controlsPage : mcmPage
 local this = {}
 
@@ -9,19 +5,23 @@ local this = {}
 ---@param template mwseMCMTemplate
 ---@param services serviceCollection
 function this.initialize(template, services)
-    local translations = services.translations
-    local settings = services.mcmSettings.mcm
+    local settings = services.settings
 
-    local controlsPage = template:createSideBarPage { label = translations.get(TRANSLATION_KEY.interfaceControlsHeader) }
+    local translations = services.translations
+    local translationKeys = services.enums.translationKeys
+
+    local activationStrategyNames = services.enums.activationStrategyNames
+
+    local controlsPage = template:createSideBarPage { label = translations.get(translationKeys.interfaceControlsHeader) }
 
     local rotateLockCategory = controlsPage:createCategory({
-        label = translations.get(TRANSLATION_KEY.interfaceControlsRotateLock),
-        description = translations.get(TRANSLATION_KEY.mcmDescriptionRotateLock),
+        label = translations.get(translationKeys.interfaceControlsRotateLock),
+        description = translations.get(translationKeys.mcmDescriptionRotateLock),
     })
 
     rotateLockCategory:createKeyBinder({
-        label = translations.get(TRANSLATION_KEY.mcmLabelsLeft),
-        description = translations.get(TRANSLATION_KEY.mcmDescriptionRotateLockCounterclockwise),
+        label = translations.get(translationKeys.mcmLabelsLeft),
+        description = translations.get(translationKeys.mcmDescriptionRotateLockCounterclockwise),
         allowCombinations = false,
         variable = mwse.mcm.createTableVariable({
             id = "rotateLockCounterclockwise",
@@ -30,8 +30,8 @@ function this.initialize(template, services)
     })
 
     rotateLockCategory:createKeyBinder({
-        label = translations.get(TRANSLATION_KEY.mcmLabelsRight),
-        description = translations.get(TRANSLATION_KEY.mcmDescriptionRotateLockClockwise),
+        label = translations.get(translationKeys.mcmLabelsRight),
+        description = translations.get(translationKeys.mcmDescriptionRotateLockClockwise),
         allowCombinations = false,
         variable = mwse.mcm.createTableVariable({
             id = "rotateLockClockwise",
@@ -41,13 +41,13 @@ function this.initialize(template, services)
 
 
     local cyclePicksCategory = controlsPage:createCategory({
-        label = translations.get(TRANSLATION_KEY.interfaceControlsCyclePicks),
-        description = translations.get(TRANSLATION_KEY.mcmDescriptionCyclePicks),
+        label = translations.get(translationKeys.interfaceControlsCyclePicks),
+        description = translations.get(translationKeys.mcmDescriptionCyclePicks),
     })
 
     cyclePicksCategory:createKeyBinder({
-        label = translations.get(TRANSLATION_KEY.mcmLabelsPrevious),
-        description = translations.get(TRANSLATION_KEY.mcmDescriptionCyclePreviousPick),
+        label = translations.get(translationKeys.mcmLabelsPrevious),
+        description = translations.get(translationKeys.mcmDescriptionCyclePreviousPick),
         allowCombinations = false,
         variable = mwse.mcm.createTableVariable({
             id = "cyclePreviousPick",
@@ -57,8 +57,8 @@ function this.initialize(template, services)
 
 
     cyclePicksCategory:createKeyBinder({
-        label = translations.get(TRANSLATION_KEY.mcmLabelsNext),
-        description = translations.get(TRANSLATION_KEY.mcmDescriptionCycleNextPick),
+        label = translations.get(translationKeys.mcmLabelsNext),
+        description = translations.get(translationKeys.mcmDescriptionCycleNextPick),
         allowCombinations = false,
         variable = mwse.mcm.createTableVariable({
             id = "cycleNextPick",
@@ -67,15 +67,15 @@ function this.initialize(template, services)
     })
 
     local activationCategory = controlsPage:createCategory({
-        label = translations.get(TRANSLATION_KEY.mcmActivationMethodCategory),
+        label = translations.get(translationKeys.mcmActivationMethodCategory),
     })
 
     activationCategory:createCycleButton({
-        label = translations.get(TRANSLATION_KEY.mcmActivationMethodLabel),
-        description = translations.get(TRANSLATION_KEY.mcmActivationMethodDesc),
+        label = translations.get(translationKeys.mcmActivationMethodLabel),
+        description = translations.get(translationKeys.mcmActivationMethodDesc),
         options = {
-            { text = translations.get(TRANSLATION_KEY.mcmActivationMethodDefault), value = ACTIVATION_STRATEGY_NAMES.default },
-            { text = translations.get(TRANSLATION_KEY.mcmActivationMethodAttack),  value = ACTIVATION_STRATEGY_NAMES.attack },
+            { text = translations.get(translationKeys.mcmActivationMethodDefault), value = activationStrategyNames.default },
+            { text = translations.get(translationKeys.mcmActivationMethodAttack),  value = activationStrategyNames.attack },
         },
         variable = mwse.mcm.createTableVariable({
             id = "activationStrategy",
@@ -84,8 +84,8 @@ function this.initialize(template, services)
     })
 
     activationCategory:createOnOffButton({
-        label = translations.get(TRANSLATION_KEY.mcmAllowEquipPicksLabel),
-        description = translations.get(TRANSLATION_KEY.mcmAllowEquipPicksDesc),
+        label = translations.get(translationKeys.mcmAllowEquipPicksLabel),
+        description = translations.get(translationKeys.mcmAllowEquipPicksDesc),
         variable = mwse.mcm.createTableVariable({
             id = "allowEquipPicks",
             table = settings,
@@ -93,13 +93,13 @@ function this.initialize(template, services)
     })
 
     local otherCategory = controlsPage:createCategory({
-        label = translations.get(TRANSLATION_KEY.mcmLabelsOther),
-        description = translations.get(TRANSLATION_KEY.mcmDescriptionOther),
+        label = translations.get(translationKeys.mcmLabelsOther),
+        description = translations.get(translationKeys.mcmDescriptionOther),
     })
 
     otherCategory:createKeyBinder({
-        label = translations.get(TRANSLATION_KEY.interfaceControlsExit),
-        description = translations.get(TRANSLATION_KEY.mcmDescriptionExit),
+        label = translations.get(translationKeys.interfaceControlsExit),
+        description = translations.get(translationKeys.mcmDescriptionExit),
         allowCombinations = false,
         variable = mwse.mcm.createTableVariable({
             id = "exit",

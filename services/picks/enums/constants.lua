@@ -1,4 +1,4 @@
----@enum PICK_CONSTANTS
+---@enum pickConstants
 local enum = {
 	rotation = {
 		original = tes3vector3.new(-0.19, 1.41, 0.10),

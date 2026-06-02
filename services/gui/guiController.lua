@@ -1,9 +1,3 @@
---- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
-local CONSTANTS = require("tauer.modern-lockpicking.services.gui.enums.CONSTANTS")
----
-
 ---@class guiController : initializedService
 local this = {}
 
@@ -35,6 +29,10 @@ this.picks = nil
 ---@type number
 this.usesTooltipId = -1217
 
+---@private
+---@type enums
+this.enums = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
@@ -42,13 +40,18 @@ function this.initialize(services)
 	this.guiBuilder   = services.guiBuilder
 	this.translations = services.translations
 	this.settings     = services.settings
+	this.enums        = services.enums
 
 	event.register(tes3.event.load, this.onLoad)
-	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
-	event.register(EVENTS.pickBroken, this.onPickBroken)
 	event.register(tes3.event.uiObjectTooltip, this.onUiObjectTooltip)
 	event.register(tes3.event.uiActivated, this.uiActivated, { filter = "MenuOptions" })
+
+	local events = this.enums.events
+
+	event.register(events.lockpickingStart, this.onLockpickingStart)
+	event.register(events.lockpickingEnded, this.onLockpickingEnded)
+	event.register(events.pickBroken, this.onPickBroken)
+
 	return true, nil
 end
 
@@ -93,7 +96,7 @@ end
 ---@return tes3uiElement
 function this.createHeader(e)
 	local header = this.guiBuilder.createMenu({
-			id = CONSTANTS.headerId,
+			id = this.enums.constants.gui.headerId,
 			dragFrame = false,
 			fixedFrame = true,
 			modal = true
@@ -164,8 +167,11 @@ end
 ---@private
 ---@return tes3uiElement
 function this.createControls()
+	local enums = this.enums
+	local constants = enums.constants.gui
+
 	local controls = this.guiBuilder.createMenu({
-			id = CONSTANTS.controlsId,
+			id = constants.controlsId,
 			dragFrame = false,
 			fixedFrame = true,
 			modal = true
@@ -183,7 +189,7 @@ function this.createControls()
 		:wuild()
 
 	this.guiBuilder.createLabel({ parent = outerBlock })
-		:withText(this.translations.get(TRANSLATION_KEY.interfaceControlsHeader))
+		:withText(this.translations.get(enums.translationKeys.interfaceControlsHeader))
 		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:wuild()
 
@@ -200,13 +206,13 @@ function this.createControls()
 			x = 0.5,
 			y = 0.5,
 		})
-		:withCallback(EVENTS.settingsUpdated, this.onKeyBindsUpdated)
+		:withCallback(enums.events.settingsUpdated, this.onKeyBindsUpdated)
 		:wuild()
 
 	local controlTexts = this.getControlTexts()
 
 	for i, text in ipairs(controlTexts) do
-		this.guiBuilder.createLabel({ parent = innerBlock, id = string.format(CONSTANTS.controlsLabelId, i) })
+		this.guiBuilder.createLabel({ parent = innerBlock, id = string.format(constants.controlsLabelId, i) })
 			:withText(text)
 			:withColor(tes3ui.getPalette(tes3.palette.normalColor))
 			:wuild()
@@ -238,14 +244,16 @@ function this.getControlTexts()
 
 	local exit = this.getKeyName(this.settings.keyBinds.exit)
 
+	local translationKeys = this.enums.translationKeys
+
 	return {
-		string.format("%s: %s", this.translations.get(TRANSLATION_KEY.interfaceControlsRotatePick), mouse),
-		string.format("%s: %s / %s", this.translations.get(TRANSLATION_KEY.interfaceControlsRotateLock),
+		string.format("%s: %s", this.translations.get(translationKeys.interfaceControlsRotatePick), mouse),
+		string.format("%s: %s / %s", this.translations.get(translationKeys.interfaceControlsRotateLock),
 			rotateLockCounterclockwise, rotateLockClockwise),
-		string.format("%s: %s / %s", this.translations.get(TRANSLATION_KEY.interfaceControlsCyclePicks),
+		string.format("%s: %s / %s", this.translations.get(translationKeys.interfaceControlsCyclePicks),
 			cyclePreviousPick,
 			cycleNextPick),
-		string.format("%s: %s", this.translations.get(TRANSLATION_KEY.interfaceControlsExit), exit),
+		string.format("%s: %s", this.translations.get(translationKeys.interfaceControlsExit), exit),
 	}
 end
 
@@ -261,8 +269,12 @@ end
 ---@param picks tes3itemStack[]
 ---@return tes3uiElement
 function this.createPicks(activePick, picks)
+	local enums = this.enums
+	local constants = enums.constants.gui
+	local events = enums.events
+
 	local picksMenu = this.guiBuilder.createMenu({
-			id = CONSTANTS.picksId,
+			id = constants.picksId,
 			dragFrame = false,
 			fixedFrame = true,
 			modal = true
@@ -281,7 +293,7 @@ function this.createPicks(activePick, picks)
 		:wuild()
 
 	this.guiBuilder.createLabel({ parent = upperBlock })
-		:withText(this.translations.get(TRANSLATION_KEY.interfacePicksHeader))
+		:withText(this.translations.get(enums.translationKeys.interfacePicksHeader))
 		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:wuild()
 
@@ -313,7 +325,7 @@ function this.createPicks(activePick, picks)
 
 		this.guiBuilder.createLabel({
 			parent = pickLabelContainer,
-			id = string.format(CONSTANTS.picksLabelId,
+			id = string.format(constants.picksLabelId,
 				pick.object.id)
 		})
 			:withText(pick.object.name)
@@ -323,12 +335,12 @@ function this.createPicks(activePick, picks)
 				bottom = verticalBorder,
 				right = horizontalBorder,
 			})
-			:withCallback(EVENTS.pickCycled, this.onPickCycled)
+			:withCallback(events.pickCycled, this.onPickCycled)
 			:wuild()
 
 		this.guiBuilder.createLabel({
 			parent = pickCountLabelContainer,
-			id = string.format(CONSTANTS.picksCountLabelId,
+			id = string.format(constants.picksCountLabelId,
 				pick.object.id)
 		})
 			:withText(string.format("%d", pick.count))
@@ -337,7 +349,7 @@ function this.createPicks(activePick, picks)
 				top = verticalBorder,
 				bottom = verticalBorder,
 			})
-			:withCallback(EVENTS.pickCycled, this.onPickCycled)
+			:withCallback(events.pickCycled, this.onPickCycled)
 			:wuild()
 	end
 
@@ -369,7 +381,7 @@ end
 function this.onKeyBindsUpdated(element)
 	local texts = this.getControlTexts()
 	for i, text in ipairs(texts) do
-		local label = element:findChild(string.format(CONSTANTS.controlsLabelId, i))
+		local label = element:findChild(string.format(this.enums.constants.gui.controlsLabelId, i))
 		if not label then
 			return
 		else
@@ -391,16 +403,20 @@ end
 ---@private
 ---@param e pickBrokenEventData
 function this.onPickBroken(e)
-	if not this.picks then return end
+	if not this.picks then
+		return
+	end
+
+	local constants = this.enums.constants.gui
 
 	local objectId = e.pick.item.object.id
-	local countLabel = this.picks:findChild(string.format(CONSTANTS.picksCountLabelId, objectId))
+	local countLabel = this.picks:findChild(string.format(constants.picksCountLabelId, objectId))
 	if not countLabel then return end
 
 	local newCount = math.max(0, (tonumber(countLabel.text) or 1) - 1)
 
 	if newCount == 0 then
-		local nameLabel = this.picks:findChild(string.format(CONSTANTS.picksLabelId, objectId))
+		local nameLabel = this.picks:findChild(string.format(constants.picksLabelId, objectId))
 		if nameLabel then nameLabel:destroy() end
 		countLabel:destroy()
 	else
@@ -445,7 +461,7 @@ function this.onUiObjectTooltip(e)
 	local conditionRatio = itemData and math.max(0, itemData.condition / e.object.maxCondition) or 1
 	usesTooltip.text = string.format(
 		"%s: %d%%",
-		this.translations.get(TRANSLATION_KEY.tooltipPickHealth),
+		this.translations.get(this.enums.translationKeys.tooltipPickHealth),
 		math.round(conditionRatio * 100))
 
 	e.tooltip:updateLayout()
@@ -458,12 +474,12 @@ function this.uiActivated(e)
 		tes3.uiEvent.destroy,
 		this.onOptionsMenuClosed
 	)
-	event.trigger(EVENTS.optionsMenuOpened)
+	event.trigger(this.enums.events.optionsMenuOpened)
 end
 
 ---@private
 function this.onOptionsMenuClosed()
-	event.trigger(EVENTS.optionsMenuClosed)
+	event.trigger(this.enums.events.optionsMenuClosed)
 end
 
 return this

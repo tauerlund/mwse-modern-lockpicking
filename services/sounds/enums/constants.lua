@@ -1,4 +1,4 @@
----@enum SOUND_CONSTANTS
+---@enum soundConstants
 local enum = {
     paths = {
         sound = "data files/sound",

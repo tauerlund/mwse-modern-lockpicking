@@ -1,8 +1,3 @@
---- ENUMS
-local CONSTANTS = require("tauer.modern-lockpicking.services.picks.enums.CONSTANTS")
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
----
-
 ---@class pickAnimator : initializedService
 local this = {}
 
@@ -52,33 +47,11 @@ this.targetHelperAngle = 0
 
 ---@private
 ---@type nodeAnimatorKeyframe[]
-this.startAnimationKeyFrames = {
-	{
-		time = 0,
-		translation = CONSTANTS.translation.original,
-		rotation = CONSTANTS.rotation.original,
-	},
-	{
-		time = CONSTANTS.animation.startAnimationDuration,
-		translation = CONSTANTS.translation.target,
-		rotation = CONSTANTS.rotation.target,
-	}
-}
+this.startAnimationKeyFrames = nil
 
 ---@private
 ---@type nodeAnimatorKeyframe[]
-this.cycleAnimationKeyFrames = {
-	{
-		time = 0,
-		translation = CONSTANTS.translation.original,
-		rotation = CONSTANTS.rotation.original,
-	},
-	{
-		time = CONSTANTS.animation.cycleAnimationDuration,
-		translation = CONSTANTS.translation.target,
-		rotation = CONSTANTS.rotation.target,
-	}
-}
+this.cycleAnimationKeyFrames = nil
 
 ---@private
 ---@type tes3matrix33
@@ -92,22 +65,55 @@ this.nodeAnimator = nil
 ---@type timerManager
 this.timerManager = nil
 
+---@private
+---@type enums
+this.enums = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
 function this.initialize(services)
 	this.nodeAnimator = services.nodeAnimator
 	this.timerManager = services.timerManager
+	this.enums = services.enums
 
-	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
-	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
-	event.register(EVENTS.pickCycled, this.onPickCycled)
-	event.register(EVENTS.rotationStarted, this.onRotationStarted)
-	event.register(EVENTS.rotationEnded, this.onRotationEnded)
-	event.register(EVENTS.cylinderBlocked, this.onCylinderBlocked)
-	event.register(EVENTS.optionsMenuOpened, this.onOptionsMenuOpened)
-	event.register(EVENTS.optionsMenuClosed, this.onOptionsMenuClosed)
+	local events = services.enums.events
+	local constants = services.enums.constants.picks
+
+	this.startAnimationKeyFrames = {
+		{
+			time = 0,
+			translation = constants.translation.original,
+			rotation = constants.rotation.original,
+		},
+		{
+			time = constants.animation.startAnimationDuration,
+			translation = constants.translation.target,
+			rotation = constants.rotation.target,
+		}
+	}
+	this.cycleAnimationKeyFrames = {
+		{
+			time = 0,
+			translation = constants.translation.original,
+			rotation = constants.rotation.original,
+		},
+		{
+			time = constants.animation.cycleAnimationDuration,
+			translation = constants.translation.target,
+			rotation = constants.rotation.target,
+		}
+	}
+
+	event.register(events.lockpickingStart, this.onLockpickingStart)
+	event.register(events.lockpickingEnd, this.onLockpickingEnd)
+	event.register(events.lockpickingEnded, this.onLockpickingEnded)
+	event.register(events.pickCycled, this.onPickCycled)
+	event.register(events.rotationStarted, this.onRotationStarted)
+	event.register(events.rotationEnded, this.onRotationEnded)
+	event.register(events.cylinderBlocked, this.onCylinderBlocked)
+	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
+	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
 	return true, nil
 end
 
@@ -215,12 +221,12 @@ function this.start(pick, keyframes)
 	this.nodeAnimator.start({
 		node = pick.mesh,
 		keyframes = keyframes,
-		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickCycled },
+		cancelOn = { this.enums.events.lockpickingEnded, this.enums.events.pickCycled },
 	})
 
 	this.timerManager.start({
 		durationInSeconds = keyframes[#keyframes].time,
-		cancelOn = { EVENTS.lockpickingEnded, EVENTS.pickCycled },
+		cancelOn = { this.enums.events.lockpickingEnded, this.enums.events.pickCycled },
 		finishedCallback = this.onStartTimerFinished,
 	})
 end
@@ -276,14 +282,15 @@ end
 ---@private
 ---@param delta number
 function this.updateAngle(delta)
-	local transition = math.min(CONSTANTS.animation.lerpSpeed * delta, 1)
+	local transition = math.min(this.enums.constants.picks.animation.lerpSpeed * delta, 1)
 	this.currentHelperAngle = math.lerp(this.currentHelperAngle, this.targetHelperAngle, transition)
 end
 
 ---@private
 ---@return number
 function this.computeJiggleAmplitude()
-	local base = CONSTANTS.animation.jiggleAmplitude
+	local constants = this.enums.constants.picks
+	local base = constants.animation.jiggleAmplitude
 	if not this.item then
 		return base
 	end
@@ -298,13 +305,14 @@ function this.computeJiggleAmplitude()
 	end
 
 	local conditionRatio = itemData and math.max(0, itemData.condition / this.item.object.maxCondition) or 1
-	return base * (1 + CONSTANTS.animation.jiggleDamageFactor * (1 - conditionRatio))
+	return base * (1 + constants.animation.jiggleDamageFactor * (1 - conditionRatio))
 end
 
 ---@private
 function this.updateJiggle(delta)
-	this.jigglePhase = this.jigglePhase + CONSTANTS.animation.jiggleSpeed * delta
-	local wave = math.sin(this.jigglePhase) + math.sin(this.jigglePhase * 1.7 + 1.3) * CONSTANTS.animation.jiggleNoise
+	local constants = this.enums.constants.picks
+	this.jigglePhase = this.jigglePhase + constants.animation.jiggleSpeed * delta
+	local wave = math.sin(this.jigglePhase) + math.sin(this.jigglePhase * 1.7 + 1.3) * constants.animation.jiggleNoise
 	this.jiggleOffset = wave * this.computeJiggleAmplitude()
 	this.rotateHelper()
 	this.rotatePick()

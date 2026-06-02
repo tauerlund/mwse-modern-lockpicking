@@ -1,7 +1,3 @@
---- ENUMS
-local CONSTANTS = require("tauer.modern-lockpicking.services.sounds.enums.CONSTANTS")
----
-
 ---@class soundFileResolver : initializedService
 local this = {}
 
@@ -19,18 +15,26 @@ this.empty = {
     duration = 0,
 }
 
+---@private
+---@type enums
+this.enums = nil
+
 ---@public
----@param _ serviceCollection
+---@param services serviceCollection
 ---@return boolean,string|nil
-function this.initialize(_)
-    for file in lfs.dir(string.format("%s/%s", CONSTANTS.paths.sound, CONSTANTS.paths.mod)) do
+function this.initialize(services)
+    this.enums = services.enums
+
+    local constants = services.enums.constants.sounds
+
+    for file in lfs.dir(string.format("%s/%s", constants.paths.sound, constants.paths.mod)) do
         if file:match("%.wav$") then
             local name = file:match("^(.*)%.wav$")
             local template = name:gsub("%-%d+$", "")
 
             this.sounds[template] = this.sounds[template] or {}
 
-            local path = string.format("%s/%s", CONSTANTS.paths.mod, file)
+            local path = string.format("%s/%s", constants.paths.mod, file)
             ---@type soundFile
             local soundFile = {
                 path = path,
@@ -65,7 +69,7 @@ end
 ---@private
 ---@return boolean, string|nil
 function this.validate()
-    for _, template in pairs(CONSTANTS.templates) do
+    for _, template in pairs(this.enums.constants.sounds.templates) do
         if not this.sounds[template] then
             return false, string.format("sound template '%s' is missing or has no sound files.", template)
         end
@@ -77,11 +81,13 @@ end
 ---@param path string
 ---@return number
 function this.calculateDuration(path)
-    local fileSize = lfs.attributes(string.format("%s/%s", CONSTANTS.paths.sound, path), "size")
+    local constants = this.enums.constants.sounds
 
-    local headerSize = CONSTANTS.wav.headerSize
-    local sampleRate = CONSTANTS.wav.sampleRate
-    local bytesPerSample = CONSTANTS.wav.bytesPerSample
+    local fileSize = lfs.attributes(string.format("%s/%s", constants.paths.sound, path), "size")
+
+    local headerSize = constants.wav.headerSize
+    local sampleRate = constants.wav.sampleRate
+    local bytesPerSample = constants.wav.bytesPerSample
 
     local bytesPerSecond = sampleRate * bytesPerSample
 

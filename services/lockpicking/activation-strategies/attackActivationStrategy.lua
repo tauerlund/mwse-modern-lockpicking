@@ -1,17 +1,25 @@
-local timerManager = require("tauer.modern-lockpicking.services.timers.timerManager")
-
---- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local ACTIVATION_STRATEGY_NAMES = require(
-    "tauer.modern-lockpicking.services.lockpicking.activation-strategies.enums.ACTIVATION_STRATEGY_NAMES")
----
-
 ---@class attackActivationStrategy : activationStrategy
 local this = {}
 
 ---@public
 ---@type string
-this.name = ACTIVATION_STRATEGY_NAMES.attack
+this.name = nil
+
+---@private
+---@type enums
+this.enums = nil
+
+---@private
+---@type timerManager
+this.timerManager = nil
+
+---@public
+---@param services serviceCollection
+function this.initialize(services)
+    this.name = services.enums.activationStrategyNames.attack
+    this.enums = services.enums
+    this.timerManager = services.timerManager
+end
 
 ---@public
 function this.enable()
@@ -36,7 +44,7 @@ function this.onLockPick(e)
 
     e.block = true
 
-    timerManager.start({
+    this.timerManager.start({
         finishedCallback = this.onStartTimerFinished,
         durationInSeconds = 0.5,
         ---@class attackActivationStrategy.startTimer.data
@@ -53,7 +61,7 @@ function this.onStartTimerFinished(data)
     local eventData = {
         activator = data.activator
     }
-    event.trigger(EVENTS.lockpickingActivated, eventData)
+    event.trigger(this.enums.events.lockpickingActivated, eventData)
 end
 
 return this

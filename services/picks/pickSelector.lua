@@ -1,10 +1,3 @@
---- ENUMS
-local CYCLE = require("tauer.modern-lockpicking.services.lockpicking.enums.CYCLE_DIRECTION")
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local ACTIVATION_STRATEGY_NAMES = require(
-    "tauer.modern-lockpicking.services.lockpicking.activation-strategies.enums.ACTIVATION_STRATEGY_NAMES")
----
-
 ---@class pickSelector : initializedService
 local this = {}
 
@@ -28,6 +21,10 @@ this.inventoryController = nil
 ---@type settings
 this.settings = nil
 
+---@private
+---@type enums
+this.enums = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean, string|nil
@@ -35,9 +32,11 @@ function this.initialize(services)
     this.playerDataController = services.playerDataController
     this.inventoryController = services.inventoryController
     this.settings = services.mcmSettings.mcm
+    this.enums = services.enums
+    local events = services.enums.events
 
-    event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
-    event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+    event.register(events.lockpickingStarted, this.onLockpickingStarted)
+    event.register(events.lockpickingEnded, this.onLockpickingEnded)
     return true, nil
 end
 
@@ -55,7 +54,7 @@ end
 
 ---@public
 ---@param picks tes3itemStack[]
----@param direction CYCLE_DIRECTION?
+---@param direction cycleDirections?
 ---@return tes3itemStack
 function this.select(picks, direction)
     if not direction then
@@ -65,7 +64,7 @@ function this.select(picks, direction)
 
     local startIndex = this.currentIndex
     repeat
-        if direction == CYCLE.next then
+        if direction == this.enums.cycleDirections.next then
             this.currentIndex = this.incrementIndex(picks)
         else
             this.currentIndex = this.decrementIndex(picks)
@@ -118,7 +117,7 @@ end
 ---@private
 ---@return string|nil
 function this.tryResolvePickId()
-    if this.settings.activationStrategy == ACTIVATION_STRATEGY_NAMES.attack then
+    if this.settings.activationStrategy == this.enums.activationStrategyNames.attack then
         return this.tryResolveEquippedPickId()
     end
     return this.tryResolveLastPickId()

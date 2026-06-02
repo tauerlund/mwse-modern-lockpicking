@@ -1,8 +1,3 @@
---- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local DIRECTION = require("tauer.modern-lockpicking.services.lockpicking.enums.ROTATION_DIRECTION")
----
-
 ---@class cylinderAnimator : initializedService
 local this = {}
 
@@ -15,11 +10,10 @@ this.cylinder = nil
 this.phase = 0
 
 ---@private
----@type ROTATION_DIRECTION|nil
+---@type rotationDirections|nil
 this.rotationDirection = nil
 
 ---@private
----@type boolean
 this.blocked = false
 
 ---@private
@@ -29,21 +23,28 @@ this.constants = {
 }
 
 ---@private
----@type tes3matrix33
 this.rotationBuffer = tes3matrix33.new()
 
+---@private
+---@type enums
+this.enums = nil
+
 ---@public
----@param _ serviceCollection
+---@param services serviceCollection
 ---@return boolean,string|nil
-function this.initialize(_)
-	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
-	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
-	event.register(EVENTS.rotationStarted, this.onRotationStarted)
-	event.register(EVENTS.rotationEnded, this.onRotationEnded)
-	event.register(EVENTS.cylinderBlocked, this.onCylinderBlocked)
-	event.register(EVENTS.optionsMenuOpened, this.onOptionsMenuOpened)
-	event.register(EVENTS.optionsMenuClosed, this.onOptionsMenuClosed)
+function this.initialize(services)
+	this.enums = services.enums
+
+	local events = services.enums.events
+
+	event.register(events.lockpickingStart, this.onLockpickingStart)
+	event.register(events.lockpickingEnd, this.onLockpickingEnd)
+	event.register(events.lockpickingEnded, this.onLockpickingEnded)
+	event.register(events.rotationStarted, this.onRotationStarted)
+	event.register(events.rotationEnded, this.onRotationEnded)
+	event.register(events.cylinderBlocked, this.onCylinderBlocked)
+	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
+	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
 	return true, nil
 end
 
@@ -125,7 +126,7 @@ function this.onEnterFrame(e)
 		local multiplier = rotation <= 0 and 1 or -1
 		this.updatePhase(multiplier, this.constants.resetSpeed, e.delta)
 	else
-		local multiplier = this.rotationDirection == DIRECTION.counterClockwise and 1 or -1
+		local multiplier = this.rotationDirection == this.enums.rotationDirections.counterClockwise and 1 or -1
 		this.updatePhase(multiplier, this.constants.rotateSpeed, e.delta)
 	end
 

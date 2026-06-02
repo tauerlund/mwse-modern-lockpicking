@@ -1,4 +1,4 @@
----@enum GUI_CONSTANTS
+---@enum guiConstants
 local enum = {
     headerId = "tauer.modern-lockpicking.gui.header",
     controlsId = "tauer.modern-lockpicking.gui.controls",

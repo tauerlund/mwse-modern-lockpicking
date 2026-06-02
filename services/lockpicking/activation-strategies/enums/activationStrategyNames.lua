@@ -1,4 +1,4 @@
----@enum ACTIVATION_STRATEGY_NAMES
+---@enum activationStrategyNames
 local this = {
     default = "default",
     attack = "attack"

@@ -1,4 +1,4 @@
----@enum OBJECT_NAMES
+---@enum objectNames
 local enum = {
 	knife = "ModernLockpicking:Knife",
 	knifeHelper = "ModernLockpicking:KnifeHelper",

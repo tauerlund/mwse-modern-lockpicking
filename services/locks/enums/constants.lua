@@ -1,4 +1,4 @@
----@enum LOCK_CONSTANTS
+---@enum lockConstants
 local enum = {
 	targetDistance = 65,
 	paths = {

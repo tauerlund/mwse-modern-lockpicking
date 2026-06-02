@@ -49,7 +49,34 @@ local this = {
 
     translations = require("tauer.modern-lockpicking.services.translations.translations"),
 
-    playerDataController = require("tauer.modern-lockpicking.services.player.playerDataController")
+    playerDataController = require("tauer.modern-lockpicking.services.player.playerDataController"),
+
+    ---@class enums
+    enums = {
+        events = require("tauer.modern-lockpicking.services.events.enums.events"),
+        rotationDirections = require("tauer.modern-lockpicking.services.lockpicking.enums.rotationDirections"),
+        cycleDirections = require("tauer.modern-lockpicking.services.lockpicking.enums.cycleDirections"),
+        activationStrategyNames = require(
+            "tauer.modern-lockpicking.services.lockpicking.activation-strategies.enums.activationStrategyNames"),
+        fileTypes = require("tauer.modern-lockpicking.services.files.enums.fileType"),
+        translationKeys = require("tauer.modern-lockpicking.services.translations.enums.translationKeys"),
+        objectNames = require("tauer.modern-lockpicking.services.nodes.enums.objectNames"),
+        zBufferIndex = require("tauer.modern-lockpicking.services.rendering.enums.zBufferIndex"),
+
+        ---@class constants
+        constants = {
+            cylinder = require("tauer.modern-lockpicking.services.lockpicking.enums.constants"),
+            lockpicking = require("tauer.modern-lockpicking.services.lockpicking.enums.constants"),
+            gui = require("tauer.modern-lockpicking.services.gui.enums.constants"),
+            knives = require("tauer.modern-lockpicking.services.knives.enums.constants"),
+            sounds = require("tauer.modern-lockpicking.services.sounds.enums.constants"),
+            picks = require("tauer.modern-lockpicking.services.picks.enums.constants"),
+            locks = require("tauer.modern-lockpicking.services.locks.enums.constants"),
+            rendering = require("tauer.modern-lockpicking.services.rendering.enums.constants"),
+            skills = require("tauer.modern-lockpicking.services.skills.enums.constants"),
+            timers = require("tauer.modern-lockpicking.services.timers.enums.constants"),
+        }
+    }
 }
 
 return this

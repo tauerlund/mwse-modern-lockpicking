@@ -1,4 +1,4 @@
----@enum Z_BUFFER_INDEX
+---@enum zBufferIndex
 local enum = {
 	test = 0,
 	write = 1,

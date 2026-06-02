@@ -24,7 +24,7 @@
 ---@class settings
 ---@field public keyBinds keybindSettings
 ---@field public logLevel string
----@field public activationStrategy string
+---@field public activationStrategy string|nil
 ---@field public allowEquipPicks boolean
 ---@field public difficulty difficultySettings
 ---@field public debugging debuggingSettings

@@ -1,4 +1,4 @@
----@enum KNIFE_CONSTANTS
+---@enum knifeConstants
 local enum = {
 	rotation = {
 		original = tes3vector3.new(-1.65, -1.37, 0.85),

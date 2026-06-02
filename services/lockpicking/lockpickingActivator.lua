@@ -1,7 +1,3 @@
---- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
----
-
 ---@class lockpickingActivator : initializedService
 local this = {}
 
@@ -21,11 +17,17 @@ this.activationStrategies = nil
 ---@type activationStrategy
 this.currentActivationStrategy = nil
 
+---@private
+---@type enums
+this.enums = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean, string|nil
 function this.initialize(services)
+	this.enums = services.enums
 	this.settings = services.settings
+	local events = services.enums.events
 
 	this.activationStrategies = services.strategyLoader.loadAll({
 		directory = "tauer\\modern-lockpicking\\services\\lockpicking\\activation-strategies",
@@ -36,7 +38,7 @@ function this.initialize(services)
 		return false, "Failed to load activation strategies"
 	end
 
-	event.register(EVENTS.settingsUpdated, this.onSettingsUpdated)
+	event.register(events.settingsUpdated, this.onSettingsUpdated)
 	this.applyStrategy()
 
 	return true, nil
@@ -48,7 +50,9 @@ function this.applyStrategy()
 		this.currentActivationStrategy.disable()
 	end
 
-	this.currentActivationStrategy = this.activationStrategies[this.settings.activationStrategy]
+	local strategyName = this.settings.activationStrategy or this.enums.activationStrategyNames.default
+
+	this.currentActivationStrategy = this.activationStrategies[strategyName]
 	this.currentActivationStrategy.enable()
 end
 

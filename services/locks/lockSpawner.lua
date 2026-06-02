@@ -1,7 +1,3 @@
-local Z_BUFFER_INDEX = require("tauer.modern-lockpicking.services.rendering.enums.Z_BUFFER_INDEX")
-local OBJECT_NAMES = require("tauer.modern-lockpicking.services.nodes.enums.OBJECT_NAMES")
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-
 ---@class lockSpawner : initializedService
 local this = {}
 
@@ -9,13 +5,19 @@ local this = {}
 ---@type lockMeshResolver
 this.lockMeshResolver = nil
 
+---@private
+---@type enums
+this.enums = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean, string|nil
 function this.initialize(services)
 	this.lockMeshResolver = services.lockMeshResolver
+	this.enums = services.enums
+	local events = services.enums.events
 
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+	event.register(events.lockpickingEnded, this.onLockpickingEnded)
 	return true, nil
 end
 
@@ -27,7 +29,7 @@ function this.spawn(activator)
 
 	return {
 		mesh = mesh,
-		cylinder = mesh:getObjectByName(OBJECT_NAMES.cylinderHelper),
+		cylinder = mesh:getObjectByName(this.enums.objectNames.cylinderHelper),
 		container = activator,
 	}
 end
@@ -95,9 +97,10 @@ end
 ---@return niZBufferProperty
 function this.getZBufferProperty()
 	local property = niZBufferProperty.new()
+	local zBufferIndex = this.enums.zBufferIndex
 
-	property:setFlag(false, Z_BUFFER_INDEX.test)
-	property:setFlag(true, Z_BUFFER_INDEX.write)
+	property:setFlag(false, zBufferIndex.test)
+	property:setFlag(true, zBufferIndex.write)
 	property.testFunction = ni.zBufferPropertyTestFunction.always
 
 	return property

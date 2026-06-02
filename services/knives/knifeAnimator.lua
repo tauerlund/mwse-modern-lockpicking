@@ -1,9 +1,3 @@
---- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local DIRECTION = require("tauer.modern-lockpicking.services.lockpicking.enums.ROTATION_DIRECTION")
-local CONSTANTS = require("tauer.modern-lockpicking.services.knives.enums.CONSTANTS")
----
-
 ---@class knifeAnimator : initializedService
 local this = {}
 
@@ -16,6 +10,10 @@ this.timerManager = nil
 this.nodeAnimator = nil
 
 ---@private
+---@type enums
+this.enums = nil
+
+---@private
 ---@type knife
 this.knife = nil
 
@@ -25,7 +23,7 @@ this.phase = 0
 
 ---@private
 ---@type number
-this.phaseSpeed = CONSTANTS.animation.phaseSpeed
+this.phaseSpeed = 0
 
 ---@private
 ---@type tes3matrix33|nil
@@ -48,11 +46,8 @@ this.currentAngle = 0
 this.blocked = false
 
 ---@private
----@type { [ROTATION_DIRECTION]: number }
-this.angles = {
-	[DIRECTION.clockwise] = CONSTANTS.angles.clockwise,
-	[DIRECTION.counterClockwise] = CONSTANTS.angles.counterClockwise,
-}
+---@type { [rotationDirections]: number }
+this.angles = nil
 
 ---@private
 ---@type tes3matrix33
@@ -60,18 +55,7 @@ this.rotationBuffer = tes3matrix33.new()
 
 ---@private
 ---@type nodeAnimatorKeyframe[]
-this.startAnimationKeyFrames = {
-	{
-		time = 0,
-		translation = CONSTANTS.translation.original,
-		rotation = CONSTANTS.rotation.original,
-	},
-	{
-		time = CONSTANTS.animation.startAnimationDuration,
-		translation = CONSTANTS.translation.target,
-		rotation = CONSTANTS.rotation.target,
-	},
-}
+this.startAnimationKeyFrames = nil
 
 ---@public
 ---@param services serviceCollection
@@ -79,15 +63,37 @@ this.startAnimationKeyFrames = {
 function this.initialize(services)
 	this.timerManager = services.timerManager
 	this.nodeAnimator = services.nodeAnimator
+	this.enums = services.enums
 
-	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
-	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
-	event.register(EVENTS.rotationStarted, this.onRotationStarted)
-	event.register(EVENTS.rotationEnded, this.onRotationEnded)
-	event.register(EVENTS.cylinderBlocked, this.onCylinderBlocked)
-	event.register(EVENTS.optionsMenuOpened, this.onOptionsMenuOpened)
-	event.register(EVENTS.optionsMenuClosed, this.onOptionsMenuClosed)
+	local events = services.enums.events
+	local constants = services.enums.constants.knives
+
+	this.phaseSpeed = constants.animation.phaseSpeed
+	this.angles = {
+		[this.enums.rotationDirections.clockwise] = constants.angles.clockwise,
+		[this.enums.rotationDirections.counterClockwise] = constants.angles.counterClockwise,
+	}
+	this.startAnimationKeyFrames = {
+		{
+			time = 0,
+			translation = constants.translation.original,
+			rotation = constants.rotation.original,
+		},
+		{
+			time = constants.animation.startAnimationDuration,
+			translation = constants.translation.target,
+			rotation = constants.rotation.target,
+		},
+	}
+
+	event.register(events.lockpickingStart, this.onLockpickingStart)
+	event.register(events.lockpickingEnd, this.onLockpickingEnd)
+	event.register(events.lockpickingEnded, this.onLockpickingEnded)
+	event.register(events.rotationStarted, this.onRotationStarted)
+	event.register(events.rotationEnded, this.onRotationEnded)
+	event.register(events.cylinderBlocked, this.onCylinderBlocked)
+	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
+	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
 	return true, nil
 end
 
@@ -129,7 +135,7 @@ end
 function this.onRotationStarted(e)
 	this.targetAngle = this.angles[e.direction]
 	this.sourceAngle = this.currentAngle
-	this.phaseSpeed = CONSTANTS.animation.phaseSpeed
+	this.phaseSpeed = this.enums.constants.knives.animation.phaseSpeed
 	this.phase = 0
 end
 
@@ -182,13 +188,13 @@ function this.start(knife)
 	this.nodeAnimator.start({
 		node = knife,
 		keyframes = this.startAnimationKeyFrames,
-		cancelOn = EVENTS.lockpickingEnded,
+		cancelOn = this.enums.events.lockpickingEnded,
 	})
 
 	this.timerManager.start({
-		durationInSeconds = CONSTANTS.animation.startAnimationDuration,
+		durationInSeconds = this.enums.constants.knives.animation.startAnimationDuration,
 		finishedCallback = this.onStartTimerFinished,
-		cancelOn = EVENTS.lockpickingEnded,
+		cancelOn = this.enums.events.lockpickingEnded,
 	})
 end
 
@@ -217,9 +223,9 @@ end
 ---@private
 function this.getRelativePhaseSpeed()
 	if this.phase == 0 then
-		return CONSTANTS.animation.phaseSpeed
+		return this.enums.constants.knives.animation.phaseSpeed
 	end
-	return CONSTANTS.animation.phaseSpeed / this.phase
+	return this.enums.constants.knives.animation.phaseSpeed / this.phase
 end
 
 return this

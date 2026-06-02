@@ -1,8 +1,3 @@
---- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local CONSTANTS = require("tauer.modern-lockpicking.services.sounds.enums.CONSTANTS")
----
-
 ---@class soundController : initializedService
 local this = {}
 
@@ -39,6 +34,10 @@ this.paused = false
 this.soundFileResolver = nil
 
 ---@private
+---@type enums
+this.enums = nil
+
+---@private
 ---@type integer
 this.debounceInFrames = 3
 
@@ -51,16 +50,19 @@ this.frameCounter = 0
 ---@return boolean,string|nil
 function this.initialize(services)
 	this.soundFileResolver = services.soundFileResolver
+	this.enums = services.enums
 
-	event.register(EVENTS.lockpickingStart, this.onLockpickingStart)
-	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
-	event.register(EVENTS.pickCycled, this.onPickCycled)
-	event.register(EVENTS.rotationStarted, this.onRotationStarted)
-	event.register(EVENTS.rotationEnded, this.onRotationEnded)
-	event.register(EVENTS.cylinderBlocked, this.onCylinderBlocked)
-	event.register(EVENTS.pickBroken, this.onPickBroken)
-	event.register(EVENTS.optionsMenuOpened, this.onOptionsMenuOpened)
-	event.register(EVENTS.optionsMenuClosed, this.onOptionsMenuClosed)
+	local events = services.enums.events
+
+	event.register(events.lockpickingStart, this.onLockpickingStart)
+	event.register(events.lockpickingEnd, this.onLockpickingEnd)
+	event.register(events.pickCycled, this.onPickCycled)
+	event.register(events.rotationStarted, this.onRotationStarted)
+	event.register(events.rotationEnded, this.onRotationEnded)
+	event.register(events.cylinderBlocked, this.onCylinderBlocked)
+	event.register(events.pickBroken, this.onPickBroken)
+	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
+	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
 	return true, nil
 end
 
@@ -77,9 +79,10 @@ end
 ---@private
 ---@param _ lockpickingStartEventData
 function this.onLockpickingStart(_)
+	local constants = this.enums.constants.sounds
 	tes3.playSound({
 		reference = tes3.player,
-		soundPath = this.soundFileResolver.resolve(CONSTANTS.templates.lockpickingStart).path,
+		soundPath = this.soundFileResolver.resolve(constants.templates.lockpickingStart).path,
 	})
 	this.lastCursorPosition = tes3.getCursorPosition().x
 
@@ -91,10 +94,11 @@ end
 ---@private
 ---@param e lockpickingEndEventData
 function this.onLockpickingEnd(e)
+	local constants = this.enums.constants.sounds
 	if e.success then
 		tes3.playSound({
 			reference = tes3.player,
-			soundPath = this.soundFileResolver.resolve(CONSTANTS.templates.unlock).path,
+			soundPath = this.soundFileResolver.resolve(constants.templates.unlock).path,
 		})
 	end
 
@@ -111,7 +115,7 @@ end
 function this.onPickCycled(_)
 	tes3.playSound({
 		reference = tes3.player,
-		soundPath = this.soundFileResolver.resolve(CONSTANTS.templates.changeLockpick).path,
+		soundPath = this.soundFileResolver.resolve(this.enums.constants.sounds.templates.changeLockpick).path,
 	})
 end
 
@@ -119,7 +123,7 @@ end
 function this.onPickBroken()
 	tes3.playSound({
 		reference = tes3.player,
-		soundPath = this.soundFileResolver.resolve(CONSTANTS.templates.breakLockpick).path,
+		soundPath = this.soundFileResolver.resolve(this.enums.constants.sounds.templates.breakLockpick).path,
 	})
 end
 
@@ -143,11 +147,12 @@ end
 ---@private
 ---@param delta number
 function this.playLockpickRotationSound(delta)
+	local constants = this.enums.constants.sounds
 	local currentCursorPosition = tes3.getCursorPosition().x
-	local moved = math.abs(currentCursorPosition - this.lastCursorPosition) > CONSTANTS.lockpickRotationMaxDelta
+	local moved = math.abs(currentCursorPosition - this.lastCursorPosition) > constants.lockpickRotationMaxDelta
 	this.playOnCooldown({
 		state = this.lockpickRotationState,
-		template = CONSTANTS.templates.rotateLockpick,
+		template = constants.templates.rotateLockpick,
 		delta = delta,
 		condition = not this.rotatingCylinder and moved,
 	})
@@ -159,7 +164,7 @@ end
 function this.playCylinderRotationSound(delta)
 	this.playOnCooldown({
 		state = this.cylinderRotationState,
-		template = CONSTANTS.templates.rotateCylinder,
+		template = this.enums.constants.sounds.templates.rotateCylinder,
 		delta = delta,
 		condition = this.rotatingCylinder,
 	})
@@ -170,7 +175,7 @@ end
 function this.playJiggleSound(delta)
 	this.playOnCooldown({
 		state = this.jiggleState,
-		template = CONSTANTS.templates.jiggleLockpick,
+		template = this.enums.constants.sounds.templates.jiggleLockpick,
 		delta = delta,
 		condition = this.jiggling,
 	})

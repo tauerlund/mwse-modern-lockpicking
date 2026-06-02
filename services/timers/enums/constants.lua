@@ -1,4 +1,4 @@
----@enum TIMER_CONSTANTS
+---@enum timerConstants
 local enum = {
 	tick = 0.008,
 }

@@ -1,8 +1,3 @@
---- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
----
-
 ---@class lockpickingController : initializedService
 local this = {}
 
@@ -39,6 +34,10 @@ this.inventoryController = nil
 this.translations = nil
 
 ---@private
+---@type enums
+this.enums = nil
+
+---@private
 ---@type lockpickingSession|nil
 this.session = nil
 
@@ -54,15 +53,17 @@ function this.initialize(services)
 	this.timerManager = services.timerManager
 	this.inventoryController = services.inventoryController
 	this.translations = services.translations
+	this.enums = services.enums
+	local events = services.enums.events
 
-	event.register(EVENTS.lockpickingActivated, this.onLockPickingActivated)
-	event.register(EVENTS.cylinderTargetReached, this.onCylinderTargetReached)
-	event.register(EVENTS.pickCycled, this.onPickCycled)
-	event.register(EVENTS.pickBroken, this.onPickBroken)
-	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
-	event.register(EVENTS.settingsUpdated, this.onSettingsUpdated)
-	event.register(EVENTS.optionsMenuOpened, this.onOptionsMenuOpened)
-	event.register(EVENTS.optionsMenuClosed, this.onOptionsMenuClosed)
+	event.register(events.lockpickingActivated, this.onLockPickingActivated)
+	event.register(events.cylinderTargetReached, this.onCylinderTargetReached)
+	event.register(events.pickCycled, this.onPickCycled)
+	event.register(events.pickBroken, this.onPickBroken)
+	event.register(events.lockpickingEnd, this.onLockpickingEnd)
+	event.register(events.settingsUpdated, this.onSettingsUpdated)
+	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
+	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
 	return true, nil
 end
 
@@ -106,12 +107,12 @@ function this.onLockPickingActivated(e)
 	local eventData = {
 		session = this.session,
 	}
-	event.trigger(EVENTS.lockpickingStart, eventData)
+	event.trigger(this.enums.events.lockpickingStart, eventData)
 
 	this.timerManager.start({
 		durationInSeconds = 1.3,
 		finishedCallback = this.onStartTimerFinished,
-		cancelOn = EVENTS.lockpickingEnded,
+		cancelOn = this.enums.events.lockpickingEnded,
 	})
 end
 
@@ -121,7 +122,7 @@ end
 function this.createSession(activator)
 	local picks = this.inventoryController.getLockpicks()
 	if not picks then
-		tes3.messageBox(this.translations.get(TRANSLATION_KEY.messageBoxNoLockpicks))
+		tes3.messageBox(this.translations.get(this.enums.translationKeys.messageBoxNoLockpicks))
 		return nil
 	end
 
@@ -161,7 +162,7 @@ function this.triggerSweetSpotUpdated()
 		radius = radius,
 		gradientWidth = radius * this.settings.difficulty.gradientFactor,
 	}
-	event.trigger(EVENTS.sweetSpotUpdated, eventData)
+	event.trigger(this.enums.events.sweetSpotUpdated, eventData)
 end
 
 ---@private
@@ -170,7 +171,7 @@ function this.onStartTimerFinished()
 	local eventData = {
 		session = this.session,
 	}
-	event.trigger(EVENTS.lockpickingStarted, eventData)
+	event.trigger(this.enums.events.lockpickingStarted, eventData)
 	this.enableInput()
 	this.triggerSweetSpotUpdated()
 end
@@ -182,7 +183,7 @@ function this.onCylinderTargetReached()
 		session = this.session,
 		success = true,
 	}
-	event.trigger(EVENTS.lockpickingEnd, data)
+	event.trigger(this.enums.events.lockpickingEnd, data)
 end
 
 ---@private
@@ -205,7 +206,7 @@ function this.onKeyUp(e)
 			session = this.session,
 			success = false,
 		}
-		event.trigger(EVENTS.lockpickingEnd, data)
+		event.trigger(this.enums.events.lockpickingEnd, data)
 	end
 end
 
@@ -229,7 +230,7 @@ function this.onEndTimerFinished(data)
 		session = this.session,
 		success = data.success,
 	}
-	event.trigger(EVENTS.lockpickingEnded, eventData)
+	event.trigger(this.enums.events.lockpickingEnded, eventData)
 	this.session = nil
 end
 

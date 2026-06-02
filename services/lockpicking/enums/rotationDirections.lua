@@ -1,4 +1,4 @@
----@enum ROTATION_DIRECTION
+---@enum rotationDirections
 local enum = {
 	clockwise = 0,
 	counterClockwise = 1,

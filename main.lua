@@ -24,6 +24,7 @@ function this.initializeMod(_)
 
 	---@type initializedService[]
 	local initializedServices = {
+		services.strategyLoader,
 		services.lockpickingController,
 		services.lockpickingActivator,
 		services.lockController,
@@ -46,7 +47,8 @@ function this.initializeMod(_)
 		services.inventoryController,
 		services.eventLogger,
 		services.debuggingRenderer,
-		services.nodeAnimator
+		services.nodeAnimator,
+		services.timerManager,
 	}
 
 	for _, service in pairs(initializedServices) do

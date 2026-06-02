@@ -1,7 +1,3 @@
---- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
----
-
 ---@class inventoryController : initializedService
 local this = {}
 
@@ -15,8 +11,11 @@ this.settings = nil
 function this.initialize(services)
 	this.settings = services.settings
 
-	event.register(EVENTS.pickBreak, this.onPickBroken)
-	event.register(EVENTS.settingsUpdated, this.onSettingsUpdated)
+	local events = services.enums.events
+
+	event.register(events.pickBreak, this.onPickBroken)
+	event.register(events.settingsUpdated, this.onSettingsUpdated)
+
 	this.applySettings()
 	return true, nil
 end

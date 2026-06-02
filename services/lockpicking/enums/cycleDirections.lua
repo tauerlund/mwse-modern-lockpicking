@@ -1,4 +1,4 @@
----@enum CYCLE_DIRECTION
+---@enum cycleDirections
 local enum = {
     next = 0,
     previous = 1,

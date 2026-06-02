@@ -1,17 +1,12 @@
---- ENUMS
-local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
----
-
 ---@class mcmInitializer : initializedService
 local this = {}
 
 --- @private
 --- @type mcmPage[]
 this.pages = {
-    require("tauer.modern-lockpicking.services.mcm.pages.controlsPage"),
-    require("tauer.modern-lockpicking.services.mcm.pages.difficultyPage"),
-    require("tauer.modern-lockpicking.services.mcm.pages.debuggingPage")
+	require("tauer.modern-lockpicking.services.mcm.pages.controlsPage"),
+	require("tauer.modern-lockpicking.services.mcm.pages.difficultyPage"),
+	require("tauer.modern-lockpicking.services.mcm.pages.debuggingPage")
 }
 
 ---@private
@@ -22,31 +17,37 @@ this.headerImagePath = "textures\\tauer\\modern-lockpicking\\logo.tga"
 ---@type mcmSettings
 this.settings = nil
 
+---@private
+---@type enums
+this.enums = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean, string|nil
 function this.initialize(services)
-    this.settings = services.mcmSettings
+	this.settings = services.mcmSettings
+	this.enums = services.enums
+	local translationKeys = services.enums.translationKeys
 
-    local template = mwse.mcm.createTemplate({
-        name = services.translations.get(TRANSLATION_KEY.modName),
-        headerImagePath = this.headerImagePath,
-        onClose = this.onClose
-    })
+	local template = mwse.mcm.createTemplate({
+		name = services.translations.get(translationKeys.modName),
+		headerImagePath = this.headerImagePath,
+		onClose = this.onClose
+	})
 
-    for _, page in ipairs(this.pages) do
-        page.initialize(template, services)
-    end
+	for _, page in ipairs(this.pages) do
+		page.initialize(template, services)
+	end
 
-    template:register()
+	template:register()
 
-    return true, nil
+	return true, nil
 end
 
 ---@private
 function this.onClose()
-    this.settings.save()
-    event.trigger(EVENTS.settingsUpdated)
+	this.settings.save()
+	event.trigger(this.enums.events.settingsUpdated)
 end
 
 return this

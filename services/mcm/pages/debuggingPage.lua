@@ -1,5 +1,3 @@
-local TRANSLATION_KEY = require("tauer.modern-lockpicking.services.translations.enums.TRANSLATION_KEY")
-
 ---@class debuggingPage : mcmPage
 local this = {}
 
@@ -7,16 +5,18 @@ local this = {}
 ---@param template mwseMCMTemplate
 ---@param services serviceCollection
 function this.initialize(template, services)
+    local settings = services.settings
+
     local translations = services.translations
-    local settings = services.mcmSettings.mcm
+    local translationKeys = services.enums.translationKeys
 
     local page = template:createSideBarPage {
-        label = translations.get(TRANSLATION_KEY.mcmHeaderDebugging)
+        label = translations.get(translationKeys.mcmHeaderDebugging)
     }
 
     page:createOnOffButton({
-        label = translations.get(TRANSLATION_KEY.mcmDebuggingLabelShowRenderer),
-        description = translations.get(TRANSLATION_KEY.mcmDebuggingDescShowRenderer),
+        label = translations.get(translationKeys.mcmDebuggingLabelShowRenderer),
+        description = translations.get(translationKeys.mcmDebuggingDescShowRenderer),
         variable = mwse.mcm.createTableVariable({
             id = "showSweetSpotRenderer",
             table = settings.debugging,

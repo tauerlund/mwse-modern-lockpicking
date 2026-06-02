@@ -1,16 +1,22 @@
---- SERVICES
-local fileHelper = require("tauer.modern-lockpicking.services.files.fileHelper")
----
-
---- ENUMS
-local FILE_TYPE = require("tauer.modern-lockpicking.services.files.enums.FILE_TYPE")
----
-
-local logger = mwse.Logger.new()
-
 --- Generic class responsible for loading strategy implementations from Lua files.
----@class strategyLoader
+---@class strategyLoader : initializedService
 local this = {}
+
+---@private
+---@type mwseLogger
+this.logger = mwse.Logger.new()
+
+---@private
+---@type serviceCollection
+this.services = nil
+
+---@public
+---@param services serviceCollection
+---@return boolean,string|nil
+function this.initialize(services)
+    this.services = services
+    return true, nil
+end
 
 --- Loads all strategy implementations from the specified directory.
 ---@public
@@ -19,7 +25,7 @@ local this = {}
 function this.loadAll(params)
     local path = string.format("data files\\mwse\\mods\\%s", params.directory)
 
-    local files = fileHelper.getAllFilesInDirectory(path, FILE_TYPE.lua)
+    local files = this.services.fileHelper.getAllFilesInDirectory(path, this.services.enums.fileTypes.lua)
     if not files then
         return params.requireNotEmpty and nil or {}
     end
@@ -34,20 +40,18 @@ function this.loadAll(params)
         if validator then
             local valid, reason = validator.validate(strategy)
             if not valid then
-                logger:error("Strategy '%s' invalid! Reason: %s.", strategy.name, reason or "unknown")
+                this.logger:error("Strategy '%s' invalid! Reason: %s.", strategy.name, reason or "unknown")
                 return nil
             end
         end
 
-        if strategy.registerEvents then
-            strategy.registerEvents()
-        end
+        strategy.initialize(this.services)
 
         strategies[strategy.name] = strategy
     end
 
     if params.requireNotEmpty and table.size(strategies) == 0 then
-        logger:error("No strategies found in directory '%s'.", params.directory)
+        this.logger:error("No strategies found in directory '%s'.", params.directory)
         return nil
     end
 
@@ -60,7 +64,7 @@ end
 ---@return strategy
 function this.load(file, directory)
     local packageDirectory = directory:gsub("\\", ".")
-    local packageName = file:gsub(FILE_TYPE.lua, "")
+    local packageName = file:gsub(this.services.enums.fileTypes.lua, "")
 
     local package = string.format("%s.%s", packageDirectory, packageName)
 

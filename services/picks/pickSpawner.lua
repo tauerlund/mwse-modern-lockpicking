@@ -1,18 +1,19 @@
---- ENUMS
-local Z_BUFFER_INDEX = require("tauer.modern-lockpicking.services.rendering.enums.Z_BUFFER_INDEX")
-local OBJECT_NAMES = require("tauer.modern-lockpicking.services.nodes.enums.OBJECT_NAMES")
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
----
-
 ---@class pickSpawner : initializedService
 local this = {}
 
+---@private
+---@type enums
+this.enums = nil
+
 ---@public
----@param _ serviceCollection
+---@param services serviceCollection
 ---@return boolean,string|nil
-function this.initialize(_)
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
-	event.register(EVENTS.pickCycled, this.onPickCycled)
+function this.initialize(services)
+	this.enums = services.enums
+	local events = services.enums.events
+
+	event.register(events.lockpickingEnded, this.onLockpickingEnded)
+	event.register(events.pickCycled, this.onPickCycled)
 
 	return true, nil
 end
@@ -23,7 +24,7 @@ end
 ---@return pick
 function this.spawn(lock, pickItem)
 	local pick = this.getMesh(pickItem.object --[[@as tes3lockpick]])
-	local helper = lock.mesh:getObjectByName(OBJECT_NAMES.pickHelper) --[[@as niNode]]
+	local helper = lock.mesh:getObjectByName(this.enums.objectNames.pickHelper) --[[@as niNode]]
 
 	helper:attachChild(pick)
 
@@ -61,7 +62,7 @@ end
 function this.getMesh(pick)
 	local mesh = tes3.loadMesh(pick.mesh, true):clone() --[[@as niNode]]
 
-	mesh.name = OBJECT_NAMES.pick
+	mesh.name = this.enums.objectNames.pick
 	mesh:attachProperty(this.getZBufferProperty())
 
 	return mesh
@@ -71,9 +72,10 @@ end
 ---@return niZBufferProperty
 function this.getZBufferProperty()
 	local property = niZBufferProperty.new()
+	local zBufferIndex = this.enums.zBufferIndex
 
-	property:setFlag(true, Z_BUFFER_INDEX.test)
-	property:setFlag(true, Z_BUFFER_INDEX.write)
+	property:setFlag(true, zBufferIndex.test)
+	property:setFlag(true, zBufferIndex.write)
 
 	return property
 end

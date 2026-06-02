@@ -1,15 +1,20 @@
---- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local ACTIVATION_STRATEGY_NAMES = require(
-    "tauer.modern-lockpicking.services.lockpicking.activation-strategies.enums.ACTIVATION_STRATEGY_NAMES")
----
-
 ---@class defaultActivationStrategy : activationStrategy
 local this = {}
 
 ---@public
 ---@type string
-this.name = ACTIVATION_STRATEGY_NAMES.default
+this.name = nil
+
+---@private
+---@type enums
+this.enums = nil
+
+---@public
+---@param services serviceCollection
+function this.initialize(services)
+    this.name = services.enums.activationStrategyNames.default
+    this.enums = services.enums
+end
 
 ---@public
 function this.enable()
@@ -45,7 +50,7 @@ function this.onActivate(e)
     local eventData = {
         activator = activator
     }
-    event.trigger(EVENTS.lockpickingActivated, eventData)
+    event.trigger(this.enums.events.lockpickingActivated, eventData)
 end
 
 ---@private

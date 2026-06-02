@@ -1,4 +1,4 @@
----@enum RENDERING_CONSTANTS
+---@enum renderingConstants
 local enum = {
     focusDistance = 0.8,
     focalLength = 4,

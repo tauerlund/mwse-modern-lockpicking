@@ -1,7 +1,3 @@
---- ENUMS
-local CONSTANTS = require("tauer.modern-lockpicking.services.locks.enums.CONSTANTS")
----
-
 ---@class lockMeshResolver : initializedService
 local this = {}
 
@@ -14,10 +10,11 @@ this.defaultMesh = nil
 this.meshes = {}
 
 ---@public
----@param _ serviceCollection
+---@param services serviceCollection
 ---@return boolean,string|nil
-function this.initialize(_)
-	this.defaultMesh = tes3.loadMesh(CONSTANTS.paths.defaultLockMesh, true):clone() --[[@as niNode]]
+function this.initialize(services)
+	local constants = services.enums.constants.locks
+	this.defaultMesh = tes3.loadMesh(constants.paths.defaultLockMesh, true):clone() --[[@as niNode]]
 	return true, nil
 end
 

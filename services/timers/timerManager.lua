@@ -1,8 +1,4 @@
---- ENUMS
-local CONSTANTS = require("tauer.modern-lockpicking.services.timers.enums.CONSTANTS")
----
-
----@class timerManager
+---@class timerManager : initializedService
 local this = {}
 
 ---@package
@@ -11,15 +7,28 @@ local this = {}
 ---@field package finishedCallback fun(data:timerData)?
 ---@field package cancellationEvents { [string]: function }
 
+---@private
+---@type enums
+this.enums = nil
+
+---@public
+---@param services serviceCollection
+---@return boolean,string|nil
+function this.initialize(services)
+	this.enums = services.enums
+	return true, nil
+end
+
 ---@public
 ---@param parameters timerParameters
 ---@return mwseTimer
 function this.start(parameters)
+	local constants = this.enums.constants.timers
 	local data = parameters.data or {}
 
 	---@cast data +timerDataInner, -timerData
 
-	data.totalIterations = math.floor(parameters.durationInSeconds / CONSTANTS.tick)
+	data.totalIterations = math.floor(parameters.durationInSeconds / constants.tick)
 	data.callback = parameters.callback
 	data.finishedCallback = parameters.finishedCallback
 	data.cancellationEvents = {}
@@ -27,7 +36,7 @@ function this.start(parameters)
 	local timer = timer.start({
 		type = timer.real,
 		iterations = data.totalIterations,
-		duration = CONSTANTS.tick,
+		duration = constants.tick,
 		callback = this.callbackInner,
 		---@type timerDataInner
 		data = data,

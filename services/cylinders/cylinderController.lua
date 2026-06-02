@@ -1,9 +1,3 @@
---- ENUMS
-local CONSTANTS = require("tauer.modern-lockpicking.services.lockpicking.enums.CONSTANTS")
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
-local DIRECTION = require("tauer.modern-lockpicking.services.lockpicking.enums.ROTATION_DIRECTION")
----
-
 ---@class cylinderController : initializedService
 local this = {}
 
@@ -44,8 +38,8 @@ this.maxAngle = 0
 this.currentDirectionKey = nil
 
 ---@private
----@type { [tes3.scanCode]: ROTATION_DIRECTION }
-this.rotationDirections = nil
+---@type { [tes3.scanCode]: rotationDirections }
+this.rotationKeyCodeToRotatioDirectionMap = nil
 
 ---@private
 ---@type boolean
@@ -55,20 +49,27 @@ this.paused = false
 ---@type settings
 this.settings = nil
 
+---@private
+---@type enums
+this.enums = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
 function this.initialize(services)
 	this.settings = services.settings
-
+	this.enums = services.enums
 	this.applyKeybinds()
-	event.register(EVENTS.settingsUpdated, this.onSettingsUpdated)
-	event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
-	event.register(EVENTS.lockpickingEnd, this.onLockpickingEnd)
-	event.register(EVENTS.sweetSpotUpdated, this.onSweetSpotUpdated)
-	event.register(EVENTS.pickCycled, this.onPickCycled)
-	event.register(EVENTS.optionsMenuOpened, this.onOptionsMenuOpened)
-	event.register(EVENTS.optionsMenuClosed, this.onOptionsMenuClosed)
+
+	local events = this.enums.events
+
+	event.register(events.settingsUpdated, this.onSettingsUpdated)
+	event.register(events.lockpickingStarted, this.onLockpickingStarted)
+	event.register(events.lockpickingEnd, this.onLockpickingEnd)
+	event.register(events.sweetSpotUpdated, this.onSweetSpotUpdated)
+	event.register(events.pickCycled, this.onPickCycled)
+	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
+	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
 	return true, nil
 end
 
@@ -157,17 +158,20 @@ function this.onEnterFrame(_)
 		return
 	end
 
+	local constants = this.enums.constants.cylinder
+	local events = this.enums.events
+
 	local rotation = this.cylinder.rotation:toEulerXYZ().y
 
-	if rotation <= CONSTANTS.targetRotationLeft or rotation >= CONSTANTS.targetRotationRight then
-		event.trigger(EVENTS.cylinderTargetReached)
+	if rotation <= constants.targetRotationLeft or rotation >= constants.targetRotationRight then
+		event.trigger(events.cylinderTargetReached)
 		return
 	end
 
 	if this.maxAngle == 0 or math.abs(rotation) >= this.maxAngle then
 		this.rotating = false
 		this.blocked = true
-		event.trigger(EVENTS.cylinderBlocked)
+		event.trigger(events.cylinderBlocked)
 	end
 end
 
@@ -191,13 +195,13 @@ function this.computeMaxAngle()
 	local overshoot = distance - this.sweetSpotRadius
 	local fraction = math.max(0, 1 - overshoot / this.gradientWidth)
 
-	return CONSTANTS.targetRotationRight * fraction
+	return this.enums.constants.cylinder.targetRotationRight * fraction
 end
 
 ---@private
 ---@param e keyDownEventData
 function this.onKeyDown(e)
-	if this.rotationDirections[e.keyCode] then
+	if this.rotationKeyCodeToRotatioDirectionMap[e.keyCode] then
 		this.onRotationKeyDown(e)
 	end
 end
@@ -205,7 +209,7 @@ end
 ---@private
 ---@param e keyUpEventData
 function this.onKeyUp(e)
-	if this.rotationDirections[e.keyCode] then
+	if this.rotationKeyCodeToRotatioDirectionMap[e.keyCode] then
 		this.onRotationKeyUp(e)
 	end
 end
@@ -223,9 +227,9 @@ function this.onRotationKeyDown(e)
 
 	---@type rotationEventData
 	local eventData = {
-		direction = this.rotationDirections[e.keyCode],
+		direction = this.rotationKeyCodeToRotatioDirectionMap[e.keyCode],
 	}
-	event.trigger(EVENTS.rotationStarted, eventData)
+	event.trigger(this.enums.events.rotationStarted, eventData)
 end
 
 ---@private
@@ -241,16 +245,19 @@ function this.onRotationKeyUp(e)
 
 	---@type rotationEventData
 	local eventData = {
-		direction = this.rotationDirections[e.keyCode],
+		direction = this.rotationKeyCodeToRotatioDirectionMap[e.keyCode],
 	}
-	event.trigger(EVENTS.rotationEnded, eventData)
+	event.trigger(this.enums.events.rotationEnded, eventData)
 end
 
 ---@private
 function this.applyKeybinds()
-	this.rotationDirections = {
-		[this.settings.keyBinds.rotateLockClockwise.keyCode] = DIRECTION.clockwise,
-		[this.settings.keyBinds.rotateLockCounterclockwise.keyCode] = DIRECTION.counterClockwise,
+	local keyBinds = this.settings.keyBinds
+	local rotationDirections = this.enums.rotationDirections
+
+	this.rotationKeyCodeToRotatioDirectionMap = {
+		[keyBinds.rotateLockClockwise.keyCode] = rotationDirections.clockwise,
+		[keyBinds.rotateLockCounterclockwise.keyCode] = rotationDirections.counterClockwise,
 	}
 end
 

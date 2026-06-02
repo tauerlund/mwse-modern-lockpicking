@@ -1,7 +1,3 @@
---- ENUMS
-local EVENTS = require("tauer.modern-lockpicking.services.events.enums.EVENTS")
----
-
 ---@class lockController : initializedService
 local this = {}
 
@@ -10,11 +6,13 @@ local this = {}
 this.activator = nil
 
 ---@public
----@param _ serviceCollection
+---@param services serviceCollection
 ---@return boolean,string|nil
-function this.initialize(_)
-	event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
-	event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
+function this.initialize(services)
+	local events = services.enums.events
+
+	event.register(events.lockpickingStarted, this.onLockpickingStarted)
+	event.register(events.lockpickingEnded, this.onLockpickingEnded)
 	return true, nil
 end
 
