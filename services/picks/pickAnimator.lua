@@ -81,6 +81,10 @@ this.cycleAnimationKeyFrames = {
 }
 
 ---@private
+---@type tes3matrix33
+this.rotationBuffer = tes3matrix33.new()
+
+---@private
 ---@type nodeAnimator
 this.nodeAnimator = nil
 
@@ -308,19 +312,16 @@ end
 
 ---@private
 function this.rotateHelper()
-	local rotation = this.helper.rotation:copy()
-	rotation:toRotationY(this.currentHelperAngle + this.jiggleOffset)
-
-	this.helper.rotation = rotation
+	this.rotationBuffer:toRotationY(this.currentHelperAngle + this.jiggleOffset)
+	this.helper.rotation = this.rotationBuffer
 	this.helper:update()
 end
 
 ---@private
 function this.rotatePick()
-	local rotation = this.mesh.rotation:copy()
-	rotation:toRotationY(this.currentHelperAngle + this.jiggleOffset)
+	this.rotationBuffer:toRotationY(this.currentHelperAngle + this.jiggleOffset)
 
-	this.mesh.rotation = this.originalPickRotation * rotation
+	this.mesh.rotation = this.originalPickRotation * this.rotationBuffer
 	this.mesh:update()
 end
 

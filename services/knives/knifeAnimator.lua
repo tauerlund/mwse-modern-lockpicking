@@ -55,6 +55,10 @@ this.angles = {
 }
 
 ---@private
+---@type tes3matrix33
+this.rotationBuffer = tes3matrix33.new()
+
+---@private
 ---@type nodeAnimatorKeyframe[]
 this.startAnimationKeyFrames = {
 	{
@@ -198,10 +202,9 @@ end
 function this.rotate()
 	this.currentAngle = math.lerp(this.sourceAngle, this.targetAngle, this.phase)
 
-	local rotation = tes3matrix33.new()
-	rotation:toRotationY(this.currentAngle)
+	this.rotationBuffer:toRotationY(this.currentAngle)
 
-	this.knife.rotation = this.baseRotation * rotation
+	this.knife.rotation = this.baseRotation * this.rotationBuffer
 	this.knife:update()
 end
 

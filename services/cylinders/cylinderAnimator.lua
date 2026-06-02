@@ -28,6 +28,10 @@ this.constants = {
 	resetSpeed = 1.8,
 }
 
+---@private
+---@type tes3matrix33
+this.rotationBuffer = tes3matrix33.new()
+
 ---@public
 ---@param _ serviceCollection
 ---@return boolean,string|nil
@@ -140,10 +144,8 @@ end
 function this.rotate()
 	local cylinder = this.cylinder
 
-	local rotation = cylinder.rotation:copy()
-	rotation:toRotationY(this.phase)
-
-	cylinder.rotation = rotation
+	this.rotationBuffer:toRotationY(this.phase)
+	cylinder.rotation = this.rotationBuffer
 	cylinder:update()
 end
 
