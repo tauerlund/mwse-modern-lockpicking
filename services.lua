@@ -48,6 +48,8 @@ local this = {
     timerManager = require("tauer.modern-lockpicking.services.timers.timerManager"),
 
     translations = require("tauer.modern-lockpicking.services.translations.translations"),
+
+    playerDataController = require("tauer.modern-lockpicking.services.player.playerDataController")
 }
 
 return this

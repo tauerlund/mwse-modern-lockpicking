@@ -1,0 +1,3 @@
+---@meta
+---@class playerData
+---@field public lastPickId string

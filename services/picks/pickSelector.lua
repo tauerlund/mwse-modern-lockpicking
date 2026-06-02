@@ -10,17 +10,35 @@ local this = {}
 ---@type integer
 this.currentIndex = 1
 
+---@private
+---@type tes3itemStack[]
+this.picks = nil
+
+---@private
+---@type playerDataController
+this.playerDataController = nil
+
 ---@public
----@param _ serviceCollection
+---@param services serviceCollection
 ---@return boolean, string|nil
-function this.initialize(_)
+function this.initialize(services)
+    this.playerDataController = services.playerDataController
+
+    event.register(EVENTS.lockpickingStarted, this.onLockpickingStarted)
     event.register(EVENTS.lockpickingEnded, this.onLockpickingEnded)
     return true, nil
 end
 
 ---@private
+---@param e lockpickingStartEventData
+function this.onLockpickingStarted(e)
+    this.picks = e.session.picks
+end
+
+---@private
 function this.onLockpickingEnded()
-    this.currentIndex = this.getInitialIndex()
+    local data = this.playerDataController.resolve()
+    data.lastPickId = this.picks[this.currentIndex].object.id
 end
 
 ---@public
@@ -29,7 +47,7 @@ end
 ---@return tes3itemStack
 function this.select(picks, direction)
     if not direction then
-        this.currentIndex = this.getInitialIndex()
+        this.currentIndex = this.resolveInitialIndex(picks)
         return picks[this.currentIndex]
     end
 
@@ -68,8 +86,21 @@ function this.decrementIndex(picks)
 end
 
 ---@private
+---@param picks tes3itemStack[]
 ---@return integer
-function this.getInitialIndex()
+function this.resolveInitialIndex(picks)
+    local data = this.playerDataController.resolve()
+    local lastPickId = data.lastPickId
+    if not lastPickId then
+        return 1
+    end
+
+    for i, pick in ipairs(picks) do
+        if pick.object.id == lastPickId then
+            return i
+        end
+    end
+
     return 1
 end
 

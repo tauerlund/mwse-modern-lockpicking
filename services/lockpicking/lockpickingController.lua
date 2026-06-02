@@ -127,7 +127,7 @@ function this.createSession(activator)
 
 	local lock = this.lockSpawner.spawn(activator)
 	local knife = this.knifeSpawner.spawn(lock)
-	local item = this.pickSelector.select(picks, nil)
+	local item = this.pickSelector.select(picks)
 	local pick = this.pickSpawner.spawn(lock, item)
 
 	return {
