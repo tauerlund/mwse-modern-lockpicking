@@ -87,7 +87,7 @@ function this.start(e)
 	end
 
 	if not this.picks then
-		this.picks = this.createPicks(e.session.pick, e.session.picks)
+		this.picks = this.createPicks(e.session.pick, e.session.picks, e.session.eligiblePicks)
 	end
 end
 
@@ -267,8 +267,9 @@ end
 ---@private
 ---@param activePick pick
 ---@param picks tes3itemStack[]
+---@param eligiblePicks { [string]: boolean }
 ---@return tes3uiElement
-function this.createPicks(activePick, picks)
+function this.createPicks(activePick, picks, eligiblePicks)
 	local enums = this.enums
 	local constants = enums.constants.gui
 	local events = enums.events
@@ -316,17 +317,28 @@ function this.createPicks(activePick, picks)
 		:wuild()
 
 	for _, pick in ipairs(picks) do
-		local color = pick.object.id == activePick.item.object.id and
-			tes3ui.getPalette(tes3.palette.normalOverColor) or
-			tes3ui.getPalette(tes3.palette.normalColor)
+		local isActive = pick.object.id == activePick.item.object.id
+		local isEligible = eligiblePicks[pick.object.id]
+		local pickPalette = constants.pickPalette
+		local color = isActive and tes3ui.getPalette(pickPalette.active)
+			or isEligible and tes3ui.getPalette(pickPalette.inactive)
+			or tes3ui.getPalette(pickPalette.ineligible)
 
 		local verticalBorder = 8
 		local horizontalBorder = 16
 
+		local pickId = pick.object.id
+		local pickPalette = constants.pickPalette
+		local function onPickCycled(element, e)
+			local isActive = pickId == e.pick.item.object.id
+			element.color = isActive and tes3ui.getPalette(pickPalette.active)
+				or eligiblePicks[pickId] and tes3ui.getPalette(pickPalette.inactive)
+				or tes3ui.getPalette(pickPalette.ineligible)
+		end
+
 		this.guiBuilder.createLabel({
 			parent = pickLabelContainer,
-			id = string.format(constants.picksLabelId,
-				pick.object.id)
+			id = string.format(constants.picksLabelId, pickId)
 		})
 			:withText(pick.object.name)
 			:withColor(color)
@@ -335,13 +347,12 @@ function this.createPicks(activePick, picks)
 				bottom = verticalBorder,
 				right = horizontalBorder,
 			})
-			:withCallback(events.pickCycled, this.onPickCycled)
+			:withCallback(events.pickCycled, onPickCycled)
 			:wuild()
 
 		this.guiBuilder.createLabel({
 			parent = pickCountLabelContainer,
-			id = string.format(constants.picksCountLabelId,
-				pick.object.id)
+			id = string.format(constants.picksCountLabelId, pickId)
 		})
 			:withText(string.format("%d", pick.count))
 			:withColor(color)
@@ -349,7 +360,7 @@ function this.createPicks(activePick, picks)
 				top = verticalBorder,
 				bottom = verticalBorder,
 			})
-			:withCallback(events.pickCycled, this.onPickCycled)
+			:withCallback(events.pickCycled, onPickCycled)
 			:wuild()
 	end
 
@@ -388,16 +399,6 @@ function this.onKeyBindsUpdated(element)
 			label.text = text
 		end
 	end
-end
-
----@private
----@param element tes3uiElement
----@param e pickCycledEventData
-function this.onPickCycled(element, e)
-	local isSelected = element.name:endswith(e.pick.item.object.id)
-	element.color = isSelected
-		and tes3ui.getPalette(tes3.palette.normalOverColor)
-		or tes3ui.getPalette(tes3.palette.normalColor)
 end
 
 ---@private

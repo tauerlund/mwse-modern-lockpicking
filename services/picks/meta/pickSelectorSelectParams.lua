@@ -1,0 +1,5 @@
+---@meta
+---@class pickSelector.select.params
+---@field public picks tes3itemStack[]
+---@field public direction cycleDirections?
+---@field public eligiblePicks { [string]: boolean }?

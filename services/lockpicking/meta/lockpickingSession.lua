@@ -2,6 +2,7 @@
 ---@class lockpickingSession
 ---@field public activator tes3reference
 ---@field public picks tes3itemStack[]
+---@field public eligiblePicks { [string]: boolean }
 ---@field public lock lock
 ---@field public knife knife
 ---@field public pick pick?

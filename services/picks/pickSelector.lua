@@ -10,6 +10,10 @@ this.currentIndex = 1
 this.picks = nil
 
 ---@private
+---@type { [string]: boolean }|nil
+this.eligiblePicks = nil
+
+---@private
 ---@type playerDataController
 this.playerDataController = nil
 
@@ -53,10 +57,16 @@ function this.onLockpickingEnded()
 end
 
 ---@public
----@param picks tes3itemStack[]
----@param direction cycleDirections?
+---@param params pickSelector.select.params
 ---@return tes3itemStack
-function this.select(picks, direction)
+function this.select(params)
+    if params.eligiblePicks then
+        this.eligiblePicks = params.eligiblePicks
+    end
+
+    local picks = params.picks
+    local direction = params.direction
+
     if not direction then
         this.currentIndex = this.resolveInitialIndex(picks)
         return picks[this.currentIndex]
@@ -69,9 +79,17 @@ function this.select(picks, direction)
         else
             this.currentIndex = this.decrementIndex(picks)
         end
-    until picks[this.currentIndex].count > 0 or this.currentIndex == startIndex
+    until (picks[this.currentIndex].count > 0 and this.isEligible(picks[this.currentIndex]))
+        or this.currentIndex == startIndex
 
     return picks[this.currentIndex]
+end
+
+---@private
+---@param pick tes3itemStack
+---@return boolean
+function this.isEligible(pick)
+    return not this.eligiblePicks or this.eligiblePicks[pick.object.id] == true
 end
 
 ---@private
@@ -101,12 +119,16 @@ end
 ---@return integer
 function this.resolveInitialIndex(picks)
     local pickId = this.tryResolvePickId()
-    if not pickId then
-        return 1
+    if pickId then
+        for i, pick in ipairs(picks) do
+            if pick.object.id == pickId and this.isEligible(pick) then
+                return i
+            end
+        end
     end
 
     for i, pick in ipairs(picks) do
-        if pick.object.id == pickId then
+        if this.isEligible(pick) and pick.count > 0 then
             return i
         end
     end
