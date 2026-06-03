@@ -34,6 +34,10 @@ this.inventoryController = nil
 this.translations = nil
 
 ---@private
+---@type skillController
+this.skillController = nil
+
+---@private
 ---@type enums
 this.enums = nil
 
@@ -53,6 +57,7 @@ function this.initialize(services)
 	this.timerManager = services.timerManager
 	this.inventoryController = services.inventoryController
 	this.translations = services.translations
+	this.skillController = services.skillController
 	this.enums = services.enums
 	local events = services.enums.events
 
@@ -128,17 +133,39 @@ function this.createSession(activator)
 
 	local lock = this.lockSpawner.spawn(activator)
 	local knife = this.knifeSpawner.spawn(lock)
-	local item = this.pickSelector.select(picks)
+	local eligiblePicks = this.computeEligiblePicks(picks, activator)
+	local item = this.pickSelector.select({
+		picks = picks,
+		eligiblePicks = eligiblePicks
+	})
 	local pick = this.pickSpawner.spawn(lock, item)
 
 	return {
 		activator = activator,
 		picks = picks,
+		eligiblePicks = eligiblePicks,
 		lock = lock,
 		knife = knife,
 		pick = pick,
 		sweetSpotCenter = math.random() * math.pi - (math.pi / 2),
 	}
+end
+
+---@private
+---@param picks tes3itemStack[]
+---@param activator tes3reference
+---@return { [string]: boolean }
+function this.computeEligiblePicks(picks, activator)
+	local eligiblePicks = {}
+	local lockNode = activator.lockNode
+	for _, pick in ipairs(picks) do
+		if not this.settings.useLockComplexity or not lockNode then
+			eligiblePicks[pick.object.id] = true
+		else
+			eligiblePicks[pick.object.id] = this.skillController.getSuccessChance(pick, lockNode) > 0
+		end
+	end
+	return eligiblePicks
 end
 
 ---@private

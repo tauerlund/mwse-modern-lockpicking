@@ -242,8 +242,15 @@ function this.cyclePick(direction)
 	local previousPick = this.currentPick
 
 	local item = direction
-		and this.pickSelector.select(this.picks, direction)
+		and this.pickSelector.select({
+			picks = this.picks,
+			direction = direction
+		})
 		or previousPick.item
+
+	if direction and item == previousPick.item then
+		return
+	end
 
 	local pick = this.pickSpawner.spawn(this.lock, item)
 
