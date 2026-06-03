@@ -49,7 +49,7 @@ function this.onLockPick(e)
     e.block = true
 
     this.timerManager.start({
-        finishedCallback = this.onStartTimerFinished,
+        callback = this.onStartTimerFinished,
         durationInSeconds = 0.5,
         ---@class attackActivationStrategy.startTimer.data
         data = {

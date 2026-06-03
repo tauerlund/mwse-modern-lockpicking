@@ -47,7 +47,6 @@ function this.initializeMod(_)
 		services.inventoryController,
 		services.eventLogger,
 		services.debuggingRenderer,
-		services.timerManager,
 	}
 
 	for _, service in pairs(initializedServices) do

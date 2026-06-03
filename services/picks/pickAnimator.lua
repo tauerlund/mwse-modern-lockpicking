@@ -227,7 +227,7 @@ function this.start(pick, keyframes)
 	this.timerManager.start({
 		durationInSeconds = keyframes[#keyframes].time,
 		cancelOn = { this.enums.events.lockpickingEnded, this.enums.events.pickCycled },
-		finishedCallback = this.onStartTimerFinished,
+		callback = this.onStartTimerFinished,
 	})
 end
 
