@@ -42,6 +42,10 @@ function this.onLockPick(e)
         return
     end
 
+    if e.chance <= 0 then
+        return
+    end
+
     e.block = true
 
     this.timerManager.start({

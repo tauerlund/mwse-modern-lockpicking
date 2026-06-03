@@ -16,6 +16,32 @@ function this.initialize(services)
 	return true, nil
 end
 
+--- Based on the formula described here: https://en.uesp.net/wiki/Morrowind:Security
+---@public
+---@param pick tes3itemStack
+---@param lock tes3lockNode
+---@return number
+function this.getSuccessChance(pick, lock)
+	return (this.getStatsModifier() * pick.object.quality * this.getFatigueModifier()) - lock.level
+end
+
+---@private
+---@return number
+function this.getStatsModifier()
+	local security = tes3.mobilePlayer:getSkillValue(tes3.skill.security)
+	local agility = tes3.mobilePlayer.attributes[tes3.attribute.agility].current
+	local luck = tes3.mobilePlayer.attributes[tes3.attribute.luck].current
+
+	return security + (agility / 5 + luck / 10)
+end
+
+---@private
+---@return number
+function this.getFatigueModifier()
+	local fatigue = tes3.mobilePlayer.fatigue
+	return 0.75 + (0.5 * fatigue.normalized)
+end
+
 ---@private
 ---@param e lockpickingEndedEventData
 function this.onLockpickingEnded(e)

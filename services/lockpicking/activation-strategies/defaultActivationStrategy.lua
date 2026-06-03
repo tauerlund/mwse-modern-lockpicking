@@ -9,11 +9,31 @@ this.name = nil
 ---@type enums
 this.enums = nil
 
+---@private
+---@type inventoryController
+this.inventoryController = nil
+
+---@private
+---@type skillController
+this.skillController = nil
+
+---@private
+---@type translations
+this.translations = nil
+
+---@private
+---@type settings
+this.settings = nil
+
 ---@public
 ---@param services serviceCollection
 function this.initialize(services)
     this.name = services.enums.activationStrategyNames.default
     this.enums = services.enums
+    this.inventoryController = services.inventoryController
+    this.skillController = services.skillController
+    this.translations = services.translations
+    this.settings = services.settings
 end
 
 ---@public
@@ -46,11 +66,38 @@ function this.onActivate(e)
         return
     end
 
+    local canPick, reason = this.canPick(activator.lockNode)
+    if canPick == false then
+        tes3.messageBox(reason)
+        return
+    end
+
     ---@type lockpickingActivatedEventData
     local eventData = {
         activator = activator
     }
     event.trigger(this.enums.events.lockpickingActivated, eventData)
+end
+
+---@private
+---@param lock tes3lockNode
+---@return boolean, string
+function this.canPick(lock)
+    local pick = this.inventoryController.getBestLockpick()
+    if not pick then
+        return false, this.translations.get(this.enums.translationKeys.messageBoxNoLockpicks)
+    end
+
+    if not this.settings.useLockComplexity then
+        return true, ""
+    end
+
+    local chance = this.skillController.getSuccessChance(pick, lock)
+    if chance <= 0 then
+        return false, tes3.findGMST(tes3.gmst.sLockImpossible).value --[[@as string]]
+    end
+
+    return true, ""
 end
 
 ---@private

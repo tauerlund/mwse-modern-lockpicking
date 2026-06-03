@@ -92,6 +92,15 @@ function this.initialize(template, services)
         }),
     })
 
+    activationCategory:createOnOffButton({
+        label = translations.get(translationKeys.mcmUseLockComplexityLabel),
+        description = translations.get(translationKeys.mcmUseLockComplexityDesc),
+        variable = mwse.mcm.createTableVariable({
+            id = "useLockComplexity",
+            table = settings,
+        }),
+    })
+
     local otherCategory = controlsPage:createCategory({
         label = translations.get(translationKeys.mcmLabelsOther),
         description = translations.get(translationKeys.mcmDescriptionOther),

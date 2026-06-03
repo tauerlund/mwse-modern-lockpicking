@@ -21,7 +21,16 @@ function this.initialize(services)
 end
 
 ---@public
----@return tes3itemStack[]|nil
+---@return tes3itemStack|nil
+function this.getBestLockpick()
+	local picks = this.getLockpicks()
+	return table.size(picks) > 0
+		and picks[table.size(picks)]
+		or nil
+end
+
+---@public
+---@return tes3itemStack[]
 function this.getLockpicks()
 	---@type tes3itemStack[]
 	local lockpicks = {}
@@ -30,10 +39,6 @@ function this.getLockpicks()
 		if item.object.objectType == tes3.objectType.lockpick then
 			table.insert(lockpicks, item)
 		end
-	end
-
-	if #lockpicks == 0 then
-		return nil
 	end
 
 	table.sort(lockpicks, this.sortByLowestQuality)
