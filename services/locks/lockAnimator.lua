@@ -6,6 +6,10 @@ local this = {}
 this.timerManager = nil
 
 ---@private
+---@type nodeAnimator
+this.nodeAnimator = nil
+
+---@private
 ---@type enums
 this.enums = nil
 
@@ -55,8 +59,10 @@ this.rotationBufferY = tes3matrix33.new()
 ---@param services serviceCollection
 ---@return boolean,string|nil
 function this.initialize(services)
+	this.nodeAnimator = services.nodeAnimator
 	this.timerManager = services.timerManager
 	this.enums = services.enums
+
 	local events = services.enums.events
 
 	event.register(events.lockpickingStart, this.onLockpickingStart)
@@ -64,6 +70,7 @@ function this.initialize(services)
 	event.register(events.lockpickingEnded, this.onLockpickingEnded)
 	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
 	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
+
 	return true, nil
 end
 
@@ -82,16 +89,19 @@ end
 function this.onLockpickingStart(e)
 	local lock = e.session.lock
 
-	this.timerManager.start({
-		durationInSeconds = 0.8,
-		callback = this.onStartTimer,
-		cancelOn = this.enums.events.lockpickingEnded,
-		---@type onStartLockAnimationData
-		data = {
-			mesh = lock.mesh,
-			initialTranslation = lock.mesh.translation:copy(),
-			targetTranslation = this.getTargetTranslation(lock),
+	this.nodeAnimator.start({
+		node = lock.mesh,
+		keyframes = {
+			{
+				time = 0,
+				translation = lock.mesh.translation:copy(),
+			},
+			{
+				time = 0.8,
+				translation = this.getTargetTranslation(lock),
+			}
 		},
+		cancelOn = { this.enums.events.lockpickingEnded }
 	})
 end
 
@@ -102,9 +112,11 @@ function this.onLockpickingStarted(e)
 	this.initialRotation = e.session.lock.mesh.rotation:copy()
 	this.currentRotX = 0
 	this.currentRotY = 0
+
 	local cursor = tes3.getCursorPosition()
 	this.startCursorX = cursor.x
 	this.startCursorY = cursor.y
+
 	this.enable()
 end
 
@@ -115,6 +127,7 @@ function this.onLockpickingEnded(_)
 	this.initialRotation = nil
 	this.currentRotX = 0
 	this.currentRotY = 0
+
 	this.disable()
 end
 
@@ -173,30 +186,6 @@ function this.getTargetTranslation(lock)
 	local translation = lock.mesh.translation + forward
 
 	return translation
-end
-
----@private
----@param callback mwseTimerCallbackData
-function this.onStartTimer(callback)
-	local data = callback.timer.data --[[@as onStartLockAnimationData]]
-	local lock = data.mesh
-
-	local initialTranslation = data.initialTranslation
-	local targetTranslation = data.targetTranslation
-
-	local currentPhase = callback.timer.iterations
-	local targetPhase = data.totalIterations
-
-	lock.translation = this.getUpdatedTranslation(currentPhase, targetPhase, initialTranslation, targetTranslation)
-	lock:update()
-end
-
-function this.getUpdatedTranslation(currentPhase, targetPhase, initialTranslation, targetTranslation)
-	return tes3vector3.new(
-		math.remap(currentPhase, 0, targetPhase, targetTranslation.x, initialTranslation.x),
-		math.remap(currentPhase, 0, targetPhase, targetTranslation.y, initialTranslation.y),
-		math.remap(currentPhase, 0, targetPhase, targetTranslation.z, initialTranslation.z)
-	)
 end
 
 return this

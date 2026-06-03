@@ -117,7 +117,7 @@ function this.onLockPickingActivated(e)
 	this.timerManager.start({
 		durationInSeconds = 1.3,
 		finishedCallback = this.onStartTimerFinished,
-		cancelOn = this.enums.events.lockpickingEnded,
+		cancelOn = { this.enums.events.lockpickingEnded },
 	})
 end
 

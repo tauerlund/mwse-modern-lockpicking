@@ -33,15 +33,19 @@ end
 
 ---@private
 ---@param mesh niNode
----@param originalTranslation tes3vector3
----@param originalRotation tes3vector3
+---@param originalTranslation tes3vector3?
+---@param originalRotation tes3vector3?
 function this.initializeTransforms(mesh, originalTranslation, originalRotation)
-	mesh.translation = originalTranslation
+	if originalRotation then
+		mesh.translation = originalTranslation --[[@as tes3vector3]]
+	end
 
-	local rotation = tes3matrix33.new()
-	rotation:fromEulerXYZ(originalRotation.x, originalRotation.y, originalRotation.z)
+	if originalRotation then
+		local rotation = tes3matrix33.new()
+		rotation:fromEulerXYZ(originalRotation.x, originalRotation.y, originalRotation.z)
+		mesh.rotation = rotation
+	end
 
-	mesh.rotation = rotation
 	mesh:update()
 end
 
@@ -78,9 +82,14 @@ function this.update(index, animation, delta)
 	local node = animation.node
 	local transition = math.remap(animation.phase, currentTransform.time, nextTransform.time, 0, 1)
 
-	node.translation = this.getUpdatedTranslation(currentTransform.translation, nextTransform.translation,
-		transition)
-	node.rotation = this.getUpdatedRotation(currentTransform.rotation, nextTransform.rotation, transition)
+	if currentTransform.translation and nextTransform.translation then
+		node.translation = this.getUpdatedTranslation(currentTransform.translation, nextTransform.translation,
+			transition)
+	end
+
+	if currentTransform.rotation and nextTransform.rotation then
+		node.rotation = this.getUpdatedRotation(currentTransform.rotation, nextTransform.rotation, transition)
+	end
 
 	node:update()
 end

@@ -194,7 +194,7 @@ function this.start(knife)
 	this.timerManager.start({
 		durationInSeconds = this.enums.constants.knives.animation.startAnimationDuration,
 		finishedCallback = this.onStartTimerFinished,
-		cancelOn = this.enums.events.lockpickingEnded,
+		cancelOn = { this.enums.events.lockpickingEnded },
 	})
 end
 

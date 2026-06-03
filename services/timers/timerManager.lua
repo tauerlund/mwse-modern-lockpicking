@@ -20,17 +20,17 @@ function this.initialize(services)
 end
 
 ---@public
----@param parameters timerParameters
+---@param params timerManager.start.params
 ---@return mwseTimer
-function this.start(parameters)
+function this.start(params)
 	local constants = this.enums.constants.timers
-	local data = parameters.data or {}
+	local data = params.data or {}
 
 	---@cast data +timerDataInner, -timerData
 
-	data.totalIterations = math.floor(parameters.durationInSeconds / constants.tick)
-	data.callback = parameters.callback
-	data.finishedCallback = parameters.finishedCallback
+	data.totalIterations = math.floor(params.durationInSeconds / constants.tick)
+	data.callback = params.callback
+	data.finishedCallback = params.finishedCallback
 	data.cancellationEvents = {}
 
 	local timer = timer.start({
@@ -42,8 +42,8 @@ function this.start(parameters)
 		data = data,
 	})
 
-	if parameters.cancelOn then
-		this.registerCancellationEvents(parameters.cancelOn, data, timer)
+	if params.cancelOn then
+		this.registerCancellationEvents(params.cancelOn --[[@as string[] ]], data, timer)
 	end
 
 	return timer
@@ -65,33 +65,20 @@ function this.callbackInner(callback)
 end
 
 ---@private
----@param events string|string[]
----@param data timerDataInner
----@param timer mwseTimer
-function this.registerCancellationEvents(events, data, timer)
-	if type(events) == "string" then
-		this.registerCancellationEvent(events, data, timer)
-		return
-	end
-
-	for _, event in pairs(events) do
-		this.registerCancellationEvent(event, data, timer)
-	end
-end
-
----@private
----@param evt string
+---@param events string[]
 ---@param data timerDataInner
 ---@param t mwseTimer
-function this.registerCancellationEvent(evt, data, t)
-	data.cancellationEvents[evt] = function ()
-		if not t or not t.state == timer.active then
-			return
+function this.registerCancellationEvents(events, data, t)
+	for _, evt in ipairs(events) do
+		data.cancellationEvents[evt] = function ()
+			if not t or not t.state == timer.active then
+				return
+			end
+			t:cancel()
+			this.unregisterCancellationEvents(data)
 		end
-		t:cancel()
-		this.unregisterCancellationEvents(data)
+		event.register(evt, data.cancellationEvents[evt], { doOnce = true })
 	end
-	event.register(evt, data.cancellationEvents[evt], { doOnce = true })
 end
 
 ---@private

@@ -1,7 +1,7 @@
 ---@meta
----@class timerParameters
+---@class timerManager.start.params
 ---@field public durationInSeconds number
 ---@field public callback fun(callback:mwseTimerCallbackData)?
 ---@field public finishedCallback fun(configuration:timerData)?
----@field public cancelOn string|string[]?
+---@field public cancelOn string[]?
 ---@field public data? timerData
