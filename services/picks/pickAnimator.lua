@@ -46,11 +46,11 @@ this.currentHelperAngle = 0
 this.targetHelperAngle = 0
 
 ---@private
----@type nodeAnimatorKeyframe[]
+---@type nodeAnimatonKeyframe[]
 this.startAnimationKeyFrames = nil
 
 ---@private
----@type nodeAnimatorKeyframe[]
+---@type nodeAnimatonKeyframe[]
 this.cycleAnimationKeyFrames = nil
 
 ---@private
@@ -213,7 +213,7 @@ end
 
 ---@private
 ---@param pick pick
----@param keyframes nodeAnimatorKeyframe[]
+---@param keyframes nodeAnimatonKeyframe[]
 function this.start(pick, keyframes)
 	this.mesh = pick.mesh
 	this.blocked = true

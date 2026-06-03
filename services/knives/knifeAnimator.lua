@@ -54,7 +54,7 @@ this.angles = nil
 this.rotationBuffer = tes3matrix33.new()
 
 ---@private
----@type nodeAnimatorKeyframe[]
+---@type nodeAnimatonKeyframe[]
 this.startAnimationKeyFrames = nil
 
 ---@public
@@ -188,7 +188,7 @@ function this.start(knife)
 	this.nodeAnimator.start({
 		node = knife,
 		keyframes = this.startAnimationKeyFrames,
-		cancelOn = this.enums.events.lockpickingEnded,
+		cancelOn = { this.enums.events.lockpickingEnded },
 	})
 
 	this.timerManager.start({

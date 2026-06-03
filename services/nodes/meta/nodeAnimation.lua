@@ -1,0 +1,9 @@
+---@meta
+---@class nodeAnimation
+---@field public node niNode
+---@field public phase number
+---@field public keyframes nodeAnimatonKeyframe[]
+---@field public duration number
+---@field public currentFrame integer
+---@field public cancellationEvents string[]?
+---@field public cancellationHandlers table<string, fun()>?

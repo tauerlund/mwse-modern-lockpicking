@@ -1,0 +1,5 @@
+---@meta
+---@class nodeAnimator.start.params
+---@field public node niNode
+---@field public keyframes nodeAnimatonKeyframe[]
+---@field public cancelOn string[]?

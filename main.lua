@@ -47,7 +47,6 @@ function this.initializeMod(_)
 		services.inventoryController,
 		services.eventLogger,
 		services.debuggingRenderer,
-		services.nodeAnimator,
 		services.timerManager,
 	}
 
