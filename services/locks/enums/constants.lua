@@ -4,6 +4,8 @@ local enum = {
 	paths = {
 		defaultLockMesh = "tauer\\lock.nif",
 	},
+	rootName = "ModernLockpicking:Root",
+	cameraRootZBufferName = "ModernLockpicking:NoDepth",
 }
 
 return enum
