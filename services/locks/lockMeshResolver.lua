@@ -13,6 +13,10 @@ this.meshes = {}
 ---@param services serviceCollection
 ---@return boolean,string|nil
 function this.initialize(services)
+	if services.lockMeshValidator.initalized == false then
+		return false, "lockMeshValidator must be initialized before lockMeshResolver"
+	end
+
 	local constants = services.enums.constants.locks
 	this.defaultMesh = tes3.loadMesh(constants.paths.defaultLockMesh, true):clone() --[[@as niNode]]
 	return true, nil

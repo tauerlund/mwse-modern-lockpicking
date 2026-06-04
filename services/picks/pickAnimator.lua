@@ -271,7 +271,9 @@ end
 ---@param cursor tes3vector2
 ---@return boolean
 function this.cursorIsAboveHelper(cursor)
-	local screenPoint = tes3.getCamera():worldPointToScreenPoint(this.helper.worldTransform.translation)
+	-- Lock mesh is in menuCamera space, so world-to-screen projection must use the menu camera.
+	local menuCam = tes3.worldController.menuCamera.cameraData.camera
+	local screenPoint = menuCam:worldPointToScreenPoint(this.helper.worldTransform.translation)
 	if not screenPoint then
 		return false
 	end

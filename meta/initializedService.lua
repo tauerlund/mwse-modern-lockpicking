@@ -1,3 +1,4 @@
 ---@meta
 ---@class initializedService
 ---@field public initialize fun(services:serviceCollection):boolean,string|nil
+---@field public initalized? boolean

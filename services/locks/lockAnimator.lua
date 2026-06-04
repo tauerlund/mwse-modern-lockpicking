@@ -167,12 +167,14 @@ function this.onEnterFrame(e)
 	this.currentRotX = currentRotX + (targetRotX - currentRotX) * t
 	this.currentRotY = currentRotY + (targetRotY - currentRotY) * t
 
-	this.rotationBufferX:toRotationZ(this.currentRotX)
-	this.rotationBufferY:toRotationY(this.currentRotY)
+	-- X=right, Y=depth, Z=up in menuCamera space.
+	-- Pitch (vertical mouse)   → rotate around X
+	-- Yaw   (horizontal mouse) → rotate around Z
+	this.rotationBufferX:toRotationX(this.currentRotX)
+	this.rotationBufferY:toRotationZ(this.currentRotY)
 
-	local camRot = tes3.getCamera().worldTransform.rotation
-	this.lock.mesh.rotation = camRot * this.rotationBufferX * this.rotationBufferY * camRot:transpose() *
-		this.initialRotation
+	-- menuCamRot is identity (cameraRoot has no world rotation), so no change-of-basis needed.
+	this.lock.mesh.rotation = this.rotationBufferX * this.rotationBufferY * this.initialRotation
 	this.lock.mesh:update()
 end
 
@@ -180,12 +182,7 @@ end
 ---@param lock lock
 ---@return tes3vector3
 function this.getTargetTranslation(lock)
-	local direction = tes3.getCameraVector()
-	local forward = direction:normalized() * this.enums.constants.locks.targetDistance
-
-	local translation = lock.mesh.translation + forward
-
-	return translation
+	return tes3vector3.new(0, this.enums.constants.locks.targetDistance, 0)
 end
 
 return this

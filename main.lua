@@ -28,6 +28,7 @@ function this.initializeMod(_)
 		services.lockpickingController,
 		services.lockpickingActivator,
 		services.lockController,
+		services.lockMeshValidator,
 		services.lockMeshResolver,
 		services.lockSpawner,
 		services.lockAnimator,
@@ -50,11 +51,15 @@ function this.initializeMod(_)
 	}
 
 	for _, service in pairs(initializedServices) do
-		local initialized, reason = service.initialize(services)
-		if not initialized then
+		service.initalized = false
+
+		local success, reason = service.initialize(services)
+		if not success then
 			this.logger:error("Initialization failed. Reason: %s", reason)
 			return
 		end
+
+		service.initalized = true
 	end
 
 	this.logger:info("Initialized.")
