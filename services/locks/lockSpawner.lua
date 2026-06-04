@@ -57,15 +57,6 @@ function this.spawnMesh(activator)
 	local mesh = this.getMesh(activator)
 	local root = this.getRootNode()
 
-	local cameraData = tes3.worldController.menuCamera.cameraData
-	mwse.log("[ML] menuCamera.cameraRoot: name=%s worldTrans=%s", tostring(root.name), tostring(root.worldTransform.translation))
-	mwse.log("[ML] menuCamera: fov=%s near=%s far=%s vpW=%s vpH=%s",
-		tostring(cameraData.fov), tostring(cameraData.nearPlaneDistance),
-		tostring(cameraData.farPlaneDistance), tostring(cameraData.viewportWidth), tostring(cameraData.viewportHeight))
-	local wcd = tes3.worldController.worldCamera.cameraData
-	mwse.log("[ML] worldCamera: fov=%s near=%s far=%s",
-		tostring(wcd.fov), tostring(wcd.nearPlaneDistance), tostring(wcd.farPlaneDistance))
-
 	-- Mirror InspectIt: add test=false,write=false to camera root so depth buffer from
 	-- world pass doesn't occlude things; child mesh overrides with its own property.
 	if not root:getProperty(ni.propertyType.zBuffer) then
@@ -95,10 +86,6 @@ function this.spawnMesh(activator)
 
 	root:updateEffects()
 	root:update()
-
-	mwse.log("[ML] mesh.appCulled=%s mesh.worldTrans=%s", tostring(mesh.appCulled), tostring(mesh.worldTransform.translation))
-	local niCam = tes3.worldController.menuCamera.cameraData.camera
-	mwse.log("[ML] niCamera worldPos=%s", tostring(niCam.worldTransform.translation))
 
 	return mesh
 end
@@ -130,9 +117,9 @@ function this.getZBufferProperty()
 	local property = niZBufferProperty.new()
 	local zBufferIndex = this.enums.zBufferIndex
 
-	-- test=true,write=true: self-occlusion within the mesh; overrides the camera root's test=false,write=false
-	property:setFlag(true, zBufferIndex.test)
+	property:setFlag(false, zBufferIndex.test)
 	property:setFlag(true, zBufferIndex.write)
+	property.testFunction = ni.zBufferPropertyTestFunction.always
 
 	return property
 end
