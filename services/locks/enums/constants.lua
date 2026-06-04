@@ -1,6 +1,6 @@
 ---@enum lockConstants
 local enum = {
-	targetDistance = 150,
+	targetDistance = 80,
 	paths = {
 		defaultLockMesh = "tauer\\lock.nif",
 	},

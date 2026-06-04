@@ -167,14 +167,14 @@ function this.onEnterFrame(e)
 	this.currentRotX = currentRotX + (targetRotX - currentRotX) * t
 	this.currentRotY = currentRotY + (targetRotY - currentRotY) * t
 
-	this.rotationBufferX:toRotationZ(this.currentRotX)
-	this.rotationBufferY:toRotationY(this.currentRotY)
+	-- X=right, Y=depth, Z=up in menuCamera space.
+	-- Pitch (vertical mouse)   → rotate around X
+	-- Yaw   (horizontal mouse) → rotate around Z
+	this.rotationBufferX:toRotationX(this.currentRotX)
+	this.rotationBufferY:toRotationZ(this.currentRotY)
 
-	-- Use the menuCamera's fixed orientation, not the world camera which rotates with player look direction.
-	-- Using world camRot causes inverted axes when the player doesn't face +Y.
-	local menuCamRot = tes3.worldController.menuCamera.cameraRoot.worldTransform.rotation
-	this.lock.mesh.rotation = menuCamRot * this.rotationBufferX * this.rotationBufferY * menuCamRot:transpose() *
-		this.initialRotation
+	-- menuCamRot is identity (cameraRoot has no world rotation), so no change-of-basis needed.
+	this.lock.mesh.rotation = this.rotationBufferX * this.rotationBufferY * this.initialRotation
 	this.lock.mesh:update()
 end
 
