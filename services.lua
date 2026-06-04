@@ -74,7 +74,6 @@ local this = {
             locks = require("tauer.modern-lockpicking.services.locks.enums.constants"),
             rendering = require("tauer.modern-lockpicking.services.rendering.enums.constants"),
             skills = require("tauer.modern-lockpicking.services.skills.enums.constants"),
-            timers = require("tauer.modern-lockpicking.services.timers.enums.constants"),
         }
     }
 }
