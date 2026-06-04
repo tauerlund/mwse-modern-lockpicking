@@ -1,0 +1,2 @@
+---@meta
+---@alias reason string|nil
