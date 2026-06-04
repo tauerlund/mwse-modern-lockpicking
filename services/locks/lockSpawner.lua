@@ -35,10 +35,19 @@ function this.spawn(activator)
 end
 
 ---@private
+local camRootZBufName = "ModernLockpicking:NoDepth"
+
+---@private
 ---@param e lockpickingEndedEventData
 function this.onLockpickingEnded(e)
 	local root = this.getRootNode()
 	root:detachChild(e.session.lock.mesh)
+	local p = root:getProperty(ni.propertyType.zBuffer)
+	if p and p.name == camRootZBufName then
+		root:detachProperty(ni.propertyType.zBuffer)
+		root:updateProperties()
+	end
+	root:update()
 end
 
 ---@private
@@ -48,13 +57,46 @@ function this.spawnMesh(activator)
 	local mesh = this.getMesh(activator)
 	local root = this.getRootNode()
 
-	root:attachChild(mesh)
+	local cameraData = tes3.worldController.menuCamera.cameraData
+	mwse.log("[ML] menuCamera.cameraRoot: name=%s worldTrans=%s", tostring(root.name), tostring(root.worldTransform.translation))
+	mwse.log("[ML] menuCamera: fov=%s near=%s far=%s vpW=%s vpH=%s",
+		tostring(cameraData.fov), tostring(cameraData.nearPlaneDistance),
+		tostring(cameraData.farPlaneDistance), tostring(cameraData.viewportWidth), tostring(cameraData.viewportHeight))
+	local wcd = tes3.worldController.worldCamera.cameraData
+	mwse.log("[ML] worldCamera: fov=%s near=%s far=%s",
+		tostring(wcd.fov), tostring(wcd.nearPlaneDistance), tostring(wcd.farPlaneDistance))
+
+	-- Mirror InspectIt: add test=false,write=false to camera root so depth buffer from
+	-- world pass doesn't occlude things; child mesh overrides with its own property.
+	if not root:getProperty(ni.propertyType.zBuffer) then
+		local rootProp = niZBufferProperty.new()
+		rootProp.name = camRootZBufName
+		rootProp:setFlag(false, this.enums.zBufferIndex.test)
+		rootProp:setFlag(false, this.enums.zBufferIndex.write)
+		root:attachProperty(rootProp)
+		root:updateProperties()
+	end
+
+	-- Prepend as first child (InspectIt pattern): tes3ui nodes already in cameraRoot render
+	-- after our mesh and thus appear above it, which is what we want.
+	local existingChildren = {}
+	for _, child in ipairs(root.children) do
+		table.insert(existingChildren, child)
+	end
+	root:detachAllChildren()
+	root:attachChild(mesh, true)
+	for _, child in ipairs(existingChildren) do
+		root:attachChild(child, true)
+	end
 
 	mesh:updateProperties()
 	mesh:updateEffects()
 	mesh:update()
 
+	root:updateEffects()
 	root:update()
+
+	mwse.log("[ML] mesh.appCulled=%s mesh.worldTrans=%s", tostring(mesh.appCulled), tostring(mesh.worldTransform.translation))
 
 	return mesh
 end
@@ -66,8 +108,9 @@ function this.getMesh(activator)
 	local mesh = this.lockMeshResolver.resolve(activator)
 
 	mesh.name = "ModernLockpicking:Root"
-	mesh.translation = tes3.getCameraPosition():copy()
-	mesh.rotation = this.getLockRotation(mesh)
+	-- In menuCamera local space, Y is the depth axis. Place at targetDistance along Y.
+	mesh.translation = tes3vector3.new(0, this.enums.constants.locks.targetDistance, 0)
+	mesh.rotation = tes3matrix33.new(1, 0, 0, 0, 1, 0, 0, 0, 1)
 	mesh:attachProperty(this.getZBufferProperty())
 
 	return mesh
@@ -76,21 +119,7 @@ end
 ---@private
 ---@return niNode
 function this.getRootNode()
-	return tes3.worldController.vfxManager.worldVFXRoot
-end
-
----@private
----@param mesh niNode
----@return tes3matrix33
-function this.getLockRotation(mesh)
-	local rotation = mesh.rotation:copy()
-
-	local forward = tes3.getCameraVector():copy()
-	local up = tes3vector3.new(0, 0, 1)
-
-	rotation:lookAt(forward, up)
-
-	return rotation
+	return tes3.worldController.menuCamera.cameraRoot
 end
 
 ---@private
@@ -99,9 +128,9 @@ function this.getZBufferProperty()
 	local property = niZBufferProperty.new()
 	local zBufferIndex = this.enums.zBufferIndex
 
-	property:setFlag(false, zBufferIndex.test)
+	-- test=true,write=true: self-occlusion within the mesh; overrides the camera root's test=false,write=false
+	property:setFlag(true, zBufferIndex.test)
 	property:setFlag(true, zBufferIndex.write)
-	property.testFunction = ni.zBufferPropertyTestFunction.always
 
 	return property
 end

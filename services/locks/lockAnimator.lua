@@ -180,12 +180,8 @@ end
 ---@param lock lock
 ---@return tes3vector3
 function this.getTargetTranslation(lock)
-	local direction = tes3.getCameraVector()
-	local forward = direction:normalized() * this.enums.constants.locks.targetDistance
-
-	local translation = lock.mesh.translation + forward
-
-	return translation
+	-- Mesh is already at target position in menuCamera local space; no world-space offset needed.
+	return lock.mesh.translation:copy()
 end
 
 return this
