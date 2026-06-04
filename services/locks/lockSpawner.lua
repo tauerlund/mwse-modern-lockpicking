@@ -97,6 +97,8 @@ function this.spawnMesh(activator)
 	root:update()
 
 	mwse.log("[ML] mesh.appCulled=%s mesh.worldTrans=%s", tostring(mesh.appCulled), tostring(mesh.worldTransform.translation))
+	local niCam = tes3.worldController.menuCamera.cameraData.camera
+	mwse.log("[ML] niCamera worldPos=%s", tostring(niCam.worldTransform.translation))
 
 	return mesh
 end
@@ -108,8 +110,8 @@ function this.getMesh(activator)
 	local mesh = this.lockMeshResolver.resolve(activator)
 
 	mesh.name = "ModernLockpicking:Root"
-	-- In menuCamera local space, Y is the depth axis. Place at targetDistance along Y.
-	mesh.translation = tes3vector3.new(0, this.enums.constants.locks.targetDistance, 0)
+	-- Start close to camera so the fly-in animation is visible; nodeAnimator moves it to targetDistance.
+	mesh.translation = tes3vector3.new(0, 5, 0)
 	mesh.rotation = tes3matrix33.new(1, 0, 0, 0, 1, 0, 0, 0, 1)
 	mesh:attachProperty(this.getZBufferProperty())
 

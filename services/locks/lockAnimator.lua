@@ -170,8 +170,10 @@ function this.onEnterFrame(e)
 	this.rotationBufferX:toRotationZ(this.currentRotX)
 	this.rotationBufferY:toRotationY(this.currentRotY)
 
-	local camRot = tes3.getCamera().worldTransform.rotation
-	this.lock.mesh.rotation = camRot * this.rotationBufferX * this.rotationBufferY * camRot:transpose() *
+	-- Use the menuCamera's fixed orientation, not the world camera which rotates with player look direction.
+	-- Using world camRot causes inverted axes when the player doesn't face +Y.
+	local menuCamRot = tes3.worldController.menuCamera.cameraRoot.worldTransform.rotation
+	this.lock.mesh.rotation = menuCamRot * this.rotationBufferX * this.rotationBufferY * menuCamRot:transpose() *
 		this.initialRotation
 	this.lock.mesh:update()
 end
@@ -180,8 +182,7 @@ end
 ---@param lock lock
 ---@return tes3vector3
 function this.getTargetTranslation(lock)
-	-- Mesh is already at target position in menuCamera local space; no world-space offset needed.
-	return lock.mesh.translation:copy()
+	return tes3vector3.new(0, this.enums.constants.locks.targetDistance, 0)
 end
 
 return this
