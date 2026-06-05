@@ -71,7 +71,7 @@ this.enums = nil
 this.eventRegistrar = nil
 
 ---@private
----@type table<string, eventHandlers>
+---@type eventHandlerGroups
 this.eventHandlers = {
 	lifetime = {},
 	session = {}

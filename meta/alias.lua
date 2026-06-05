@@ -3,3 +3,4 @@
 ---@alias callback fun()
 ---@alias eventId string
 ---@alias eventHandlers { [eventId]: callback|callbackWithOptions }
+---@alias eventHandlerGroups table<string, eventHandlers>

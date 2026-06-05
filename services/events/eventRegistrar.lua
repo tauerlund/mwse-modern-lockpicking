@@ -48,18 +48,18 @@ end
 ---@param entry fun()|callbackWithOptions
 ---@return fun()?, event.register.options?
 function this.resolveEntry(entry)
-    local inputType = type(entry)
+    local entryType = type(entry)
 
-    if inputType == "function" then
+    if entryType == "function" then
         return entry, nil
-    elseif inputType == "table" then
+    elseif entryType == "table" then
         local handler = this.resolveType(entry[1], "function")
         local options = this.resolveType(entry[2], "table")
 
         return handler, options
     end
 
-    this.logger:error("invalid type '%s' for input", inputType)
+    this.logger:error("invalid type '%s' for input", entryType)
 end
 
 ---@generic T
