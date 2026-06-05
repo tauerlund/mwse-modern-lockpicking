@@ -50,7 +50,6 @@ this.blocked = false
 this.angles = nil
 
 ---@private
----@type tes3matrix33
 this.rotationBuffer = tes3matrix33.new()
 
 ---@private

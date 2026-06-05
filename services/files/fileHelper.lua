@@ -3,7 +3,6 @@
 local this = {}
 
 ---@private
----@type mwseLogger
 this.logger = mwse.Logger.new()
 
 --- Gets all files of the specified type in the given directory

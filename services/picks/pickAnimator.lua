@@ -10,11 +10,9 @@ this.mesh = nil
 this.helper = nil
 
 ---@private
----@type boolean
 this.blocked = false
 
 ---@private
----@type boolean
 this.jiggling = false
 
 ---@private
@@ -54,7 +52,6 @@ this.startAnimationKeyFrames = nil
 this.cycleAnimationKeyFrames = nil
 
 ---@private
----@type tes3matrix33
 this.rotationBuffer = tes3matrix33.new()
 
 ---@private

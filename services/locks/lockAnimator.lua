@@ -48,11 +48,9 @@ this.mouseConstants = {
 }
 
 ---@private
----@type tes3matrix33
 this.rotationBufferX = tes3matrix33.new()
 
 ---@private
----@type tes3matrix33
 this.rotationBufferY = tes3matrix33.new()
 
 ---@private
@@ -124,7 +122,7 @@ function this.onLockpickingStart(e)
 			},
 			{
 				time = 0.8,
-				translation = this.getTargetTranslation(lock),
+				translation = this.getTargetTranslation(),
 			}
 		},
 		cancelOn = { this.enums.events.lockpickingEnded }
@@ -189,21 +187,16 @@ function this.onEnterFrame(e)
 	this.currentRotX = currentRotX + (targetRotX - currentRotX) * t
 	this.currentRotY = currentRotY + (targetRotY - currentRotY) * t
 
-	-- X=right, Y=depth, Z=up in menuCamera space.
-	-- Pitch (vertical mouse)   → rotate around X
-	-- Yaw   (horizontal mouse) → rotate around Z
 	this.rotationBufferX:toRotationX(this.currentRotX)
 	this.rotationBufferY:toRotationZ(this.currentRotY)
 
-	-- menuCamRot is identity (cameraRoot has no world rotation), so no change-of-basis needed.
 	this.lock.mesh.rotation = this.rotationBufferX * this.rotationBufferY * this.initialRotation
 	this.lock.mesh:update()
 end
 
 ---@private
----@param lock lock
 ---@return tes3vector3
-function this.getTargetTranslation(lock)
+function this.getTargetTranslation()
 	return tes3vector3.new(0, this.enums.constants.locks.targetDistance, 0)
 end
 

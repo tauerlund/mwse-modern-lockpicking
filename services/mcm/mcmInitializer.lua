@@ -10,7 +10,6 @@ this.pages = {
 }
 
 ---@private
----@type string
 this.headerImagePath = "textures\\tauer\\modern-lockpicking\\logo.tga"
 
 ---@private

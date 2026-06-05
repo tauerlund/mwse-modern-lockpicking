@@ -2,7 +2,6 @@
 local this = {}
 
 ---@private
----@type boolean
 this.pauseRenderingInMenus = false
 
 ---@private

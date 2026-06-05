@@ -2,7 +2,6 @@
 local this = {}
 
 ---@private
----@type string
 this.path = "modern-lockpicking"
 
 ---@type settings

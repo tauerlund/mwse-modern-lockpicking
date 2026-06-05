@@ -81,7 +81,6 @@ local this = {
 }
 
 ---@private
----@type mwseLogger
 this.logger = mwse.Logger.new()
 
 for name, service in pairs(this) do

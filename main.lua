@@ -2,11 +2,9 @@
 local this = {}
 
 ---@private
----@type serviceCollection
 this.services = require("tauer.modern-lockpicking.services")
 
 ---@private
----@type mwseLogger
 this.logger = mwse.Logger.new()
 
 ---@package

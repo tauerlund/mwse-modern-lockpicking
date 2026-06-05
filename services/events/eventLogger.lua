@@ -2,7 +2,6 @@
 local this = {}
 
 ---@private
----@type mwseLogger
 this.logger = mwse.Logger.new()
 
 ---@private
