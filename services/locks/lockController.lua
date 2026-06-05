@@ -5,15 +5,34 @@ local this = {}
 ---@type tes3reference
 this.activator = nil
 
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
+---@private
+---@type eventHandlers
+this.eventHandlers = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
 function this.initialize(services)
+	this.eventRegistrar = services.eventRegistrar
+
 	local events = services.enums.events
 
-	event.register(events.lockpickingStarted, this.onLockpickingStarted)
-	event.register(events.lockpickingEnded, this.onLockpickingEnded)
+	this.eventHandlers = {
+		[events.lockpickingStarted] = this.onLockpickingStarted,
+		[events.lockpickingEnded] = this.onLockpickingEnded,
+	}
+
+	this.eventRegistrar.register(this.eventHandlers)
 	return true, nil
+end
+
+---@public
+function this.uninitialize()
+	this.eventRegistrar.unregister(this.eventHandlers)
 end
 
 ---@private

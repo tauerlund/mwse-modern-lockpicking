@@ -56,8 +56,8 @@ this.enums = nil
 ---@private
 ---@type table<string, eventHandlers>
 this.eventHandlers = {
-	initialized = {},
-	active = {}
+	lifetime = {},
+	session = {}
 }
 
 ---@private
@@ -75,7 +75,7 @@ function this.initialize(services)
 	local events = services.enums.events
 
 	this.eventHandlers = {
-		initialized = {
+		lifetime = {
 			[events.settingsUpdated] = this.onSettingsUpdated,
 			[events.lockpickingStarted] = this.onLockpickingStarted,
 			[events.lockpickingEnd] = this.onLockpickingEnd,
@@ -84,14 +84,14 @@ function this.initialize(services)
 			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
 			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
 		},
-		active = {
+		session = {
 			[tes3.event.enterFrame] = this.onEnterFrame,
 			[tes3.event.keyDown] = this.onKeyDown,
 			[tes3.event.keyUp] = this.onKeyUp
 		}
 	}
 
-	this.eventRegistrar.register(this.eventHandlers.initialized)
+	this.eventRegistrar.register(this.eventHandlers.lifetime)
 
 	this.applyKeybinds()
 
@@ -100,7 +100,7 @@ end
 
 ---@public
 function this.uninitialize()
-	this.eventRegistrar.unregister(this.eventHandlers.initialized)
+	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
 end
 
 ---@private
@@ -153,12 +153,12 @@ end
 
 ---@private
 function this.enable()
-	this.eventRegistrar.register(this.eventHandlers.active)
+	this.eventRegistrar.register(this.eventHandlers.session)
 end
 
 ---@private
 function this.disable()
-	this.eventRegistrar.unregister(this.eventHandlers.active)
+	this.eventRegistrar.unregister(this.eventHandlers.session)
 
 	this.currentDirectionKey = nil
 	this.rotating = false

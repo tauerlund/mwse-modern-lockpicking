@@ -55,6 +55,17 @@ this.rotationBufferX = tes3matrix33.new()
 ---@type tes3matrix33
 this.rotationBufferY = tes3matrix33.new()
 
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
+---@private
+---@type table<string, eventHandlers>
+this.eventHandlers = {
+	lifetime = {},
+	session = {}
+}
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
@@ -62,16 +73,31 @@ function this.initialize(services)
 	this.nodeAnimator = services.nodeAnimator
 	this.timerManager = services.timerManager
 	this.enums = services.enums
+	this.eventRegistrar = services.eventRegistrar
 
 	local events = services.enums.events
 
-	event.register(events.lockpickingStart, this.onLockpickingStart)
-	event.register(events.lockpickingStarted, this.onLockpickingStarted)
-	event.register(events.lockpickingEnded, this.onLockpickingEnded)
-	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
-	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
+	this.eventHandlers = {
+		lifetime = {
+			[events.lockpickingStart] = this.onLockpickingStart,
+			[events.lockpickingStarted] = this.onLockpickingStarted,
+			[events.lockpickingEnded] = this.onLockpickingEnded,
+			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
+			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
+		},
+		session = {
+			[tes3.event.enterFrame] = this.onEnterFrame,
+		}
+	}
+
+	this.eventRegistrar.register(this.eventHandlers.lifetime)
 
 	return true, nil
+end
+
+---@public
+function this.uninitialize()
+	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
 end
 
 ---@private
@@ -133,16 +159,12 @@ end
 
 ---@private
 function this.enable()
-	if not event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.register(tes3.event.enterFrame, this.onEnterFrame)
-	end
+	this.eventRegistrar.register(this.eventHandlers.session)
 end
 
 ---@private
 function this.disable()
-	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
-	end
+	this.eventRegistrar.unregister(this.eventHandlers.session)
 end
 
 ---@private

@@ -36,8 +36,8 @@ this.eventRegistrar = nil
 ---@private
 ---@type table<string, eventHandlers>
 this.eventHandlers = {
-	initialized = {},
-	active = {}
+	lifetime = {},
+	session = {}
 }
 
 ---@public
@@ -50,7 +50,7 @@ function this.initialize(services)
 	local events = services.enums.events
 
 	this.eventHandlers = {
-		initialized = {
+		lifetime = {
 			[events.lockpickingStart] = this.onLockpickingStart,
 			[events.lockpickingEnd] = this.onLockpickingEnd,
 			[events.lockpickingEnded] = this.onLockpickingEnded,
@@ -60,19 +60,19 @@ function this.initialize(services)
 			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
 			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
 		},
-		active = {
+		session = {
 			[tes3.event.enterFrame] = this.onEnterFrame
 		}
 	}
 
-	this.eventRegistrar.register(this.eventHandlers.initialized)
+	this.eventRegistrar.register(this.eventHandlers.lifetime)
 
 	return true, nil
 end
 
 ---@public
 function this.uninitialize()
-	this.eventRegistrar.unregister(this.eventHandlers.initialized)
+	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
 	this.enums = nil
 end
 
@@ -127,12 +127,12 @@ end
 
 ---@private
 function this.enable()
-	this.eventRegistrar.register(this.eventHandlers.active)
+	this.eventRegistrar.register(this.eventHandlers.session)
 end
 
 ---@private
 function this.disable()
-	this.eventRegistrar.unregister(this.eventHandlers.active)
+	this.eventRegistrar.unregister(this.eventHandlers.session)
 end
 
 ---@private

@@ -43,11 +43,11 @@ function this.initialize(services)
 
 	local events = services.enums.events
 
-	this.eventRegistrar.register({
+	this.eventHandlers = {
 		[events.lockpickingStarted] = this.onLockpickingStarted,
 		[events.sweetSpotUpdated] = this.onSweetSpotUpdated,
 		[events.lockpickingEnded] = this.onLockpickingEnded,
-	})
+	}
 
 	this.eventRegistrar.register(this.eventHandlers)
 

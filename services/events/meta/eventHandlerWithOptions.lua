@@ -1,0 +1,4 @@
+---@meta
+---@class callbackWithOptions
+---@field [1] callback
+---@field [2] event.register.options?

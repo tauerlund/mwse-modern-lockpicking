@@ -1,12 +1,12 @@
 ---@class serviceCollection
 local this = {
+    eventRegistrar = require("tauer.modern-lockpicking.services.events.eventRegistrar"),
+    eventLogger = require("tauer.modern-lockpicking.services.events.eventLogger"),
+
     cylinderAnimator = require("tauer.modern-lockpicking.services.cylinders.cylinderAnimator"),
     cylinderController = require("tauer.modern-lockpicking.services.cylinders.cylinderController"),
 
     debuggingRenderer = require("tauer.modern-lockpicking.services.debugging.debuggingRenderer"),
-
-    eventRegistrar = require("tauer.modern-lockpicking.services.events.eventRegistrar"),
-    eventLogger = require("tauer.modern-lockpicking.services.events.eventLogger"),
 
     fileHelper = require("tauer.modern-lockpicking.services.files.fileHelper"),
 

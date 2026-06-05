@@ -45,25 +45,51 @@ this.debounceInFrames = 3
 ---@type integer
 this.frameCounter = 0
 
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
+---@private
+---@type table<string, eventHandlers>
+this.eventHandlers = {
+	lifetime = {},
+	session = {}
+}
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
 function this.initialize(services)
 	this.soundFileResolver = services.soundFileResolver
 	this.enums = services.enums
+	this.eventRegistrar = services.eventRegistrar
 
 	local events = services.enums.events
 
-	event.register(events.lockpickingStart, this.onLockpickingStart)
-	event.register(events.lockpickingEnd, this.onLockpickingEnd)
-	event.register(events.pickCycled, this.onPickCycled)
-	event.register(events.rotationStarted, this.onRotationStarted)
-	event.register(events.rotationEnded, this.onRotationEnded)
-	event.register(events.cylinderBlocked, this.onCylinderBlocked)
-	event.register(events.pickBroken, this.onPickBroken)
-	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
-	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
+	this.eventHandlers = {
+		lifetime = {
+			[events.lockpickingStart] = this.onLockpickingStart,
+			[events.lockpickingEnd] = this.onLockpickingEnd,
+			[events.pickCycled] = this.onPickCycled,
+			[events.rotationStarted] = this.onRotationStarted,
+			[events.rotationEnded] = this.onRotationEnded,
+			[events.cylinderBlocked] = this.onCylinderBlocked,
+			[events.pickBroken] = this.onPickBroken,
+			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
+			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
+		},
+		session = {
+			[tes3.event.enterFrame] = this.onEnterFrame,
+		}
+	}
+
+	this.eventRegistrar.register(this.eventHandlers.lifetime)
 	return true, nil
+end
+
+---@public
+function this.uninitialize()
+	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
 end
 
 ---@private
@@ -85,10 +111,7 @@ function this.onLockpickingStart(_)
 		soundPath = this.soundFileResolver.resolve(constants.templates.lockpickingStart).path,
 	})
 	this.lastCursorPosition = tes3.getCursorPosition().x
-
-	if not event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.register(tes3.event.enterFrame, this.onEnterFrame)
-	end
+	this.enable()
 end
 
 ---@private
@@ -104,10 +127,17 @@ function this.onLockpickingEnd(e)
 
 	this.rotatingCylinder = false
 	this.jiggling = false
+	this.disable()
+end
 
-	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
-	end
+---@private
+function this.enable()
+	this.eventRegistrar.register(this.eventHandlers.session)
+end
+
+---@private
+function this.disable()
+	this.eventRegistrar.unregister(this.eventHandlers.session)
 end
 
 ---@private

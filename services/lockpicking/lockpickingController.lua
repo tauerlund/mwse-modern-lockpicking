@@ -46,12 +46,15 @@ this.enums = nil
 this.session = nil
 
 ---@private
----@type eventHandlers
-this.initializedEventHandlers = nil
-
----@private
 ---@type eventRegistrar
 this.eventRegistrar = nil
+
+---@private
+---@type table<string, eventHandlers>
+this.eventHandlers = {
+	lifetime = {},
+	session = {}
+}
 
 ---@public
 ---@param services serviceCollection
@@ -71,25 +74,30 @@ function this.initialize(services)
 
 	local events = services.enums.events
 
-	this.initializedEventHandlers = {
-		[events.lockpickingActivated] = this.onLockPickingActivated,
-		[events.cylinderTargetReached] = this.onCylinderTargetReached,
-		[events.pickCycled] = this.onPickCycled,
-		[events.pickBroken] = this.onPickBroken,
-		[events.lockpickingEnd] = this.onLockpickingEnd,
-		[events.settingsUpdated] = this.onSettingsUpdated,
-		[events.optionsMenuOpened] = this.onOptionsMenuOpened,
-		[events.optionsMenuClosed] = this.onOptionsMenuClosed,
+	this.eventHandlers = {
+		lifetime = {
+			[events.lockpickingActivated] = this.onLockPickingActivated,
+			[events.cylinderTargetReached] = this.onCylinderTargetReached,
+			[events.pickCycled] = this.onPickCycled,
+			[events.pickBroken] = this.onPickBroken,
+			[events.lockpickingEnd] = this.onLockpickingEnd,
+			[events.settingsUpdated] = this.onSettingsUpdated,
+			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
+			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
+		},
+		session = {
+			[tes3.event.keyUp] = this.onKeyUp,
+		}
 	}
 
-	this.eventRegistrar.register(this.initializedEventHandlers)
+	this.eventRegistrar.register(this.eventHandlers.lifetime)
 
 	return true, nil
 end
 
 ---@public
 function this.uninitialize()
-	this.eventRegistrar.unregister(this.initializedEventHandlers)
+	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
 end
 
 ---@private
@@ -286,16 +294,12 @@ end
 
 ---@private
 function this.enableInput()
-	if not event.isRegistered(tes3.event.keyUp, this.onKeyUp) then
-		event.register(tes3.event.keyUp, this.onKeyUp)
-	end
+	this.eventRegistrar.register(this.eventHandlers.session)
 end
 
 ---@private
 function this.disableInput()
-	if event.isRegistered(tes3.event.keyUp, this.onKeyUp) then
-		event.unregister(tes3.event.keyUp, this.onKeyUp)
-	end
+	this.eventRegistrar.unregister(this.eventHandlers.session)
 end
 
 return this

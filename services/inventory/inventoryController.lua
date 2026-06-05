@@ -5,19 +5,45 @@ local this = {}
 ---@type settings
 this.settings = nil
 
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
+---@private
+---@type table<string, eventHandlers>
+this.eventHandlers = {
+	lifetime = {},
+	session = {}
+}
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean, string|nil
 function this.initialize(services)
 	this.settings = services.settings
+	this.eventRegistrar = services.eventRegistrar
 
 	local events = services.enums.events
 
-	event.register(events.pickBreak, this.onPickBroken)
-	event.register(events.settingsUpdated, this.onSettingsUpdated)
+	this.eventHandlers = {
+		lifetime = {
+			[events.pickBreak] = this.onPickBroken,
+			[events.settingsUpdated] = this.onSettingsUpdated,
+		},
+		session = {
+			[tes3.event.equip] = this.onEquip,
+		}
+	}
+
+	this.eventRegistrar.register(this.eventHandlers.lifetime)
 
 	this.applySettings()
 	return true, nil
+end
+
+---@public
+function this.uninitialize()
+	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
 end
 
 ---@public
@@ -93,16 +119,12 @@ end
 
 ---@private
 function this.disableLockpickEquip()
-	if not event.isRegistered(tes3.event.equip, this.onEquip) then
-		event.register(tes3.event.equip, this.onEquip)
-	end
+	this.eventRegistrar.register(this.eventHandlers.session)
 end
 
 ---@private
 function this.enableLockpickEquip()
-	if event.isRegistered(tes3.event.equip, this.onEquip) then
-		event.unregister(tes3.event.equip, this.onEquip)
-	end
+	this.eventRegistrar.unregister(this.eventHandlers.session)
 end
 
 ---@private

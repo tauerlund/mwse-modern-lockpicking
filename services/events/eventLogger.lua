@@ -9,24 +9,42 @@ this.logger = mwse.Logger.new()
 ---@type enums
 this.enums = nil
 
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
+---@private
+---@type eventHandlers
+this.eventHandlers = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean, string|nil
 function this.initialize(services)
     this.enums = services.enums
+    this.eventRegistrar = services.eventRegistrar
 
     local events = services.enums.events
 
-    event.register(events.lockpickingStart, this.onLockpickingStart)
-    event.register(events.lockpickingStarted, this.onLockpickingStarted)
-    event.register(events.lockpickingEnd, this.onLockpickingEnd)
-    event.register(events.lockpickingEnded, this.onLockpickingEnded)
-    event.register(events.rotationStarted, this.onRotationStarted)
-    event.register(events.rotationEnded, this.onRotationEnded)
-    event.register(events.cylinderBlocked, this.onCylinderBlocked)
-    event.register(events.pickCycled, this.onPickCycled)
-    event.register(events.pickBroken, this.onPickBroken)
+    this.eventHandlers = {
+        [events.lockpickingStart] = this.onLockpickingStart,
+        [events.lockpickingStarted] = this.onLockpickingStarted,
+        [events.lockpickingEnd] = this.onLockpickingEnd,
+        [events.lockpickingEnded] = this.onLockpickingEnded,
+        [events.rotationStarted] = this.onRotationStarted,
+        [events.rotationEnded] = this.onRotationEnded,
+        [events.cylinderBlocked] = this.onCylinderBlocked,
+        [events.pickCycled] = this.onPickCycled,
+        [events.pickBroken] = this.onPickBroken,
+    }
+
+    this.eventRegistrar.register(this.eventHandlers)
     return true, nil
+end
+
+---@public
+function this.uninitialize()
+    this.eventRegistrar.unregister(this.eventHandlers)
 end
 
 ---@private

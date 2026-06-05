@@ -57,6 +57,17 @@ this.rotationBuffer = tes3matrix33.new()
 ---@type nodeAnimatonKeyframe[]
 this.startAnimationKeyFrames = nil
 
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
+---@private
+---@type table<string, eventHandlers>
+this.eventHandlers = {
+	lifetime = {},
+	session = {}
+}
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
@@ -64,6 +75,7 @@ function this.initialize(services)
 	this.timerManager = services.timerManager
 	this.nodeAnimator = services.nodeAnimator
 	this.enums = services.enums
+	this.eventRegistrar = services.eventRegistrar
 
 	local events = services.enums.events
 	local constants = services.enums.constants.knives
@@ -86,15 +98,29 @@ function this.initialize(services)
 		},
 	}
 
-	event.register(events.lockpickingStart, this.onLockpickingStart)
-	event.register(events.lockpickingEnd, this.onLockpickingEnd)
-	event.register(events.lockpickingEnded, this.onLockpickingEnded)
-	event.register(events.rotationStarted, this.onRotationStarted)
-	event.register(events.rotationEnded, this.onRotationEnded)
-	event.register(events.cylinderBlocked, this.onCylinderBlocked)
-	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
-	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
+	this.eventHandlers = {
+		lifetime = {
+			[events.lockpickingStart] = this.onLockpickingStart,
+			[events.lockpickingEnd] = this.onLockpickingEnd,
+			[events.lockpickingEnded] = this.onLockpickingEnded,
+			[events.rotationStarted] = this.onRotationStarted,
+			[events.rotationEnded] = this.onRotationEnded,
+			[events.cylinderBlocked] = this.onCylinderBlocked,
+			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
+			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
+		},
+		session = {
+			[tes3.event.enterFrame] = this.onEnterFrame,
+		}
+	}
+
+	this.eventRegistrar.register(this.eventHandlers.lifetime)
 	return true, nil
+end
+
+---@public
+function this.uninitialize()
+	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
 end
 
 ---@private
@@ -156,16 +182,12 @@ end
 
 ---@private
 function this.enable()
-	if not event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.register(tes3.event.enterFrame, this.onEnterFrame)
-	end
+	this.eventRegistrar.register(this.eventHandlers.session)
 end
 
 ---@private
 function this.disable()
-	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
-	end
+	this.eventRegistrar.unregister(this.eventHandlers.session)
 end
 
 ---@private

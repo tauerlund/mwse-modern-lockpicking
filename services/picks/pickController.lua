@@ -52,6 +52,17 @@ this.pickSpawner = nil
 ---@type enums
 this.enums = nil
 
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
+---@private
+---@type table<string, eventHandlers>
+this.eventHandlers = {
+	lifetime = {},
+	session = {}
+}
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
@@ -60,19 +71,36 @@ function this.initialize(services)
 	this.pickSelector = services.pickSelector
 	this.pickSpawner = services.pickSpawner
 	this.enums = services.enums
+	this.eventRegistrar = services.eventRegistrar
+
 	local events = services.enums.events
 
+	this.eventHandlers = {
+		lifetime = {
+			[events.settingsUpdated] = this.onKeyBindsUpdated,
+			[events.lockpickingStarted] = this.onLockpickingStarted,
+			[events.lockpickingEnd] = this.onLockpickingEnd,
+			[events.lockpickingEnded] = this.onLockpickingEnded,
+			[events.sweetSpotUpdated] = this.onSweetSpotUpdated,
+			[events.cylinderBlocked] = this.onCylinderBlocked,
+			[events.rotationEnded] = this.onRotationEnded,
+			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
+			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
+		},
+		session = {
+			[tes3.event.keyDown] = this.onKeyDown,
+			[tes3.event.enterFrame] = this.onEnterFrame,
+		}
+	}
+
 	this.applyKeybinds()
-	event.register(events.settingsUpdated, this.onKeyBindsUpdated)
-	event.register(events.lockpickingStarted, this.onLockpickingStarted)
-	event.register(events.lockpickingEnd, this.onLockpickingEnd)
-	event.register(events.lockpickingEnded, this.onLockpickingEnded)
-	event.register(events.sweetSpotUpdated, this.onSweetSpotUpdated)
-	event.register(events.cylinderBlocked, this.onCylinderBlocked)
-	event.register(events.rotationEnded, this.onRotationEnded)
-	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
-	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
+	this.eventRegistrar.register(this.eventHandlers.lifetime)
 	return true, nil
+end
+
+---@public
+function this.uninitialize()
+	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
 end
 
 ---@private
@@ -128,22 +156,12 @@ end
 
 ---@private
 function this.enable()
-	if not event.isRegistered(tes3.event.keyDown, this.onKeyDown) then
-		event.register(tes3.event.keyDown, this.onKeyDown)
-	end
-	if not event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.register(tes3.event.enterFrame, this.onEnterFrame)
-	end
+	this.eventRegistrar.register(this.eventHandlers.session)
 end
 
 ---@private
 function this.disable()
-	if event.isRegistered(tes3.event.keyDown, this.onKeyDown) then
-		event.unregister(tes3.event.keyDown, this.onKeyDown)
-	end
-	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
-	end
+	this.eventRegistrar.unregister(this.eventHandlers.session)
 end
 
 ---@private

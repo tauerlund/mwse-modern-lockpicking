@@ -25,6 +25,14 @@ this.translations = nil
 ---@type settings
 this.settings = nil
 
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
+---@private
+---@type eventHandlers
+this.eventHandlers = nil
+
 ---@public
 ---@param services serviceCollection
 function this.initialize(services)
@@ -34,20 +42,21 @@ function this.initialize(services)
     this.skillController = services.skillController
     this.translations = services.translations
     this.settings = services.settings
+    this.eventRegistrar = services.eventRegistrar
+
+    this.eventHandlers = {
+        [tes3.event.activate] = this.onActivate,
+    }
 end
 
 ---@public
 function this.enable()
-    if not event.isRegistered(tes3.event.activate, this.onActivate) then
-        event.register(tes3.event.activate, this.onActivate)
-    end
+    this.eventRegistrar.register(this.eventHandlers)
 end
 
 ---@public
 function this.disable()
-    if event.isRegistered(tes3.event.activate, this.onActivate) then
-        event.unregister(tes3.event.activate, this.onActivate)
-    end
+    this.eventRegistrar.unregister(this.eventHandlers)
 end
 
 ---@private

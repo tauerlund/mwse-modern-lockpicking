@@ -21,12 +21,22 @@ this.currentActivationStrategy = nil
 ---@type enums
 this.enums = nil
 
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
+---@private
+---@type eventHandlers
+this.eventHandlers = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean, string|nil
 function this.initialize(services)
 	this.enums = services.enums
 	this.settings = services.settings
+	this.eventRegistrar = services.eventRegistrar
+
 	local events = services.enums.events
 
 	this.activationStrategies = services.strategyLoader.loadAll({
@@ -38,10 +48,19 @@ function this.initialize(services)
 		return false, "Failed to load activation strategies"
 	end
 
-	event.register(events.settingsUpdated, this.onSettingsUpdated)
+	this.eventHandlers = {
+		[events.settingsUpdated] = this.onSettingsUpdated,
+	}
+
+	this.eventRegistrar.register(this.eventHandlers)
 	this.applyStrategy()
 
 	return true, nil
+end
+
+---@public
+function this.uninitialize()
+	this.eventRegistrar.unregister(this.eventHandlers)
 end
 
 ---@private
