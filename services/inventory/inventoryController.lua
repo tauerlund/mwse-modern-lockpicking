@@ -50,26 +50,32 @@ end
 ---@return tes3itemStack|nil
 function this.getBestLockpick()
 	local picks = this.getLockpicks()
-	return table.size(picks) > 0
-		and picks[table.size(picks)]
-		or nil
+	if not picks then
+		return nil
+	end
+
+	return picks[table.size(picks)]
 end
 
 ---@public
----@return tes3itemStack[]
+---@return tes3itemStack[]|nil
 function this.getLockpicks()
 	---@type tes3itemStack[]
-	local lockpicks = {}
+	local picks = {}
 
 	for _, item in pairs(tes3.player.object.inventory.items) do
 		if item.object.objectType == tes3.objectType.lockpick then
-			table.insert(lockpicks, item)
+			table.insert(picks, item)
 		end
 	end
 
-	table.sort(lockpicks, this.sortByLowestQuality)
+	table.sort(picks, this.sortByLowestQuality)
 
-	return lockpicks
+	if table.size(picks) == 0 then
+		return nil
+	end
+
+	return picks
 end
 
 ---@public

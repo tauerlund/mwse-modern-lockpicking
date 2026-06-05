@@ -122,6 +122,8 @@ end
 function this.onPickBroken(_)
 	local picks = this.inventoryController.getLockpicks()
 	if not picks then
+		this.endLockpicking(false)
+		tes3.messageBox(this.translations.get(this.enums.translationKeys.messageBoxNoLockpicks))
 		return
 	end
 
@@ -273,7 +275,7 @@ end
 function this.onLockpickingEnd(e)
 	this.disableInput()
 	this.timerManager.start({
-		durationInSeconds = 1,
+		durationInSeconds = 0.1,
 		callback = this.onEndTimerFinished,
 		data = e --[[@as timerData]],
 	})
@@ -284,9 +286,16 @@ end
 function this.onEndTimerFinished(data)
 	---@cast data +lockpickingEndEventData, -timerData
 	---@type lockpickingEndedEventData
+	this.endLockpicking(data.success)
+end
+
+---@private
+---@param success boolean
+function this.endLockpicking(success)
+	---@type lockpickingEndedEventData
 	local eventData = {
 		session = this.session,
-		success = data.success,
+		success = success,
 	}
 	event.trigger(this.enums.events.lockpickingEnded, eventData)
 	this.session = nil
