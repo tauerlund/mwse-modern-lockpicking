@@ -53,6 +53,34 @@ this.angles = nil
 this.rotationBuffer = tes3matrix33.new()
 
 ---@private
+this.rotationBufferTiltX = tes3matrix33.new()
+
+---@private
+this.rotationBufferTiltZ = tes3matrix33.new()
+
+---@private
+this.mouseConstants = {
+	amplitude = 0.06,
+	lerpSpeed = 5,
+}
+
+---@private
+---@type number
+this.startCursorX = 0
+
+---@private
+---@type number
+this.startCursorY = 0
+
+---@private
+---@type number
+this.currentTiltX = 0
+
+---@private
+---@type number
+this.currentTiltZ = 0
+
+---@private
 ---@type nodeAnimatonKeyframe[]
 this.startAnimationKeyFrames = nil
 
@@ -152,6 +180,8 @@ function this.onLockpickingEnded(_)
 	this.targetAngle = 0
 	this.sourceAngle = 0
 	this.baseRotation = nil
+	this.currentTiltX = 0
+	this.currentTiltZ = 0
 	this.disable()
 end
 
@@ -197,6 +227,7 @@ function this.onEnterFrame(e)
 	end
 
 	this.updatePhase(e.delta)
+	this.updateTilt(e.delta)
 	this.rotate()
 end
 
@@ -222,7 +253,24 @@ end
 ---@private
 function this.onStartTimerFinished()
 	this.baseRotation = this.knife.rotation:copy()
+	local cursor = tes3.getCursorPosition()
+	this.startCursorX = cursor.x
+	this.startCursorY = cursor.y
 	this.blocked = false
+end
+
+---@private
+function this.updateTilt(delta)
+	local cursor = tes3.getCursorPosition()
+	local viewportWidth, viewportHeight = tes3.getViewportSize()
+	local constants = this.mouseConstants
+
+	local targetTiltX = ((cursor.y - this.startCursorY) / viewportHeight) * constants.amplitude
+	local targetTiltZ = ((this.startCursorX - cursor.x) / viewportWidth) * constants.amplitude
+
+	local t = math.min(1, constants.lerpSpeed * delta)
+	this.currentTiltX = this.currentTiltX + (targetTiltX - this.currentTiltX) * t
+	this.currentTiltZ = this.currentTiltZ + (targetTiltZ - this.currentTiltZ) * t
 end
 
 ---@private
@@ -230,8 +278,10 @@ function this.rotate()
 	this.currentAngle = math.lerp(this.sourceAngle, this.targetAngle, this.phase)
 
 	this.rotationBuffer:toRotationY(this.currentAngle)
+	this.rotationBufferTiltX:toRotationX(this.currentTiltX)
+	this.rotationBufferTiltZ:toRotationZ(this.currentTiltZ)
 
-	this.knife.rotation = this.baseRotation * this.rotationBuffer
+	this.knife.rotation = this.rotationBufferTiltX * this.rotationBufferTiltZ * this.baseRotation * this.rotationBuffer
 	this.knife:update()
 end
 
