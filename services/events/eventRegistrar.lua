@@ -45,8 +45,8 @@ function this.unregister(handlers)
 end
 
 ---@private
----@param entry fun()|callbackWithOptions
----@return fun()?, event.register.options?
+---@param entry callback|callbackWithOptions
+---@return callback?, event.register.options?
 function this.resolveEntry(entry)
     local entryType = type(entry)
 
@@ -59,7 +59,7 @@ function this.resolveEntry(entry)
         return handler, options
     end
 
-    this.logger:error("invalid type '%s' for input", entryType)
+    this.logger:error("Invalid type '%s'", entryType)
 end
 
 ---@generic T
