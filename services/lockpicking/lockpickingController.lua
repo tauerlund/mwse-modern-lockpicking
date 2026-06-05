@@ -123,7 +123,7 @@ function this.onPickBroken(_)
 	local picks = this.inventoryController.getLockpicks()
 	if not picks then
 		this.endLockpicking(false)
-		tes3.messageBox(this.translations.get(this.enums.translationKeys.messageBoxNoLockpicks))
+		tes3.messageBox(this.translations.get(this.enums.translationKeys.messageBoxOutOfLockpicks))
 		return
 	end
 

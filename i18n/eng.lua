@@ -3,6 +3,7 @@ local keys = require("tauer.modern-lockpicking.services.translations.enums.trans
 return {
 	[keys.modName] = "Modern Lockpicking",
 	[keys.messageBoxNoLockpicks] = "You have no lockpicks.",
+	[keys.messageBoxOutOfLockpicks] = "You are out of lockpicks.",
 	[keys.interfaceControlsHeader] = "Controls",
 	[keys.interfaceControlsRotatePick] = "Rotate Pick",
 	[keys.interfaceControlsRotateLock] = "Rotate Lock",
