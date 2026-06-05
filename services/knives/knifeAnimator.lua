@@ -60,8 +60,8 @@ this.rotationBufferTiltZ = tes3matrix33.new()
 
 ---@private
 this.mouseConstants = {
-	amplitude = 0.06,
-	lerpSpeed = 5,
+	amplitude = 0.05,
+	lerpSpeed = 2,
 }
 
 ---@private
