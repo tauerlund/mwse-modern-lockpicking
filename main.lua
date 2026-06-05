@@ -50,19 +50,43 @@ function this.initializeMod(_)
 		services.debuggingRenderer,
 	}
 
-	for _, service in pairs(initializedServices) do
+	local success, reason = this.intializeServices(initializedServices)
+
+	if not success then
+		this.logger:error("Initialization failed. Reason: %s", reason)
+		this.uninitializeServices(initializedServices)
+		return
+	end
+
+	this.logger:info("Initialized.")
+end
+
+---@private
+---@param initializedServices initializedService[]
+---@return boolean, reason
+function this.intializeServices(initializedServices)
+	for _, service in ipairs(initializedServices) do
 		service.initalized = false
 
-		local success, reason = service.initialize(services)
+		local success, reason = service.initialize(this.services)
 		if not success then
-			this.logger:error("Initialization failed. Reason: %s", reason)
-			return
+			return false, string.format("'%s' could not be initialized because %s", service.name, reason)
 		end
 
 		service.initalized = true
 	end
 
-	this.logger:info("Initialized.")
+	return true, nil
+end
+
+---@private
+---@param initializedServices initializedService[]
+function this.uninitializeServices(initializedServices)
+	for _, service in ipairs(initializedServices) do
+		if service.initalized and service.uninitialize then
+			service.uninitialize()
+		end
+	end
 end
 
 event.register(tes3.event.modConfigReady, this.initializeMcm)

@@ -39,7 +39,7 @@ this.currentDirectionKey = nil
 
 ---@private
 ---@type { [tes3.scanCode]: rotationDirections }
-this.rotationKeyCodeToRotatioDirectionMap = nil
+this.rotationKeyCodeToRotationDirectionMap = nil
 
 ---@private
 ---@type boolean
@@ -53,24 +53,54 @@ this.settings = nil
 ---@type enums
 this.enums = nil
 
+---@private
+---@type table<string, eventHandlers>
+this.eventHandlers = {
+	lifetime = {},
+	session = {}
+}
+
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
 function this.initialize(services)
+	this.eventRegistrar = services.eventRegistrar
 	this.settings = services.settings
 	this.enums = services.enums
+
+	local events = services.enums.events
+
+	this.eventHandlers = {
+		lifetime = {
+			[events.settingsUpdated] = this.onSettingsUpdated,
+			[events.lockpickingStarted] = this.onLockpickingStarted,
+			[events.lockpickingEnd] = this.onLockpickingEnd,
+			[events.sweetSpotUpdated] = this.onSweetSpotUpdated,
+			[events.pickCycled] = this.onPickCycled,
+			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
+			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
+		},
+		session = {
+			[tes3.event.enterFrame] = this.onEnterFrame,
+			[tes3.event.keyDown] = this.onKeyDown,
+			[tes3.event.keyUp] = this.onKeyUp
+		}
+	}
+
+	this.eventRegistrar.register(this.eventHandlers.lifetime)
+
 	this.applyKeybinds()
 
-	local events = this.enums.events
-
-	event.register(events.settingsUpdated, this.onSettingsUpdated)
-	event.register(events.lockpickingStarted, this.onLockpickingStarted)
-	event.register(events.lockpickingEnd, this.onLockpickingEnd)
-	event.register(events.sweetSpotUpdated, this.onSweetSpotUpdated)
-	event.register(events.pickCycled, this.onPickCycled)
-	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
-	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
 	return true, nil
+end
+
+---@public
+function this.uninitialize()
+	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
 end
 
 ---@private
@@ -123,28 +153,13 @@ end
 
 ---@private
 function this.enable()
-	if not event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.register(tes3.event.enterFrame, this.onEnterFrame)
-	end
-	if not event.isRegistered(tes3.event.keyDown, this.onKeyDown) then
-		event.register(tes3.event.keyDown, this.onKeyDown)
-	end
-	if not event.isRegistered(tes3.event.keyUp, this.onKeyUp) then
-		event.register(tes3.event.keyUp, this.onKeyUp)
-	end
+	this.eventRegistrar.register(this.eventHandlers.session)
 end
 
 ---@private
 function this.disable()
-	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
-	end
-	if event.isRegistered(tes3.event.keyDown, this.onKeyDown) then
-		event.unregister(tes3.event.keyDown, this.onKeyDown)
-	end
-	if event.isRegistered(tes3.event.keyUp, this.onKeyUp) then
-		event.unregister(tes3.event.keyUp, this.onKeyUp)
-	end
+	this.eventRegistrar.unregister(this.eventHandlers.session)
+
 	this.currentDirectionKey = nil
 	this.rotating = false
 	this.blocked = false
@@ -201,7 +216,7 @@ end
 ---@private
 ---@param e keyDownEventData
 function this.onKeyDown(e)
-	if this.rotationKeyCodeToRotatioDirectionMap[e.keyCode] then
+	if this.rotationKeyCodeToRotationDirectionMap[e.keyCode] then
 		this.onRotationKeyDown(e)
 	end
 end
@@ -209,7 +224,7 @@ end
 ---@private
 ---@param e keyUpEventData
 function this.onKeyUp(e)
-	if this.rotationKeyCodeToRotatioDirectionMap[e.keyCode] then
+	if this.rotationKeyCodeToRotationDirectionMap[e.keyCode] then
 		this.onRotationKeyUp(e)
 	end
 end
@@ -227,7 +242,7 @@ function this.onRotationKeyDown(e)
 
 	---@type rotationEventData
 	local eventData = {
-		direction = this.rotationKeyCodeToRotatioDirectionMap[e.keyCode],
+		direction = this.rotationKeyCodeToRotationDirectionMap[e.keyCode],
 	}
 	event.trigger(this.enums.events.rotationStarted, eventData)
 end
@@ -245,7 +260,7 @@ function this.onRotationKeyUp(e)
 
 	---@type rotationEventData
 	local eventData = {
-		direction = this.rotationKeyCodeToRotatioDirectionMap[e.keyCode],
+		direction = this.rotationKeyCodeToRotationDirectionMap[e.keyCode],
 	}
 	event.trigger(this.enums.events.rotationEnded, eventData)
 end
@@ -255,7 +270,7 @@ function this.applyKeybinds()
 	local keyBinds = this.settings.keyBinds
 	local rotationDirections = this.enums.rotationDirections
 
-	this.rotationKeyCodeToRotatioDirectionMap = {
+	this.rotationKeyCodeToRotationDirectionMap = {
 		[keyBinds.rotateLockClockwise.keyCode] = rotationDirections.clockwise,
 		[keyBinds.rotateLockCounterclockwise.keyCode] = rotationDirections.counterClockwise,
 	}

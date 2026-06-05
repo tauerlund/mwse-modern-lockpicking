@@ -1,2 +1,5 @@
 ---@meta
 ---@alias reason string|nil
+---@alias callback fun()
+---@alias eventId string
+---@alias eventHandlers { [eventId]: callback|callbackWithOptions }

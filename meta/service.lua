@@ -1,0 +1,3 @@
+---@meta
+---@class service
+---@field public name? string

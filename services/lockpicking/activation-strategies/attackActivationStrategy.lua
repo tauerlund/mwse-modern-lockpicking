@@ -13,26 +13,35 @@ this.enums = nil
 ---@type timerManager
 this.timerManager = nil
 
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
+---@private
+---@type eventHandlers
+this.eventHandlers = nil
+
 ---@public
 ---@param services serviceCollection
 function this.initialize(services)
     this.name = services.enums.activationStrategyNames.attack
     this.enums = services.enums
     this.timerManager = services.timerManager
+    this.eventRegistrar = services.eventRegistrar
+
+    this.eventHandlers = {
+        [tes3.event.lockPick] = this.onLockPick,
+    }
 end
 
 ---@public
 function this.enable()
-    if not event.isRegistered(tes3.event.lockPick, this.onLockPick) then
-        event.register(tes3.event.lockPick, this.onLockPick)
-    end
+    this.eventRegistrar.register(this.eventHandlers)
 end
 
 ---@public
 function this.disable()
-    if event.isRegistered(tes3.event.lockPick, this.onLockPick) then
-        event.unregister(tes3.event.lockPick, this.onLockPick)
-    end
+    this.eventRegistrar.unregister(this.eventHandlers)
 end
 
 ---@private

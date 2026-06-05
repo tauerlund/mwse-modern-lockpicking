@@ -33,26 +33,43 @@ this.usesTooltipId = -1217
 ---@type enums
 this.enums = nil
 
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
+---@private
+---@type eventHandlers
+this.eventHandlers = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
 function this.initialize(services)
-	this.guiBuilder   = services.guiBuilder
-	this.translations = services.translations
-	this.settings     = services.settings
-	this.enums        = services.enums
+	this.guiBuilder     = services.guiBuilder
+	this.translations   = services.translations
+	this.settings       = services.settings
+	this.enums          = services.enums
+	this.eventRegistrar = services.eventRegistrar
 
-	event.register(tes3.event.load, this.onLoad)
-	event.register(tes3.event.uiObjectTooltip, this.onUiObjectTooltip)
-	event.register(tes3.event.uiActivated, this.uiActivated, { filter = "MenuOptions" })
+	local events        = this.enums.events
 
-	local events = this.enums.events
+	this.eventHandlers  = {
+		[tes3.event.load] = this.onLoad,
+		[tes3.event.uiObjectTooltip] = this.onUiObjectTooltip,
+		[tes3.event.uiActivated] = { this.uiActivated, { filter = "MenuOptions" } },
+		[events.lockpickingStart] = this.onLockpickingStart,
+		[events.lockpickingEnded] = this.onLockpickingEnded,
+		[events.pickBroken] = this.onPickBroken,
+	}
 
-	event.register(events.lockpickingStart, this.onLockpickingStart)
-	event.register(events.lockpickingEnded, this.onLockpickingEnded)
-	event.register(events.pickBroken, this.onPickBroken)
+	this.eventRegistrar.register(this.eventHandlers)
 
 	return true, nil
+end
+
+---@public
+function this.uninitialize()
+	this.eventRegistrar.unregister(this.eventHandlers)
 end
 
 ---@private

@@ -5,15 +5,34 @@ local this = {}
 ---@type enums
 this.enums = nil
 
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
+---@private
+---@type eventHandlers
+this.eventHandlers = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean, string|nil
 function this.initialize(services)
 	this.enums = services.enums
+	this.eventRegistrar = services.eventRegistrar
+
 	local events = services.enums.events
 
-	event.register(events.lockpickingEnded, this.onLockpickingEnded)
+	this.eventHandlers = {
+		[events.lockpickingEnded] = this.onLockpickingEnded,
+	}
+
+	this.eventRegistrar.register(this.eventHandlers)
 	return true, nil
+end
+
+---@public
+function this.uninitialize()
+	this.eventRegistrar.unregister(this.eventHandlers)
 end
 
 ---@public
