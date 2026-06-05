@@ -113,6 +113,7 @@ function this.initialize(template, services)
 	})
 
 	gradientCategory:createButton({
+		buttonText = translations.get(translationKeys.mcmDifficultyTextResetToDefaults),
 		label = translations.get(translationKeys.mcmDifficultyLabelResetToDefaults),
 		description = translations.get(translationKeys.mcmDifficultyDescResetToDefaults),
 		callback = function ()

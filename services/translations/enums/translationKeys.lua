@@ -42,6 +42,7 @@ local this = {
     mcmDifficultyCategoryPickDamage = "mcm.difficulty.category.pickDamage",
     mcmDifficultyLabelBaseRate = "mcm.difficulty.label.baseRate",
     mcmDifficultyDescBaseRate = "mcm.difficulty.desc.baseRate",
+    mcmDifficultyTextResetToDefaults = "mcm.difficulty.text.resetToDefaults",
     mcmDifficultyLabelResetToDefaults = "mcm.difficulty.label.resetToDefaults",
     mcmDifficultyDescResetToDefaults = "mcm.difficulty.desc.resetToDefaults",
     tooltipPickHealth = "tooltip.pick.health",

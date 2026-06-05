@@ -49,6 +49,7 @@ return {
 	[keys.mcmDifficultyLabelBaseRate] = "Base Damage Rate",
 	[keys.mcmDifficultyDescBaseRate] =
 	"Pick damage per second when the sweet spot is at maximum size. Scales up as the sweet spot shrinks.",
+	[keys.mcmDifficultyTextResetToDefaults] = "Reset",
 	[keys.mcmDifficultyLabelResetToDefaults] = "Reset to Defaults",
 	[keys.mcmDifficultyDescResetToDefaults] = "Reset all difficulty settings to their default values.",
 	[keys.tooltipPickHealth] = "Health",
