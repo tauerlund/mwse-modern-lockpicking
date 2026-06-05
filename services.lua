@@ -5,6 +5,7 @@ local this = {
 
     debuggingRenderer = require("tauer.modern-lockpicking.services.debugging.debuggingRenderer"),
 
+    eventRegistrar = require("tauer.modern-lockpicking.services.events.eventRegistrar"),
     eventLogger = require("tauer.modern-lockpicking.services.events.eventLogger"),
 
     fileHelper = require("tauer.modern-lockpicking.services.files.fileHelper"),
@@ -78,5 +79,19 @@ local this = {
         }
     }
 }
+
+---@private
+---@type mwseLogger
+this.logger = mwse.Logger.new()
+
+for name, service in pairs(this) do
+    if type(service) ~= "table" then
+        this.logger:warn("Could not assign name to service '%s' because it is not a table", name)
+    elseif service.name ~= nil then
+        this.logger:warn("'%s' already has a service name assigned (%s)", name, service.name)
+    else
+        service.name = name
+    end
+end
 
 return this

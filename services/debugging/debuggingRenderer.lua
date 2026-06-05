@@ -25,19 +25,38 @@ this.lineLength = 0.5
 ---@type number
 this.defaultMeshLength = 1000
 
+---@private
+---@type eventHandlers
+this.eventHandlers = nil
+
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean, string|nil
 function this.initialize(services)
+	this.eventRegistrar = services.eventRegistrar
 	this.settings = services.settings
 	this.enums = services.enums
 
 	local events = services.enums.events
 
-	event.register(events.lockpickingStarted, this.onLockpickingStarted)
-	event.register(events.sweetSpotUpdated, this.onSweetSpotUpdated)
-	event.register(events.lockpickingEnded, this.onLockpickingEnded)
+	this.eventRegistrar.register({
+		[events.lockpickingStarted] = this.onLockpickingStarted,
+		[events.sweetSpotUpdated] = this.onSweetSpotUpdated,
+		[events.lockpickingEnded] = this.onLockpickingEnded,
+	})
+
+	this.eventRegistrar.register(this.eventHandlers)
+
 	return true, nil
+end
+
+---@public
+function this.uninitialize()
+	this.eventRegistrar.unregister(this.eventHandlers)
 end
 
 ---@private

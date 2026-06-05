@@ -45,6 +45,14 @@ this.enums = nil
 ---@type lockpickingSession|nil
 this.session = nil
 
+---@private
+---@type eventHandlers
+this.initializedEventHandlers = nil
+
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
@@ -59,17 +67,29 @@ function this.initialize(services)
 	this.translations = services.translations
 	this.skillController = services.skillController
 	this.enums = services.enums
+	this.eventRegistrar = services.eventRegistrar
+
 	local events = services.enums.events
 
-	event.register(events.lockpickingActivated, this.onLockPickingActivated)
-	event.register(events.cylinderTargetReached, this.onCylinderTargetReached)
-	event.register(events.pickCycled, this.onPickCycled)
-	event.register(events.pickBroken, this.onPickBroken)
-	event.register(events.lockpickingEnd, this.onLockpickingEnd)
-	event.register(events.settingsUpdated, this.onSettingsUpdated)
-	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
-	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
+	this.initializedEventHandlers = {
+		[events.lockpickingActivated] = this.onLockPickingActivated,
+		[events.cylinderTargetReached] = this.onCylinderTargetReached,
+		[events.pickCycled] = this.onPickCycled,
+		[events.pickBroken] = this.onPickBroken,
+		[events.lockpickingEnd] = this.onLockpickingEnd,
+		[events.settingsUpdated] = this.onSettingsUpdated,
+		[events.optionsMenuOpened] = this.onOptionsMenuOpened,
+		[events.optionsMenuClosed] = this.onOptionsMenuClosed,
+	}
+
+	this.eventRegistrar.register(this.initializedEventHandlers)
+
 	return true, nil
+end
+
+---@public
+function this.uninitialize()
+	this.eventRegistrar.unregister(this.initializedEventHandlers)
 end
 
 ---@private
@@ -227,14 +247,17 @@ function this.onKeyUp(e)
 		return
 	end
 
-	if e.keyCode == this.settings.keyBinds.exit.keyCode then
-		---@type lockpickingEndEventData
-		local data = {
-			session = this.session,
-			success = false,
-		}
-		event.trigger(this.enums.events.lockpickingEnd, data)
+	local exitKeyCode = this.settings.keyBinds.exit.keyCode
+	if e.keyCode ~= exitKeyCode then
+		return
 	end
+
+	---@type lockpickingEndEventData
+	local data = {
+		session = this.session,
+		success = false,
+	}
+	event.trigger(this.enums.events.lockpickingEnd, data)
 end
 
 ---@private

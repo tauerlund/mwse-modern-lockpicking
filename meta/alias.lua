@@ -1,2 +1,4 @@
 ---@meta
 ---@alias reason string|nil
+---@alias eventId string
+---@alias eventHandlers { eventId: fun() }

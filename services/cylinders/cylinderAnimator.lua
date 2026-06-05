@@ -29,23 +29,51 @@ this.rotationBuffer = tes3matrix33.new()
 ---@type enums
 this.enums = nil
 
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
+---@private
+---@type table<string, eventHandlers>
+this.eventHandlers = {
+	initialized = {},
+	active = {}
+}
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
 function this.initialize(services)
+	this.eventRegistrar = services.eventRegistrar
 	this.enums = services.enums
 
 	local events = services.enums.events
 
-	event.register(events.lockpickingStart, this.onLockpickingStart)
-	event.register(events.lockpickingEnd, this.onLockpickingEnd)
-	event.register(events.lockpickingEnded, this.onLockpickingEnded)
-	event.register(events.rotationStarted, this.onRotationStarted)
-	event.register(events.rotationEnded, this.onRotationEnded)
-	event.register(events.cylinderBlocked, this.onCylinderBlocked)
-	event.register(events.optionsMenuOpened, this.onOptionsMenuOpened)
-	event.register(events.optionsMenuClosed, this.onOptionsMenuClosed)
+	this.eventHandlers = {
+		initialized = {
+			[events.lockpickingStart] = this.onLockpickingStart,
+			[events.lockpickingEnd] = this.onLockpickingEnd,
+			[events.lockpickingEnded] = this.onLockpickingEnded,
+			[events.rotationStarted] = this.onRotationStarted,
+			[events.rotationEnded] = this.onRotationEnded,
+			[events.cylinderBlocked] = this.onCylinderBlocked,
+			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
+			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
+		},
+		active = {
+			[tes3.event.enterFrame] = this.onEnterFrame
+		}
+	}
+
+	this.eventRegistrar.register(this.eventHandlers.initialized)
+
 	return true, nil
+end
+
+---@public
+function this.uninitialize()
+	this.eventRegistrar.unregister(this.eventHandlers.initialized)
+	this.enums = nil
 end
 
 ---@private
@@ -99,16 +127,12 @@ end
 
 ---@private
 function this.enable()
-	if not event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.register(tes3.event.enterFrame, this.onEnterFrame)
-	end
+	this.eventRegistrar.register(this.eventHandlers.active)
 end
 
 ---@private
 function this.disable()
-	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
-	end
+	this.eventRegistrar.unregister(this.eventHandlers.active)
 end
 
 ---@private
@@ -146,6 +170,7 @@ function this.rotate()
 	local cylinder = this.cylinder
 
 	this.rotationBuffer:toRotationY(this.phase)
+
 	cylinder.rotation = this.rotationBuffer
 	cylinder:update()
 end
