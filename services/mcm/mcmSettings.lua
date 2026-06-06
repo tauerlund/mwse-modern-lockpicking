@@ -24,6 +24,7 @@ this.defaults = {
         gradientFactor = 2.0,
         maxSweetSpotRadius = 45,
         baseRate = 1,
+        damageSkeletonKey = false,
     },
     debugging = {
         showSweetSpotRenderer = false,

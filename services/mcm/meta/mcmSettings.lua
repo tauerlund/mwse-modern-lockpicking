@@ -17,6 +17,7 @@
 ---@field public gradientFactor number
 ---@field public maxSweetSpotRadius number
 ---@field public baseRate number
+---@field public damageSkeletonKey boolean
 
 ---@class debuggingSettings
 ---@field public showSweetSpotRenderer boolean

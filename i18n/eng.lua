@@ -64,5 +64,8 @@ return {
 	"When enabled, lockpicks can be equipped from the inventory like in the vanilla game.",
 	[keys.mcmUseLockComplexityLabel] = "Respect lock complexity",
 	[keys.mcmUseLockComplexityDesc] =
-	"Blocks the player from entering the lockpicking mini-game if the lock is too complex (based on the same formula as the vanilla game).\n Note, this will also prevent lockpicks with too low quality to be selected for complex locks."
+	"Blocks the player from entering the lockpicking mini-game if the lock is too complex (based on the same formula as the vanilla game).\n Note, this will also prevent lockpicks with too low quality to be selected for complex locks.",
+	[keys.mcmDifficultyLabelDamageSkeletonKey] = "Damage Skeleton Key",
+	[keys.mcmDifficultyDescDamageSkeletonKey] =
+	"When enabled, the Skeleton Key can be damaged and broken like any other lockpick. When disabled, it is indestructible.",
 }

@@ -93,6 +93,15 @@ function this.initialize(template, services)
 		}),
 	})
 
+	pickDamageCategory:createOnOffButton({
+		label = translations.get(translationKeys.mcmDifficultyLabelDamageSkeletonKey),
+		description = translations.get(translationKeys.mcmDifficultyDescDamageSkeletonKey),
+		variable = mwse.mcm.createTableVariable({
+			id = "damageSkeletonKey",
+			table = settings.mcm.difficulty,
+		}),
+	})
+
 	local gradientCategory = page:createCategory({
 		label = translations.get(translationKeys
 			.mcmDifficultyCategoryGradient)

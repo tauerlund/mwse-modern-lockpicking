@@ -187,6 +187,13 @@ function this.onRotationEnded()
 end
 
 ---@private
+---@return boolean
+function this.isSkeletonKey()
+	local id = this.currentPick.item.object.id
+	return id and id:lower() == "skeleton_key"
+end
+
+---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
 	if this.paused then
@@ -194,6 +201,9 @@ function this.onEnterFrame(e)
 	end
 
 	if this.damaging then
+		if this.isSkeletonKey() and not this.settings.difficulty.damageSkeletonKey then
+			return
+		end
 		this.damagePick(e.delta)
 	end
 end

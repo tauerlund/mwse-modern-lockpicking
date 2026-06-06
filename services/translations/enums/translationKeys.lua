@@ -54,7 +54,9 @@ local this = {
     mcmAllowEquipPicksLabel = "mcm.allowEquipPicks.label",
     mcmAllowEquipPicksDesc = "mcm.allowEquipPicks.desc",
     mcmUseLockComplexityLabel = "mcm.useLockComplexity.label",
-    mcmUseLockComplexityDesc = "mcm.useLockComplexity.desc"
+    mcmUseLockComplexityDesc = "mcm.useLockComplexity.desc",
+    mcmDifficultyLabelDamageSkeletonKey = "mcm.difficulty.label.damageSkeletonKey",
+    mcmDifficultyDescDamageSkeletonKey = "mcm.difficulty.desc.damageSkeletonKey",
 }
 
 return this
