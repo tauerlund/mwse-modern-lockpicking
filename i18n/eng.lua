@@ -68,4 +68,7 @@ return {
 	[keys.mcmDifficultyLabelDamageSkeletonKey] = "Damage Skeleton Key",
 	[keys.mcmDifficultyDescDamageSkeletonKey] =
 	"When enabled, the Skeleton Key can be damaged and broken like any other lockpick. When disabled, it is indestructible.",
+	[keys.mcmEnabledLabel] = "Enable Mod",
+	[keys.mcmEnabledDesc] =
+	"When disabled, the lockpicking minigame is skipped and the vanilla lockpicking behavior is used instead.",
 }

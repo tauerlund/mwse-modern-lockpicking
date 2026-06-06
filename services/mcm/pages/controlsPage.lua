@@ -14,6 +14,19 @@ function this.initialize(template, services)
 
     local controlsPage = template:createSideBarPage { label = translations.get(translationKeys.interfaceControlsHeader) }
 
+    local enabledCategory = controlsPage:createCategory({
+        label = translations.get(translationKeys.mcmLabelsSettings),
+    })
+
+    enabledCategory:createOnOffButton({
+        label = translations.get(translationKeys.mcmEnabledLabel),
+        description = translations.get(translationKeys.mcmEnabledDesc),
+        variable = mwse.mcm.createTableVariable({
+            id = "enabled",
+            table = settings,
+        }),
+    })
+
     local rotateLockCategory = controlsPage:createCategory({
         label = translations.get(translationKeys.interfaceControlsRotateLock),
         description = translations.get(translationKeys.mcmDescriptionRotateLock),

@@ -6,6 +6,7 @@ this.path = "modern-lockpicking"
 
 ---@type settings
 this.defaults = {
+    enabled = true,
     keyBinds = {
         rotateLockCounterclockwise = { keyCode = tes3.scanCode.a },
         rotateLockClockwise = { keyCode = tes3.scanCode.d },

@@ -23,6 +23,7 @@
 ---@field public showSweetSpotRenderer boolean
 
 ---@class settings
+---@field public enabled boolean
 ---@field public keyBinds keybindSettings
 ---@field public logLevel string
 ---@field public activationStrategy string|nil

@@ -67,6 +67,11 @@ end
 function this.applyStrategy()
 	if this.currentActivationStrategy then
 		this.currentActivationStrategy.disable()
+		this.currentActivationStrategy = nil
+	end
+
+	if not this.settings.enabled then
+		return
 	end
 
 	local strategyName = this.settings.activationStrategy or this.enums.activationStrategyNames.default
