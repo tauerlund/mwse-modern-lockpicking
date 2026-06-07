@@ -75,6 +75,8 @@ function this.onActivate(e)
         return
     end
 
+    e.block = true
+
     local canPick, reason = this.canPick(activator.lockNode)
     if canPick == false then
         tes3.messageBox(reason)
