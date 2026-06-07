@@ -76,7 +76,7 @@ function this.onSweetSpotUpdated(e)
 	this.linesContainer = niNode.new()
 	this.root:attachChild(this.linesContainer)
 
-	local constants = this.enums.constants.lockpicking
+	local constants = this.enums.constants.cylinder
 	local function clamp(angle)
 		return math.max(constants.targetRotationLeft, math.min(constants.targetRotationRight, angle))
 	end

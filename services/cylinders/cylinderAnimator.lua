@@ -17,12 +17,6 @@ this.rotationDirection = nil
 this.blocked = false
 
 ---@private
-this.constants = {
-	rotateSpeed = 1.5,
-	resetSpeed = 1.8,
-}
-
----@private
 this.rotationBuffer = tes3matrix33.new()
 
 ---@private
@@ -142,16 +136,18 @@ function this.onEnterFrame(e)
 		return
 	end
 
+	local constants = this.enums.constants.cylinder
+
 	if not this.rotationDirection then
 		local rotation = this.cylinder.rotation:toEulerXYZ().y
 		if math.isclose(rotation, 0, 0.04) then
 			return
 		end
 		local multiplier = rotation <= 0 and 1 or -1
-		this.updatePhase(multiplier, this.constants.resetSpeed, e.delta)
+		this.updatePhase(multiplier, constants.resetSpeed, e.delta)
 	else
 		local multiplier = this.rotationDirection == this.enums.rotationDirections.counterClockwise and 1 or -1
-		this.updatePhase(multiplier, this.constants.rotateSpeed, e.delta)
+		this.updatePhase(multiplier, constants.rotateSpeed, e.delta)
 	end
 
 	this.rotate()
