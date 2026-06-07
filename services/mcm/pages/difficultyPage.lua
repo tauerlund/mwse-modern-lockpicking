@@ -51,7 +51,7 @@ function this.initialize(template, services)
 		label = translations.get(translationKeys.mcmDifficultyLabelQualityFactor),
 		description = translations.get(translationKeys.mcmDifficultyDescQualityFactor),
 		min = 0.1,
-		max = 10.0,
+		max = 5.0,
 		step = 0.1,
 		jump = 0.5,
 		decimalPlaces = 1,
