@@ -333,10 +333,11 @@ function this.createPicks(activePick, picks, eligiblePicks)
 		:withAutoSize()
 		:wuild()
 
+	local pickPalette = constants.pickPalette
+
 	for _, pick in ipairs(picks) do
 		local isActive = pick.object.id == activePick.item.object.id
 		local isEligible = eligiblePicks[pick.object.id]
-		local pickPalette = constants.pickPalette
 		local color = isActive and tes3ui.getPalette(pickPalette.active)
 			or isEligible and tes3ui.getPalette(pickPalette.inactive)
 			or tes3ui.getPalette(pickPalette.ineligible)
@@ -345,7 +346,6 @@ function this.createPicks(activePick, picks, eligiblePicks)
 		local horizontalBorder = 16
 
 		local pickId = pick.object.id
-		local pickPalette = constants.pickPalette
 		local function onPickCycled(element, e)
 			local isActive = pickId == e.pick.item.object.id
 			element.color = isActive and tes3ui.getPalette(pickPalette.active)
