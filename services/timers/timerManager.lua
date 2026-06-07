@@ -34,7 +34,7 @@ end
 function this.registerCancellationEvents(events, handlers, t)
 	for _, evt in ipairs(events) do
 		handlers[evt] = function ()
-			if not t or not t.state == timer.active then
+			if not t or t.state ~= timer.active then
 				return
 			end
 			t:cancel()
