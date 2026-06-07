@@ -202,10 +202,10 @@ end
 ---@return number
 function this.computeSweetSpotRadius()
 	local difficulty = this.settings.difficulty
-	local security = tes3.mobilePlayer:getSkillValue(tes3.skill.security)
+	local statsModifier = this.skillController.getStatsModifier()
 	local lockLevel = this.session.activator.lockNode and this.session.activator.lockNode.level or 1
 	local quality = this.session.pick.item.object.quality
-	local radius = math.pi * quality * difficulty.qualityFactor * security * difficulty.securityFactor /
+	local radius = math.pi * quality * difficulty.qualityFactor * statsModifier * difficulty.securityFactor /
 		(math.max(1, lockLevel) * difficulty.lockLevelFactor)
 	return math.min(radius, math.rad(difficulty.maxSweetSpotRadius))
 end

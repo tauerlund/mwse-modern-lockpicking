@@ -44,7 +44,7 @@ function this.getSuccessChance(pick, lock)
 	return (this.getStatsModifier() * pick.object.quality * this.getFatigueModifier()) - lock.level
 end
 
----@private
+---@public
 ---@return number
 function this.getStatsModifier()
 	local security = tes3.mobilePlayer:getSkillValue(tes3.skill.security)
