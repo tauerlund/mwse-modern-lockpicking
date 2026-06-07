@@ -27,7 +27,7 @@ this.picks = nil
 
 ---@private
 ---@type number
-this.usesTooltipId = -1217
+this.usesTooltipId = -1217 -- ID of the "Uses" row in the vanilla item tooltip, found by inspecting tooltip children
 
 ---@private
 ---@type enums
