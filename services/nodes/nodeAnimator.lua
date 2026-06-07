@@ -36,7 +36,7 @@ end
 ---@param originalTranslation tes3vector3?
 ---@param originalRotation tes3vector3?
 function this.initializeTransforms(mesh, originalTranslation, originalRotation)
-	if originalRotation then
+	if originalTranslation then
 		mesh.translation = originalTranslation --[[@as tes3vector3]]
 	end
 
