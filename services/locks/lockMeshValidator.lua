@@ -19,7 +19,7 @@ end
 function this.validate(mesh)
     for _, objectName in ipairs(this.enums.objectNames) do
         if not mesh:getObjectByName(objectName) then
-            return false, string.format("'%s' is missing object '%'", mesh.name, objectName)
+            return false, string.format("object '%s' is missing", mesh.name, objectName)
         end
     end
     return true, nil

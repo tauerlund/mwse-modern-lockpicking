@@ -25,6 +25,7 @@ local this = {
     lockController = require("tauer.modern-lockpicking.services.locks.lockController"),
     lockMeshValidator = require("tauer.modern-lockpicking.services.locks.lockMeshValidator"),
     lockMeshResolver = require("tauer.modern-lockpicking.services.locks.lockMeshResolver"),
+    lockMeshLoader = require("tauer.modern-lockpicking.services.locks.lockMeshLoader"),
     lockSpawner = require("tauer.modern-lockpicking.services.locks.lockSpawner"),
 
     mcmInitializer = require("tauer.modern-lockpicking.services.mcm.mcmInitializer"),

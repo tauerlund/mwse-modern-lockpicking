@@ -26,6 +26,7 @@ function this.initializeMod(_)
 		services.lockpickingController,
 		services.lockpickingActivator,
 		services.lockController,
+		services.lockMeshLoader,
 		services.lockMeshValidator,
 		services.lockMeshResolver,
 		services.lockSpawner,
@@ -64,6 +65,15 @@ end
 ---@return boolean, reason
 function this.intializeServices(initializedServices)
 	for _, service in ipairs(initializedServices) do
+		if service.dependencies then
+			local dependencies = service.dependencies(this.services)
+			for _, dependency in ipairs(dependencies) do
+				if not dependency.initalized then
+					return false, string.format("'%s' must be initialized before '%s'", dependency.name, service.name)
+				end
+			end
+		end
+
 		service.initalized = false
 
 		local success, reason = service.initialize(this.services)
