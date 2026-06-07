@@ -68,20 +68,20 @@ function this.intializeServices(initializedServices)
 		if service.dependencies then
 			local dependencies = service.dependencies(this.services)
 			for _, dependency in ipairs(dependencies) do
-				if not dependency.initalized then
+				if not dependency.initialized then
 					return false, string.format("'%s' must be initialized before '%s'", dependency.name, service.name)
 				end
 			end
 		end
 
-		service.initalized = false
+		service.initialized = false
 
 		local success, reason = service.initialize(this.services)
 		if not success then
 			return false, string.format("'%s' could not be initialized because %s", service.name, reason)
 		end
 
-		service.initalized = true
+		service.initialized = true
 	end
 
 	return true, nil
@@ -91,7 +91,7 @@ end
 ---@param initializedServices initializedService[]
 function this.uninitializeServices(initializedServices)
 	for _, service in ipairs(initializedServices) do
-		if service.initalized and service.uninitialize then
+		if service.initialized and service.uninitialize then
 			service.uninitialize()
 		end
 	end
