@@ -134,9 +134,8 @@ function this.getZBufferProperty()
 	local property = niZBufferProperty.new()
 	local zBufferIndex = this.enums.zBufferIndex
 
-	property:setFlag(false, zBufferIndex.test)
+	property:setFlag(true, zBufferIndex.test)
 	property:setFlag(true, zBufferIndex.write)
-	property.testFunction = ni.zBufferPropertyTestFunction.always
 
 	return property
 end
