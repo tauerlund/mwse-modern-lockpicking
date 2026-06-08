@@ -275,29 +275,23 @@ function this.onEnterFrame(e)
 
 	local cursor = tes3.getCursorPosition()
 
-	if this.cursorIsAboveHelper(cursor) then
-		cursor:normalize()
-		this.targetHelperAngle = -cursor.x * math.rad(90)
+	-- Lock mesh is in menuCamera space, so world-to-screen projection must use the menu camera.
+	local menuCam = tes3.worldController.menuCamera.cameraData.camera
+	local screenPoint = menuCam:worldPointToScreenPoint(this.helper.worldTransform.translation)
+
+	if screenPoint and cursor.y > screenPoint.y then
+		local relX = cursor.x - screenPoint.x
+		local relY = cursor.y - screenPoint.y
+		local len = math.sqrt(relX * relX + relY * relY)
+		if len > 0 then
+			this.targetHelperAngle = -(relX / len) * math.rad(90)
+		end
 	end
 
 	this.updateAngle(e.delta)
 
 	this.rotateHelper()
 	this.rotatePick()
-end
-
----@private
----@param cursor tes3vector2
----@return boolean
-function this.cursorIsAboveHelper(cursor)
-	-- Lock mesh is in menuCamera space, so world-to-screen projection must use the menu camera.
-	local menuCam = tes3.worldController.menuCamera.cameraData.camera
-	local screenPoint = menuCam:worldPointToScreenPoint(this.helper.worldTransform.translation)
-	if not screenPoint then
-		return false
-	end
-
-	return cursor.y > screenPoint.y
 end
 
 ---@private
