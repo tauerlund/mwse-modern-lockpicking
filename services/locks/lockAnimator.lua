@@ -197,7 +197,7 @@ end
 ---@private
 ---@return tes3vector3
 function this.getTargetTranslation()
-	return tes3vector3.new(0, this.enums.constants.locks.targetDistance, 0)
+	return tes3vector3.new(0, this.enums.constants.locks.targetDistance, -2.5)
 end
 
 return this
