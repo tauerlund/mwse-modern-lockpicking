@@ -2,46 +2,8 @@
 local this = {}
 
 ---@private
----@type niNode
-this.mesh = nil
-
----@private
----@type niNode
-this.helper = nil
-
----@private
-this.blocked = false
-
----@private
-this.jiggling = false
-
----@private
----@type number
-this.jigglePhase = 0
-
----@private
----@type number
-this.jiggleOffset = 0
-
----@private
----@type tes3itemStack
-this.item = nil
-
----@private
----@type tes3matrix33
-this.originalHelperRotation = nil
-
----@private
----@type tes3matrix33
-this.originalPickRotation = nil
-
----@private
----@type number
-this.currentHelperAngle = 0
-
----@private
----@type number
-this.targetHelperAngle = 0
+---@type pickAnimatorState|nil
+this.state = nil
 
 ---@private
 ---@type nodeAnimatonKeyframe[]
@@ -153,10 +115,19 @@ end
 ---@private
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
-	this.helper = e.session.pick.helper
-	this.originalHelperRotation = e.session.pick.helper.rotation:copy()
-	this.item = e.session.pick.item
-
+	this.state = {
+		mesh = e.session.pick.mesh,
+		helper = e.session.pick.helper,
+		item = e.session.pick.item,
+		originalHelperRotation = e.session.pick.helper.rotation:copy(),
+		originalPickRotation = nil,
+		currentHelperAngle = 0,
+		targetHelperAngle = 0,
+		blocked = true,
+		jiggling = false,
+		jigglePhase = 0,
+		jiggleOffset = 0,
+	}
 	this.start(e.session.pick, this.startAnimationKeyFrames)
 	this.enable()
 end
@@ -164,42 +135,46 @@ end
 ---@private
 ---@param _ lockpickingEndEventData
 function this.onLockpickingEnd(_)
-	this.blocked = true
+	this.state.blocked = true
 end
 
 ---@private
 ---@param _ lockpickingEndedEventData
 function this.onLockpickingEnded(_)
-	this.resetFields()
+	if this.state then
+		this.state.helper.rotation = this.state.originalHelperRotation:copy()
+		this.state.helper:update()
+		this.state = nil
+	end
 	this.disable()
 end
 
 ---@private
 ---@param e pickCycledEventData
 function this.onPickCycled(e)
-	this.item = e.pick.item
+	this.state.item = e.pick.item
 	this.start(e.pick, this.cycleAnimationKeyFrames)
 end
 
 ---@private
 ---@param _ rotationEventData
 function this.onRotationStarted(_)
-	this.blocked = true
+	this.state.blocked = true
 end
 
 ---@private
 ---@param _ rotationEventData
 function this.onRotationEnded(_)
-	this.blocked = false
-	this.jiggling = false
-	this.jigglePhase = 0
-	this.jiggleOffset = 0
+	this.state.blocked = false
+	this.state.jiggling = false
+	this.state.jigglePhase = 0
+	this.state.jiggleOffset = 0
 end
 
 ---@private
 function this.onCylinderBlocked()
-	this.blocked = true
-	this.jiggling = true
+	this.state.blocked = true
+	this.state.jiggling = true
 end
 
 ---@private
@@ -213,29 +188,11 @@ function this.disable()
 end
 
 ---@private
-function this.resetFields()
-	this.helper.rotation = this.originalHelperRotation:copy()
-	this.helper:update()
-	this.helper = nil
-
-	this.mesh = nil
-	this.item = nil
-	this.blocked = false
-	this.jiggling = false
-	this.jigglePhase = 0
-	this.jiggleOffset = 0
-	this.originalHelperRotation = nil
-	this.originalPickRotation = nil
-	this.currentHelperAngle = 0
-	this.targetHelperAngle = 0
-end
-
----@private
 ---@param pick pick
 ---@param keyframes nodeAnimatonKeyframe[]
 function this.start(pick, keyframes)
-	this.mesh = pick.mesh
-	this.blocked = true
+	this.state.mesh = pick.mesh
+	this.state.blocked = true
 
 	this.nodeAnimator.start({
 		node = pick.mesh,
@@ -253,23 +210,28 @@ end
 ---@private
 ---@param _ mwseTimerCallbackData
 function this.onStartTimerFinished(_)
-	this.blocked = false
-	this.originalPickRotation = this.mesh.rotation:copy()
+	this.state.blocked = false
+	this.state.originalPickRotation = this.state.mesh.rotation:copy()
 end
 
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
-	if this.paused then
+	if this.paused or not this.state then
 		return
 	end
 
-	if this.jiggling then
+	local state = this.state
+	if not state then
+		return
+	end
+
+	if state.jiggling then
 		this.updateJiggle(e.delta)
 		return
 	end
 
-	if this.blocked then
+	if state.blocked then
 		return
 	end
 
@@ -277,19 +239,18 @@ function this.onEnterFrame(e)
 
 	-- Lock mesh is in menuCamera space, so world-to-screen projection must use the menu camera.
 	local menuCam = tes3.worldController.menuCamera.cameraData.camera
-	local screenPoint = menuCam:worldPointToScreenPoint(this.helper.worldTransform.translation)
+	local screenPoint = menuCam:worldPointToScreenPoint(state.helper.worldTransform.translation)
 
 	if screenPoint and cursor.y > screenPoint.y then
 		local relX = cursor.x - screenPoint.x
 		local relY = cursor.y - screenPoint.y
 		local len = math.sqrt(relX * relX + relY * relY)
 		if len > 0 then
-			this.targetHelperAngle = -(relX / len) * math.rad(90)
+			state.targetHelperAngle = -(relX / len) * math.rad(90)
 		end
 	end
 
 	this.updateAngle(e.delta)
-
 	this.rotateHelper()
 	this.rotatePick()
 end
@@ -297,55 +258,68 @@ end
 ---@private
 ---@param delta number
 function this.updateAngle(delta)
+	local state = this.state --[[@as pickAnimatorState]]
 	local transition = math.min(this.enums.constants.picks.animation.lerpSpeed * delta, 1)
-	this.currentHelperAngle = math.lerp(this.currentHelperAngle, this.targetHelperAngle, transition)
+	state.currentHelperAngle = math.lerp(state.currentHelperAngle, state.targetHelperAngle, transition)
 end
 
 ---@private
 ---@return number
 function this.computeJiggleAmplitude()
+	local state = this.state --[[@as pickAnimatorState]]
 	local constants = this.enums.constants.picks
 	local base = constants.animation.jiggleAmplitude
-	if not this.item then
+
+	if not state.item then
 		return base
 	end
 
-	local itemData = this.item.variables and this.item.variables[1]
+	local itemData = state.item.variables and state.item.variables[1]
 	if itemData then
-		for _, variable in ipairs(this.item.variables) do
+		for _, variable in ipairs(state.item.variables) do
 			if variable.condition < itemData.condition then
 				itemData = variable
 			end
 		end
 	end
 
-	local conditionRatio = itemData and math.max(0, itemData.condition / this.item.object.maxCondition) or 1
+	local conditionRatio = itemData and math.max(0, itemData.condition / state.item.object.maxCondition) or 1
 	return base * (1 + constants.animation.jiggleDamageFactor * (1 - conditionRatio))
 end
 
 ---@private
+---@param delta number
 function this.updateJiggle(delta)
+	local state = this.state --[[@as pickAnimatorState]]
+
 	local constants = this.enums.constants.picks
-	this.jigglePhase = this.jigglePhase + constants.animation.jiggleSpeed * delta
-	local wave = math.sin(this.jigglePhase) + math.sin(this.jigglePhase * 1.7 + 1.3) * constants.animation.jiggleNoise
-	this.jiggleOffset = wave * this.computeJiggleAmplitude()
+	state.jigglePhase = state.jigglePhase + constants.animation.jiggleSpeed * delta
+
+	local wave = math.sin(state.jigglePhase) + math.sin(state.jigglePhase * 1.7 + 1.3) * constants.animation.jiggleNoise
+	state.jiggleOffset = wave * this.computeJiggleAmplitude()
+
 	this.rotateHelper()
 	this.rotatePick()
 end
 
 ---@private
 function this.rotateHelper()
-	this.rotationBuffer:toRotationY(this.currentHelperAngle + this.jiggleOffset)
-	this.helper.rotation = this.rotationBuffer
-	this.helper:update()
+	local state = this.state --[[@as pickAnimatorState]]
+
+	this.rotationBuffer:toRotationY(state.currentHelperAngle + state.jiggleOffset)
+
+	state.helper.rotation = this.rotationBuffer
+	state.helper:update()
 end
 
 ---@private
 function this.rotatePick()
-	this.rotationBuffer:toRotationY(this.currentHelperAngle + this.jiggleOffset)
+	local state = this.state --[[@as pickAnimatorState]]
 
-	this.mesh.rotation = this.originalPickRotation * this.rotationBuffer
-	this.mesh:update()
+	this.rotationBuffer:toRotationY(state.currentHelperAngle + state.jiggleOffset)
+
+	state.mesh.rotation = state.originalPickRotation * this.rotationBuffer
+	state.mesh:update()
 end
 
 return this
