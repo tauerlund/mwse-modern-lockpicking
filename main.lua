@@ -41,6 +41,7 @@ function this.initializeMod(_)
 		services.pickSelector,
 		services.pickSpawner,
 		services.pickAnimator,
+		services.pickBreakAnimator,
 		services.skillController,
 		services.guiController,
 		services.renderingController,

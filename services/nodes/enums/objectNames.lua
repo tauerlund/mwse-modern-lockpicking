@@ -5,6 +5,7 @@ local enum = {
 	cylinderHelper = "ModernLockpicking:CylinderHelper",
 	pick = "ModernLockpicking:Pick",
 	pickHelper = "ModernLockpicking:PickHelper",
+	brokenPick = "ModernLockpicking:BrokenPick",
 }
 
 return enum

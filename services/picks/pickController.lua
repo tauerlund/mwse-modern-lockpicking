@@ -26,6 +26,10 @@ this.sweetSpotRadius = nil
 this.damaging = false
 
 ---@private
+---@type boolean
+this.breaking = false
+
+---@private
 ---@type number
 this.damageAccumulator = 0
 
@@ -57,6 +61,10 @@ this.enums = nil
 this.eventRegistrar = nil
 
 ---@private
+---@type timerManager
+this.timerManager = nil
+
+---@private
 ---@type eventHandlerGroups
 this.eventHandlers = {
 	lifetime = {},
@@ -72,6 +80,7 @@ function this.initialize(services)
 	this.pickSpawner = services.pickSpawner
 	this.enums = services.enums
 	this.eventRegistrar = services.eventRegistrar
+	this.timerManager = services.timerManager
 
 	local events = services.enums.events
 
@@ -145,6 +154,7 @@ function this.onLockpickingEnded(_)
 	this.currentPick = nil
 	this.sweetSpotRadius = nil
 	this.damaging = false
+	this.breaking = false
 	this.damageAccumulator = 0
 end
 
@@ -252,6 +262,11 @@ end
 
 ---@private
 function this.breakPick()
+	if this.breaking then
+		return
+	end
+	this.breaking = true
+
 	---@type pickBrokenEventData|pickBreakEventData
 	local eventData = {
 		pick = this.currentPick,
@@ -261,7 +276,15 @@ function this.breakPick()
 	event.trigger(this.enums.events.pickBroken, eventData)
 
 	local direction = this.currentPick.item.count <= 0 and this.enums.cycleDirections.next or nil
-	this.cyclePick(direction)
+
+	this.timerManager.start({
+		durationInSeconds = this.enums.constants.picks.breakAnimation.duration + 0.5,
+		cancelOn = { this.enums.events.lockpickingEnded },
+		callback = function ()
+			this.breaking = false
+			this.cyclePick(direction)
+		end,
+	})
 end
 
 ---@private

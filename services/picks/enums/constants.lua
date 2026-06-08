@@ -20,6 +20,19 @@ local enum = {
 		jiggleNoise = 0.5,
 	},
 
+	breakAnimation = {
+		duration = 0.75,
+		snapAngle = math.rad(-80),
+		snapAngleVariance = 1.25,
+		snapAngleSideMax = math.rad(20),
+		snapTranslation = tes3vector3.new(0, 0, -2),
+		handleKickAngle = math.rad(8),
+		handleKickAngleVariance = 0.3,
+		handleKickAngleSideMax = math.rad(5),
+		fallDistance = 25,
+		bounceHeight = 6,
+	},
+
 	damage = {
 		baseRate = 20,
 	},
