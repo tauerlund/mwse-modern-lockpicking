@@ -2,7 +2,7 @@
 local this = {}
 
 ---@private
----@type pickBreakState|nil
+---@type pickBreakAnimatorState|nil
 this.state = nil
 
 ---@private

@@ -1,5 +1,5 @@
 ---@meta
----@class pickAnimatorState
+---@class pickSessionAnimatorState
 ---@field mesh niNode
 ---@field helper niNode
 ---@field item tes3itemStack

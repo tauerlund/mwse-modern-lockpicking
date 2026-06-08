@@ -1,5 +1,5 @@
 ---@meta
----@class pickBreakState
+---@class pickBreakAnimatorState
 ---@field breakPhase number
 ---@field ghost { mesh: niNode, originalTranslation: tes3vector3, fallTargetTranslation: tes3vector3 }
 ---@field tip { node: niNode, originalRotation: tes3matrix33, originalTranslation: tes3vector3, targetTranslation: tes3vector3, angleX: number, angleZ: number }

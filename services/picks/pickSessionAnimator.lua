@@ -1,8 +1,8 @@
----@class pickAnimator : initializedService
+---@class pickSessionAnimator : initializedService
 local this = {}
 
 ---@private
----@type pickAnimatorState|nil
+---@type pickSessionAnimatorState|nil
 this.state = nil
 
 ---@private
@@ -258,7 +258,7 @@ end
 ---@private
 ---@param delta number
 function this.updateAngle(delta)
-	local state = this.state --[[@as pickAnimatorState]]
+	local state = this.state --[[@as pickSessionAnimatorState]]
 	local transition = math.min(this.enums.constants.picks.animation.lerpSpeed * delta, 1)
 	state.currentHelperAngle = math.lerp(state.currentHelperAngle, state.targetHelperAngle, transition)
 end
@@ -266,7 +266,7 @@ end
 ---@private
 ---@return number
 function this.computeJiggleAmplitude()
-	local state = this.state --[[@as pickAnimatorState]]
+	local state = this.state --[[@as pickSessionAnimatorState]]
 	local constants = this.enums.constants.picks
 	local base = constants.animation.jiggleAmplitude
 
@@ -290,7 +290,7 @@ end
 ---@private
 ---@param delta number
 function this.updateJiggle(delta)
-	local state = this.state --[[@as pickAnimatorState]]
+	local state = this.state --[[@as pickSessionAnimatorState]]
 
 	local constants = this.enums.constants.picks
 	state.jigglePhase = state.jigglePhase + constants.animation.jiggleSpeed * delta
@@ -304,7 +304,7 @@ end
 
 ---@private
 function this.rotateHelper()
-	local state = this.state --[[@as pickAnimatorState]]
+	local state = this.state --[[@as pickSessionAnimatorState]]
 
 	this.rotationBuffer:toRotationY(state.currentHelperAngle + state.jiggleOffset)
 
@@ -314,7 +314,7 @@ end
 
 ---@private
 function this.rotatePick()
-	local state = this.state --[[@as pickAnimatorState]]
+	local state = this.state --[[@as pickSessionAnimatorState]]
 
 	this.rotationBuffer:toRotationY(state.currentHelperAngle + state.jiggleOffset)
 
