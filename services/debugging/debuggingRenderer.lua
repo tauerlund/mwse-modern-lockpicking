@@ -33,6 +33,10 @@ this.eventHandlers = nil
 ---@type eventRegistrar
 this.eventRegistrar = nil
 
+---@private
+---@type lockpickingSession
+this.session = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean, string|nil
@@ -62,6 +66,7 @@ end
 ---@private
 ---@param e lockpickingStartedEventData
 function this.onLockpickingStarted(e)
+	this.session = e.session
 	this.root = e.session.lock.mesh
 end
 
@@ -74,6 +79,15 @@ function this.onSweetSpotUpdated(e)
 	end
 
 	this.linesContainer = niNode.new()
+	this.linesContainer.translation = this.session.lock.cylinder.translation:copy()
+
+	local property = niZBufferProperty.new()
+	property:setFlag(true, this.enums.zBufferIndex.test)
+	property:setFlag(true, this.enums.zBufferIndex.write)
+	property.testFunction = ni.zBufferPropertyTestFunction.always
+	this.linesContainer:attachProperty(property)
+	this.linesContainer:updateProperties()
+
 	this.root:attachChild(this.linesContainer)
 
 	local constants = this.enums.constants.cylinder
