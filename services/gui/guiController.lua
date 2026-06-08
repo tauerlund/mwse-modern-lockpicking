@@ -425,6 +425,10 @@ function this.onPickBroken(e)
 		return
 	end
 
+	if not e.pick.item.object then
+		return
+	end
+
 	local constants = this.enums.constants.gui
 
 	local objectId = e.pick.item.object.id
