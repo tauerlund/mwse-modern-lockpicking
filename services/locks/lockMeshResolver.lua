@@ -1,12 +1,6 @@
 ---@class lockMeshResolver : initializedService
 local this = {}
 
----@public
----@type fun(service:serviceCollection):initializedService[]
-this.dependencies = function (services)
-	return { services.lockMeshLoader }
-end
-
 ---@private
 ---@type niNode
 this.defaultMesh = nil
@@ -30,6 +24,13 @@ this.enums = nil
 ---@private
 ---@type mwseLogger
 this.logger = mwse.Logger.new()
+
+---@public
+---@param services serviceCollection
+---@return initializedService[]
+function this.dependencies(services)
+	return { services.lockMeshLoader }
+end
 
 ---@public
 ---@param services serviceCollection

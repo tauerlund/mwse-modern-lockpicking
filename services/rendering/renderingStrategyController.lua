@@ -32,6 +32,13 @@ this.eventHandlers = {
 
 ---@public
 ---@param services serviceCollection
+---@return initializedService[]
+function this.dependencies(services)
+	return { services.strategyLoader }
+end
+
+---@public
+---@param services serviceCollection
 ---@return boolean, string|nil
 function this.initialize(services)
 	this.strategies = services.strategyLoader.loadAll({
