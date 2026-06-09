@@ -29,6 +29,10 @@ this.timerManager = nil
 this.enums = nil
 
 ---@private
+---@type renderingStrategyController
+this.renderingStrategyController = nil
+
+---@private
 ---@type eventRegistrar
 this.eventRegistrar = nil
 
@@ -46,6 +50,7 @@ function this.initialize(services)
 	this.nodeAnimator = services.nodeAnimator
 	this.timerManager = services.timerManager
 	this.enums = services.enums
+	this.renderingStrategyController = services.renderingStrategyController
 	this.eventRegistrar = services.eventRegistrar
 
 	local events = services.enums.events
@@ -237,9 +242,7 @@ function this.onEnterFrame(e)
 
 	local cursor = tes3.getCursorPosition()
 
-	-- Lock mesh is in menuCamera space, so world-to-screen projection must use the menu camera.
-	local menuCam = tes3.worldController.menuCamera.cameraData.camera
-	local screenPoint = menuCam:worldPointToScreenPoint(state.helper.worldTransform.translation)
+	local screenPoint = this.renderingStrategyController.getNiCamera():worldPointToScreenPoint(state.helper.worldTransform.translation)
 
 	if screenPoint and cursor.y > screenPoint.y then
 		local relX = cursor.x - screenPoint.x

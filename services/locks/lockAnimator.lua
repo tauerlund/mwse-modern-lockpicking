@@ -14,6 +14,10 @@ this.nodeAnimator = nil
 this.enums = nil
 
 ---@private
+---@type renderingStrategyController
+this.renderingStrategyController = nil
+
+---@private
 ---@type lock|nil
 this.lock = nil
 
@@ -71,6 +75,7 @@ function this.initialize(services)
 	this.nodeAnimator = services.nodeAnimator
 	this.timerManager = services.timerManager
 	this.enums = services.enums
+	this.renderingStrategyController = services.renderingStrategyController
 	this.eventRegistrar = services.eventRegistrar
 
 	local events = services.enums.events
@@ -197,7 +202,7 @@ end
 ---@private
 ---@return tes3vector3
 function this.getTargetTranslation()
-	return tes3vector3.new(0, this.enums.constants.locks.targetDistance, -2.5)
+	return tes3vector3.new(0, this.renderingStrategyController.getTargetDistance(), -2.5)
 end
 
 return this

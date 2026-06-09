@@ -23,6 +23,8 @@ function this.initializeMod(_)
 	---@type initializedService[]
 	local initializedServices = {
 		services.strategyLoader,
+		services.renderingStrategyController,
+		services.pickBreakAnimator,
 		services.lockpickingController,
 		services.lockpickingActivator,
 		services.lockController,
@@ -41,7 +43,6 @@ function this.initializeMod(_)
 		services.pickSelector,
 		services.pickSpawner,
 		services.pickSessionAnimator,
-		services.pickBreakAnimator,
 		services.skillController,
 		services.guiController,
 		services.renderingController,

@@ -1,0 +1,86 @@
+---@class menuCameraStrategy : renderingStrategy
+local this = {}
+
+---@public
+---@type string
+this.name = nil
+
+---@private
+---@type enums
+this.enums = nil
+
+---@public
+---@param services serviceCollection
+function this.initialize(services)
+	this.name = services.enums.renderingStrategyNames.menuCamera
+	this.enums = services.enums
+end
+
+---@private
+---@return niNode
+local function getRootNode()
+	return tes3.worldController.menuCamera.cameraRoot
+end
+
+---@public
+---@param mesh niNode
+function this.attachMesh(mesh)
+	local root = getRootNode()
+
+	if not root:getProperty(ni.propertyType.zBuffer) then
+		local property = niZBufferProperty.new()
+		property.name = this.enums.constants.locks.cameraRootZBufferName
+		property:setFlag(false, this.enums.zBufferIndex.test)
+		property:setFlag(false, this.enums.zBufferIndex.write)
+		root:attachProperty(property)
+		root:updateProperties()
+	end
+
+	local existingChildren = {}
+	for _, child in ipairs(root.children) do
+		table.insert(existingChildren, child)
+	end
+	root:detachAllChildren()
+	root:attachChild(mesh, true)
+	for _, child in ipairs(existingChildren) do
+		root:attachChild(child, true)
+	end
+
+	root:updateEffects()
+	root:update()
+end
+
+---@public
+---@param mesh niNode
+function this.detachMesh(mesh)
+	local root = getRootNode()
+	root:detachChild(mesh)
+
+	local property = root:getProperty(ni.propertyType.zBuffer)
+	if property and property.name == this.enums.constants.locks.cameraRootZBufferName then
+		root:detachProperty(ni.propertyType.zBuffer)
+		root:updateProperties()
+	end
+
+	root:update()
+end
+
+---@public
+---@return niCamera
+function this.getNiCamera()
+	return tes3.worldController.menuCamera.cameraData.camera
+end
+
+---@public
+---@return niNode
+function this.getGhostAttachmentNode()
+	return tes3.worldController.menuCamera.cameraRoot
+end
+
+---@public
+---@return number
+function this.getTargetDistance()
+	return this.enums.constants.locks.targetDistance
+end
+
+return this
