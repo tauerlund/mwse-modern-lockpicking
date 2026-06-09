@@ -3,3 +3,5 @@
 ---@field public item tes3itemStack
 ---@field public mesh niNode
 ---@field public helper niNode
+---@field public damaging boolean
+---@field public animating boolean

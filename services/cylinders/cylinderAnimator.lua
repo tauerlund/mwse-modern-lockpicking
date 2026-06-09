@@ -2,6 +2,10 @@
 local this = {}
 
 ---@private
+---@type lock|nil
+this.lock = nil
+
+---@private
 ---@type cylinder
 this.cylinder = nil
 
@@ -10,11 +14,7 @@ this.cylinder = nil
 this.phase = 0
 
 ---@private
----@type rotationDirections|nil
-this.rotationDirection = nil
-
----@private
-this.blocked = false
+this.ending = false
 
 ---@private
 this.rotationBuffer = tes3matrix33.new()
@@ -48,9 +48,6 @@ function this.initialize(services)
 			[events.lockpickingStart] = this.onLockpickingStart,
 			[events.lockpickingEnd] = this.onLockpickingEnd,
 			[events.lockpickingEnded] = this.onLockpickingEnded,
-			[events.rotationStarted] = this.onRotationStarted,
-			[events.rotationEnded] = this.onRotationEnded,
-			[events.cylinderBlocked] = this.onCylinderBlocked,
 			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
 			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
 		},
@@ -83,6 +80,7 @@ end
 ---@private
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
+	this.lock = e.session.lock
 	this.cylinder = e.session.lock.cylinder
 	this.enable()
 end
@@ -90,33 +88,16 @@ end
 ---@private
 ---@param _ lockpickingEndEventData
 function this.onLockpickingEnd(_)
-	this.blocked = true
+	this.ending = true
 end
 
 ---@private
 ---@param _ lockpickingEndedEventData
 function this.onLockpickingEnded(_)
 	this.phase = 0
-	this.blocked = false
-	this.rotationDirection = nil
+	this.ending = false
+	this.lock = nil
 	this.disable()
-end
-
----@private
----@param e rotationEventData
-function this.onRotationStarted(e)
-	this.rotationDirection = e.direction
-end
-
----@private
-function this.onRotationEnded()
-	this.rotationDirection = nil
-	this.blocked = false
-end
-
----@private
-function this.onCylinderBlocked()
-	this.blocked = true
 end
 
 ---@private
@@ -132,13 +113,18 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
-	if this.paused or this.blocked then
+	local lock = this.lock
+	if not lock then
+		return
+	end
+
+	if this.paused or this.ending or lock.blocked then
 		return
 	end
 
 	local constants = this.enums.constants.cylinder
 
-	if not this.rotationDirection then
+	if not (lock.rotatingClockwise or lock.rotatingCounterclockwise) then
 		local rotation = this.cylinder.rotation:toEulerXYZ().y
 		if math.isclose(rotation, 0, 0.04) then
 			return
@@ -146,7 +132,7 @@ function this.onEnterFrame(e)
 		local multiplier = rotation <= 0 and 1 or -1
 		this.updatePhase(multiplier, constants.resetSpeed, e.delta)
 	else
-		local multiplier = this.rotationDirection == this.enums.rotationDirections.counterClockwise and 1 or -1
+		local multiplier = lock.rotatingCounterclockwise and 1 or -1
 		this.updatePhase(multiplier, constants.rotateSpeed, e.delta)
 	end
 

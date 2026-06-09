@@ -8,6 +8,5 @@
 ---@field currentHelperAngle number
 ---@field targetHelperAngle number
 ---@field blocked boolean
----@field jiggling boolean
 ---@field jigglePhase number
 ---@field jiggleOffset number

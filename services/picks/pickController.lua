@@ -23,10 +23,6 @@ this.sweetSpotRadius = nil
 
 ---@private
 ---@type boolean
-this.damaging = false
-
----@private
----@type boolean
 this.breaking = false
 
 ---@private
@@ -153,7 +149,6 @@ function this.onLockpickingEnded(_)
 	this.lock = nil
 	this.currentPick = nil
 	this.sweetSpotRadius = nil
-	this.damaging = false
 	this.breaking = false
 	this.damageAccumulator = 0
 end
@@ -188,12 +183,12 @@ end
 
 ---@private
 function this.onCylinderBlocked()
-	this.damaging = true
+	this.session.pick.damaging = true
 end
 
 ---@private
 function this.onRotationEnded()
-	this.damaging = false
+	this.session.pick.damaging = false
 end
 
 ---@private
@@ -206,11 +201,13 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
-	if this.paused then
+	local session = this.session
+
+	if this.paused or not session then
 		return
 	end
 
-	if this.damaging then
+	if session.pick.damaging then
 		if this.isSkeletonKey() and not this.settings.difficulty.damageSkeletonKey then
 			return
 		end
@@ -266,6 +263,8 @@ function this.breakPick()
 		return
 	end
 	this.breaking = true
+	this.session.pick.damaging = false
+	this.session.pick.animating = true
 
 	---@type pickBrokenEventData|pickBreakEventData
 	local eventData = {
@@ -306,6 +305,7 @@ function this.cyclePick(direction)
 	local pick = this.pickSpawner.spawn(this.lock, item)
 
 	this.damageAccumulator = 0
+	this.session.pick.damaging = false
 	this.currentPick = pick
 	this.currentPickItemData = this.tryResolvePickItemData()
 

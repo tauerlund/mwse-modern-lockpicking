@@ -2,6 +2,10 @@
 local this = {}
 
 ---@private
+---@type lock|nil
+this.lock = nil
+
+---@private
 ---@type cylinder
 this.cylinder = nil
 
@@ -20,14 +24,6 @@ this.sweetSpotRadius = nil
 ---@private
 ---@type number
 this.gradientWidth = nil
-
----@private
----@type boolean
-this.rotating = false
-
----@private
----@type boolean
-this.blocked = false
 
 ---@private
 ---@type number
@@ -121,6 +117,7 @@ end
 ---@private
 ---@param e lockpickingStartedEventData
 function this.onLockpickingStarted(e)
+	this.lock = e.session.lock
 	this.cylinder = e.session.lock.cylinder
 	this.pickHelper = e.session.pick.helper
 	this.enable()
@@ -144,6 +141,7 @@ end
 ---@param _ lockpickingEndEventData
 function this.onLockpickingEnd(_)
 	this.disable()
+	this.lock = nil
 	this.cylinder = nil
 	this.pickHelper = nil
 	this.sweetSpotCenter = nil
@@ -161,15 +159,18 @@ function this.disable()
 	this.eventRegistrar.unregister(this.eventHandlers.session)
 
 	this.currentDirectionKey = nil
-	this.rotating = false
-	this.blocked = false
+	if this.lock then
+		this.lock.rotatingCounterclockwise = false
+		this.lock.rotatingClockwise = false
+		this.lock.blocked = false
+	end
 	this.maxAngle = 0
 end
 
 ---@private
 ---@param _ enterFrameEventData
 function this.onEnterFrame(_)
-	if this.paused or this.blocked or not this.rotating then
+	if this.paused or this.lock.blocked or not (this.lock.rotatingCounterclockwise or this.lock.rotatingClockwise) then
 		return
 	end
 
@@ -184,8 +185,9 @@ function this.onEnterFrame(_)
 	end
 
 	if this.maxAngle == 0 or math.abs(rotation) >= this.maxAngle then
-		this.rotating = false
-		this.blocked = true
+		this.lock.rotatingCounterclockwise = false
+		this.lock.rotatingClockwise = false
+		this.lock.blocked = true
 		event.trigger(events.cylinderBlocked)
 	end
 end
@@ -232,18 +234,19 @@ end
 ---@private
 ---@param e keyDownEventData
 function this.onRotationKeyDown(e)
-	if this.rotating or this.blocked then
+	if this.lock.rotatingCounterclockwise or this.lock.rotatingClockwise or this.lock.blocked then
 		return
 	end
 
 	this.currentDirectionKey = e.keyCode
 	this.maxAngle = this.computeMaxAngle()
-	this.rotating = true
+
+	local direction = this.rotationKeyCodeToRotationDirectionMap[e.keyCode]
+	this.lock.rotatingCounterclockwise = direction == this.enums.rotationDirections.counterClockwise
+	this.lock.rotatingClockwise = direction == this.enums.rotationDirections.clockwise
 
 	---@type rotationEventData
-	local eventData = {
-		direction = this.rotationKeyCodeToRotationDirectionMap[e.keyCode],
-	}
+	local eventData = { direction = direction }
 	event.trigger(this.enums.events.rotationStarted, eventData)
 end
 
@@ -254,8 +257,9 @@ function this.onRotationKeyUp(e)
 		return
 	end
 
-	this.blocked = false
-	this.rotating = false
+	this.lock.blocked = false
+	this.lock.rotatingCounterclockwise = false
+	this.lock.rotatingClockwise = false
 	this.currentDirectionKey = nil
 
 	---@type rotationEventData

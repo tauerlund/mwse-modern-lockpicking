@@ -6,12 +6,8 @@ local this = {}
 this.lastCursorPosition = 0
 
 ---@private
----@type boolean
-this.rotatingCylinder = false
-
----@private
----@type boolean
-this.jiggling = false
+---@type lockpickingSession|nil
+this.session = nil
 
 ---@private
 ---@type soundCooldownState
@@ -40,10 +36,6 @@ this.enums = nil
 ---@private
 ---@type renderingStrategyController
 this.renderingStrategyController = nil
-
----@private
----@type niNode|nil
-this.pickHelper = nil
 
 ---@private
 ---@type integer
@@ -82,8 +74,6 @@ function this.initialize(services)
 			[events.lockpickingEnd] = this.onLockpickingEnd,
 			[events.lockpickingEnded] = this.onLockpickingEnded,
 			[events.pickCycled] = this.onPickCycled,
-			[events.rotationStarted] = this.onRotationStarted,
-			[events.rotationEnded] = this.onRotationEnded,
 			[events.cylinderBlocked] = this.onCylinderBlocked,
 			[events.pickBroken] = this.onPickBroken,
 			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
@@ -128,7 +118,7 @@ end
 ---@private
 ---@param e lockpickingStartedEventData
 function this.onLockpickingStarted(e)
-	this.pickHelper = e.session.pick.helper
+	this.session = e.session
 end
 
 ---@private
@@ -142,18 +132,13 @@ function this.onLockpickingEnd(e)
 		})
 	end
 
-	this.pickHelper = nil
-	this.rotatingCylinder = false
-	this.jiggling = false
 	this.disable()
 end
 
 ---@private
 ---@param _ lockpickingEndedEventData
 function this.onLockpickingEnded(_)
-	this.pickHelper = nil
-	this.rotatingCylinder = false
-	this.jiggling = false
+	this.session = nil
 	this.disable()
 end
 
@@ -168,9 +153,8 @@ function this.disable()
 end
 
 ---@private
----@param e pickCycledEventData
-function this.onPickCycled(e)
-	this.pickHelper = e.pick.helper
+---@param _ pickCycledEventData
+function this.onPickCycled(_)
 	tes3.playSound({
 		reference = tes3.player,
 		soundPath = this.soundFileResolver.resolve(this.enums.constants.sounds.templates.changeLockpick).path,
@@ -205,13 +189,13 @@ end
 ---@private
 ---@return boolean
 function this.isInRotationZone()
-	if not this.pickHelper then
+	if not this.session then
 		return false
 	end
 	local cursor = tes3.getCursorPosition()
 	local screenPoint = this.renderingStrategyController
 		.getNiCamera()
-		:worldPointToScreenPoint(this.pickHelper.worldTransform.translation)
+		:worldPointToScreenPoint(this.session.pick.helper.worldTransform.translation)
 	return screenPoint ~= nil and cursor.y > screenPoint.y
 end
 
@@ -221,11 +205,19 @@ function this.playLockpickRotationSound(delta)
 	local constants = this.enums.constants.sounds
 	local currentCursorPosition = tes3.getCursorPosition().x
 	local moved = math.abs(currentCursorPosition - this.lastCursorPosition) > constants.lockpickRotationMaxDelta
+
+	local session = this.session
+
+	local active = session ~= nil
+		and not (session.lock.rotatingCounterclockwise or session.lock.rotatingClockwise)
+		and not session.pick.damaging
+		and not session.pick.animating
+
 	this.playOnCooldown({
 		state = this.lockpickRotationState,
 		template = constants.templates.rotateLockpick,
 		delta = delta,
-		condition = not this.rotatingCylinder and moved and this.isInRotationZone(),
+		condition = active and moved and this.isInRotationZone(),
 	})
 	this.lastCursorPosition = currentCursorPosition
 end
@@ -237,7 +229,8 @@ function this.playCylinderRotationSound(delta)
 		state = this.cylinderRotationState,
 		template = this.enums.constants.sounds.templates.rotateCylinder,
 		delta = delta,
-		condition = this.rotatingCylinder,
+		condition = this.session ~= nil and
+			(this.session.lock.rotatingCounterclockwise or this.session.lock.rotatingClockwise),
 	})
 end
 
@@ -248,7 +241,7 @@ function this.playJiggleSound(delta)
 		state = this.jiggleState,
 		template = this.enums.constants.sounds.templates.jiggleLockpick,
 		delta = delta,
-		condition = this.jiggling,
+		condition = this.session ~= nil and this.session.pick.damaging,
 	})
 end
 
@@ -265,22 +258,7 @@ function this.playOnCooldown(e)
 end
 
 ---@private
----@param _ rotationEventData
-function this.onRotationStarted(_)
-	this.rotatingCylinder = true
-end
-
----@private
----@param _ rotationEventData
-function this.onRotationEnded(_)
-	this.rotatingCylinder = false
-	this.jiggling = false
-end
-
----@private
 function this.onCylinderBlocked()
-	this.rotatingCylinder = false
-	this.jiggling = true
 	this.jiggleState.counter = 0
 	this.jiggleState.cooldown = 0
 end

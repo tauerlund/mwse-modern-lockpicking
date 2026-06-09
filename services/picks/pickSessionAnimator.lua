@@ -33,6 +33,10 @@ this.enums = nil
 this.renderingStrategyController = nil
 
 ---@private
+---@type lockpickingSession|nil
+this.session = nil
+
+---@private
 ---@type eventRegistrar
 this.eventRegistrar = nil
 
@@ -120,6 +124,7 @@ end
 ---@private
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
+	this.session = e.session
 	this.state = {
 		mesh = e.session.pick.mesh,
 		helper = e.session.pick.helper,
@@ -129,7 +134,6 @@ function this.onLockpickingStart(e)
 		currentHelperAngle = 0,
 		targetHelperAngle = 0,
 		blocked = true,
-		jiggling = false,
 		jigglePhase = 0,
 		jiggleOffset = 0,
 	}
@@ -151,6 +155,7 @@ function this.onLockpickingEnded(_)
 		this.state.helper:update()
 		this.state = nil
 	end
+	this.session = nil
 	this.disable()
 end
 
@@ -171,7 +176,6 @@ end
 ---@param _ rotationEventData
 function this.onRotationEnded(_)
 	this.state.blocked = false
-	this.state.jiggling = false
 	this.state.jigglePhase = 0
 	this.state.jiggleOffset = 0
 end
@@ -179,7 +183,6 @@ end
 ---@private
 function this.onCylinderBlocked()
 	this.state.blocked = true
-	this.state.jiggling = true
 end
 
 ---@private
@@ -198,6 +201,9 @@ end
 function this.start(pick, keyframes)
 	this.state.mesh = pick.mesh
 	this.state.blocked = true
+	this.state.jigglePhase = 0
+	this.state.jiggleOffset = 0
+	pick.animating = true
 
 	this.nodeAnimator.start({
 		node = pick.mesh,
@@ -217,6 +223,7 @@ end
 function this.onStartTimerFinished(_)
 	this.state.blocked = false
 	this.state.originalPickRotation = this.state.mesh.rotation:copy()
+	this.session.pick.animating = false
 end
 
 ---@private
@@ -231,7 +238,9 @@ function this.onEnterFrame(e)
 		return
 	end
 
-	if state.jiggling then
+	local session = this.session
+
+	if session and session.pick.damaging then
 		this.updateJiggle(e.delta)
 		return
 	end
