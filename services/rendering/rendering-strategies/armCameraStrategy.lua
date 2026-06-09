@@ -10,6 +10,13 @@ this.name = nil
 this.enums = nil
 
 ---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
+
+---@private
+this.sessionHandlers = {}
+
+---@private
 ---@type niNode|nil
 this.cameraJoint = nil
 
@@ -17,16 +24,27 @@ this.cameraJoint = nil
 ---@type niNode|nil
 this.wrapperRoot = nil
 
+---@private
+---@type niPointLight|nil
+this.pointLight = nil
+
+---@private
+local LIGHT_AMPLITUDE = 0.05
+
 ---@public
 ---@param services serviceCollection
 function this.initialize(services)
 	this.name = services.enums.renderingStrategyNames.armCamera
 	this.enums = services.enums
+	this.eventRegistrar = services.eventRegistrar
+	this.sessionHandlers = {
+		[tes3.event.enterFrame] = this.onEnterFrame,
+	}
 end
 
 ---@private
 ---@return tes3matrix33
-local function cameraRelativeRotation()
+function this.cameraRelativeRotation()
 	local camera = tes3.worldController.worldCamera.cameraData.camera
 	local view = tes3matrix33.new(camera.worldRight, camera.worldDirection, camera.worldUp):transpose()
 	local baseView = tes3.worldController.worldCamera.cameraRoot.worldTransform.rotation:copy()
@@ -35,13 +53,28 @@ end
 
 ---@private
 ---@return niNode
-local function getRootNode()
+function this.getRootNode()
 	return tes3.worldController.armCamera.cameraRoot
 end
 
 ---@private
+---@return niPointLight
+function this.createPointLight()
+	local light = niPointLight.new()
+
+	light.name = this.enums.objectNames.pointLight
+	light.diffuse = niColor.new(0.3, 0.25, 0.25)
+	light.ambient = niColor.new(0, 0, 0)
+	light.constantAttenuation = 1
+	light.linearAttenuation = 0
+	light.quadraticAttenuation = 0.001
+
+	return light
+end
+
+---@private
 ---@param node niNode
-local function attachDynamicEffects(node)
+function this.attachDynamicEffects(node)
 	local src = tes3.is3rdPerson() and tes3.player.sceneNode or tes3.player1stPerson.sceneNode
 	if not src then return end
 	local effects = src.effectList
@@ -57,7 +90,7 @@ end
 
 ---@private
 ---@param node niNode
-local function detachDynamicEffects(node)
+function this.detachDynamicEffects(node)
 	local list = {}
 	local effects = node.effectList
 	while effects do
@@ -75,6 +108,27 @@ local function detachDynamicEffects(node)
 	end
 end
 
+---@private
+function this.onEnterFrame()
+	if not this.pointLight then return end
+	local cursor = tes3.getCursorPosition()
+	local x = (cursor.x - 0.5) * LIGHT_AMPLITUDE
+	local z = (cursor.y - 0.5) * LIGHT_AMPLITUDE
+	local translation = tes3vector3.new(x, this.getTargetDistance() - 15, z)
+	this.pointLight.translation = translation
+	this.pointLight:update()
+end
+
+---@private
+function this.enable()
+	this.eventRegistrar.register(this.sessionHandlers)
+end
+
+---@private
+function this.disable()
+	this.eventRegistrar.unregister(this.sessionHandlers)
+end
+
 ---@public
 ---@param mesh niNode
 function this.attachMesh(mesh)
@@ -84,30 +138,39 @@ function this.attachMesh(mesh)
 	wrapperRoot.appCulled = false
 	wrapperRoot:attachChild(mesh)
 
+	local light = this.createPointLight()
+
 	local cameraJoint = niNode.new()
 	cameraJoint.name = "ModernLockpicking:CameraJoint"
-	cameraJoint.rotation = cameraRelativeRotation()
+	cameraJoint.rotation = this.cameraRelativeRotation()
 	cameraJoint:attachChild(wrapperRoot)
+	cameraJoint:attachChild(light)
 
-	local root = getRootNode()
+	local root = this.getRootNode()
 	root:attachChild(cameraJoint)
 
-	attachDynamicEffects(wrapperRoot)
+	this.attachDynamicEffects(wrapperRoot)
+	wrapperRoot:attachEffect(light)
+	light:attachAffectedNode(wrapperRoot)
 
 	root:updateEffects()
 	root:update()
 
 	this.cameraJoint = cameraJoint
 	this.wrapperRoot = wrapperRoot
+	this.pointLight = light
+	this.enable()
 end
 
 ---@public
----@param mesh niNode
-function this.detachMesh(mesh)
-	local root = getRootNode()
+---@param _ niNode
+function this.detachMesh(_)
+	local root = this.getRootNode()
+
+	this.disable()
 
 	if this.wrapperRoot then
-		detachDynamicEffects(this.wrapperRoot)
+		this.detachDynamicEffects(this.wrapperRoot)
 		this.wrapperRoot:updateEffects()
 	end
 
@@ -120,6 +183,7 @@ function this.detachMesh(mesh)
 
 	this.cameraJoint = nil
 	this.wrapperRoot = nil
+	this.pointLight = nil
 end
 
 ---@public

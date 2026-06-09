@@ -18,20 +18,22 @@ end
 
 ---@private
 ---@return niNode
-local function getRootNode()
+function this.getRootNode()
 	return tes3.worldController.menuCamera.cameraRoot
 end
 
 ---@public
 ---@param mesh niNode
 function this.attachMesh(mesh)
-	local root = getRootNode()
+	local root = this.getRootNode()
 
 	if not root:getProperty(ni.propertyType.zBuffer) then
 		local property = niZBufferProperty.new()
 		property.name = this.enums.constants.locks.cameraRootZBufferName
+
 		property:setFlag(false, this.enums.zBufferIndex.test)
 		property:setFlag(false, this.enums.zBufferIndex.write)
+
 		root:attachProperty(property)
 		root:updateProperties()
 	end
@@ -53,7 +55,7 @@ end
 ---@public
 ---@param mesh niNode
 function this.detachMesh(mesh)
-	local root = getRootNode()
+	local root = this.getRootNode()
 	root:detachChild(mesh)
 
 	local property = root:getProperty(ni.propertyType.zBuffer)
