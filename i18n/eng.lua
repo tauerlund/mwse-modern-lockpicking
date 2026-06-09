@@ -71,4 +71,11 @@ return {
 	[keys.mcmEnabledLabel] = "Enable Mod",
 	[keys.mcmEnabledDesc] =
 	"When disabled, the lockpicking minigame is skipped and the vanilla lockpicking behavior is used instead.",
+	[keys.mcmLitRenderingLabel] = "Lit Rendering",
+	[keys.mcmLitRenderingDesc] =
+	"When enabled, lock meshes are lit by scene lighting. When disabled, meshes are rendered unlit.",
+	[keys.mcmHeaderVisuals] = "Visuals",
+	[keys.mcmVisualsLabelEnableDof] = "Depth of Field",
+	[keys.mcmVisualsDescEnableDof] =
+	"When enabled, a bokeh depth of field effect is applied during lockpicking.",
 }

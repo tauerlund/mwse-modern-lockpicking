@@ -87,6 +87,7 @@ function this.initialize(services)
 			[events.lockpickingEnded] = this.onLockpickingEnded,
 			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
 			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
+			[events.settingsUpdated] = this.onSettingsUpdated,
 		},
 		session = {
 			[tes3.event.enterFrame] = this.onEnterFrame,
@@ -158,6 +159,15 @@ function this.onLockpickingEnded(_)
 	this.currentRotY = 0
 
 	this.disable()
+end
+
+---@private
+function this.onSettingsUpdated()
+	if not this.lock then
+		return
+	end
+	this.lock.mesh.translation = this.getTargetTranslation()
+	this.lock.mesh:update()
 end
 
 ---@private

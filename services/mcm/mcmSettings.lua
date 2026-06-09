@@ -16,6 +16,8 @@ this.defaults = {
     },
     logLevel = "INFO",
     activationStrategy = nil,
+    litRendering = true,
+    enableDof = true,
     allowEquipPicks = true,
     useLockComplexity = true,
     difficulty = {
