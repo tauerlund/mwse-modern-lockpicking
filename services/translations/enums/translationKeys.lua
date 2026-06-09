@@ -59,6 +59,11 @@ local this = {
     mcmDifficultyDescDamageSkeletonKey = "mcm.difficulty.desc.damageSkeletonKey",
     mcmEnabledLabel = "mcm.enabled.label",
     mcmEnabledDesc = "mcm.enabled.desc",
+    mcmLitRenderingLabel = "mcm.litRendering.label",
+    mcmLitRenderingDesc = "mcm.litRendering.desc",
+    mcmHeaderVisuals = "mcm.header.visuals",
+    mcmVisualsLabelEnableDof = "mcm.visuals.label.enableDof",
+    mcmVisualsDescEnableDof = "mcm.visuals.desc.enableDof",
 }
 
 return this

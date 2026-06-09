@@ -41,6 +41,7 @@ local this = {
     pickSpawner = require("tauer.modern-lockpicking.services.picks.pickSpawner"),
 
     renderingController = require("tauer.modern-lockpicking.services.rendering.renderingController"),
+    renderingStrategyController = require("tauer.modern-lockpicking.services.rendering.renderingStrategyController"),
 
     skillController = require("tauer.modern-lockpicking.services.skills.skillController"),
 
@@ -62,6 +63,8 @@ local this = {
         cycleDirections = require("tauer.modern-lockpicking.services.lockpicking.enums.cycleDirections"),
         activationStrategyNames = require(
             "tauer.modern-lockpicking.services.lockpicking.activation-strategies.enums.activationStrategyNames"),
+        renderingStrategyNames = require(
+            "tauer.modern-lockpicking.services.rendering.rendering-strategies.enums.renderingStrategyNames"),
         fileTypes = require("tauer.modern-lockpicking.services.files.enums.fileType"),
         translationKeys = require("tauer.modern-lockpicking.services.translations.enums.translationKeys"),
         objectNames = require("tauer.modern-lockpicking.services.nodes.enums.objectNames"),

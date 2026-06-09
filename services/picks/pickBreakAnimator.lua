@@ -16,6 +16,10 @@ this.rotationBuffer2 = tes3matrix33.new()
 this.enums = nil
 
 ---@private
+---@type renderingStrategyController
+this.renderingStrategyController = nil
+
+---@private
 ---@type eventRegistrar
 this.eventRegistrar = nil
 
@@ -31,6 +35,7 @@ this.eventHandlers = {
 ---@return boolean,string|nil
 function this.initialize(services)
 	this.enums = services.enums
+	this.renderingStrategyController = services.renderingStrategyController
 	this.eventRegistrar = services.eventRegistrar
 
 	local events = services.enums.events
@@ -119,9 +124,9 @@ function this.spawnGhost(liveMesh)
 	local ghostMesh = liveMesh:clone() --[[@as niNode]]
 	ghostMesh.name = this.enums.objectNames.brokenPick
 
-	-- Parent to cameraRoot (not pickHelper) so the fall direction is in screen space,
+	-- Parent to the strategy's attachment node so the fall direction is in screen space,
 	-- unaffected by pickHelper's cursor-driven Y-rotation.
-	local cameraRoot = tes3.worldController.menuCamera.cameraRoot
+	local cameraRoot = this.renderingStrategyController.getGhostAttachmentNode()
 	local invRot = cameraRoot.worldTransform.rotation:transpose()
 	local delta = liveMesh.worldTransform.translation - cameraRoot.worldTransform.translation
 

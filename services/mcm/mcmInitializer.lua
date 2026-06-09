@@ -6,6 +6,7 @@ local this = {}
 this.pages = {
 	require("tauer.modern-lockpicking.services.mcm.pages.controlsPage"),
 	require("tauer.modern-lockpicking.services.mcm.pages.difficultyPage"),
+	require("tauer.modern-lockpicking.services.mcm.pages.visualsPage"),
 	require("tauer.modern-lockpicking.services.mcm.pages.debuggingPage")
 }
 

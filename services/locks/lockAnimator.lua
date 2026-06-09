@@ -14,6 +14,10 @@ this.nodeAnimator = nil
 this.enums = nil
 
 ---@private
+---@type renderingStrategyController
+this.renderingStrategyController = nil
+
+---@private
 ---@type lock|nil
 this.lock = nil
 
@@ -71,6 +75,7 @@ function this.initialize(services)
 	this.nodeAnimator = services.nodeAnimator
 	this.timerManager = services.timerManager
 	this.enums = services.enums
+	this.renderingStrategyController = services.renderingStrategyController
 	this.eventRegistrar = services.eventRegistrar
 
 	local events = services.enums.events
@@ -82,6 +87,7 @@ function this.initialize(services)
 			[events.lockpickingEnded] = this.onLockpickingEnded,
 			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
 			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
+			[events.settingsUpdated] = this.onSettingsUpdated,
 		},
 		session = {
 			[tes3.event.enterFrame] = this.onEnterFrame,
@@ -156,6 +162,15 @@ function this.onLockpickingEnded(_)
 end
 
 ---@private
+function this.onSettingsUpdated()
+	if not this.lock then
+		return
+	end
+	this.lock.mesh.translation = this.getTargetTranslation()
+	this.lock.mesh:update()
+end
+
+---@private
 function this.enable()
 	this.eventRegistrar.register(this.eventHandlers.session)
 end
@@ -197,7 +212,7 @@ end
 ---@private
 ---@return tes3vector3
 function this.getTargetTranslation()
-	return tes3vector3.new(0, this.enums.constants.locks.targetDistance, -2.5)
+	return tes3vector3.new(0, this.renderingStrategyController.getTargetDistance(), -2.5)
 end
 
 return this

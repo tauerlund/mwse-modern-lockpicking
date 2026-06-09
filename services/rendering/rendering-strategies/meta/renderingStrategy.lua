@@ -1,0 +1,8 @@
+---@class renderingStrategy : strategy
+---@field public name string
+---@field public initialize fun(services: serviceCollection)
+---@field public attachMesh fun(mesh: niNode)
+---@field public detachMesh fun(mesh: niNode)
+---@field public getNiCamera fun(): niCamera
+---@field public getGhostAttachmentNode fun(): niNode
+---@field public getTargetDistance fun(): number
