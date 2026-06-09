@@ -275,7 +275,7 @@ function this.breakPick()
 	event.trigger(this.enums.events.pickBreak, eventData)
 	event.trigger(this.enums.events.pickBroken, eventData)
 
-	local direction = this.currentPick.item.count <= 0 and this.enums.cycleDirections.next or nil
+	local direction = this.currentPick.item.count <= 1 and this.enums.cycleDirections.next or nil
 
 	this.timerManager.start({
 		durationInSeconds = this.enums.constants.picks.breakAnimation.duration + 0.5,

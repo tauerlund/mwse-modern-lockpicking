@@ -91,13 +91,21 @@ end
 ---@private
 ---@param e pickCycledEventData
 function this.onPickCycled(e)
-    this.logger:debug("Cycled from %s to %s", e.previousPick.item.object.name, e.pick.item.object.name)
+    local previous = e.previousPick.item.object
+    local next = e.pick.item.object
+
+    local from = previous and previous:isValid() and previous.name or "?"
+    local to = next and next:isValid() and next.name or "?"
+
+    this.logger:debug("Cycled from %s to %s", from, to)
 end
 
 ---@private
 ---@param e pickBrokenEventData
 function this.onPickBroken(e)
-    this.logger:debug("%s broke", e.pick.item.object.name)
+    local obj = e.pick.item.object
+    local name = obj and obj:isValid() and obj.name or "?"
+    this.logger:debug("%s broke", name)
 end
 
 return this

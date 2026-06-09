@@ -425,13 +425,14 @@ function this.onPickBroken(e)
 		return
 	end
 
-	if not e.pick.item.object then
+	local obj = e.pick.item.object
+	if not obj or not obj:isValid() then
 		return
 	end
 
 	local constants = this.enums.constants.gui
 
-	local objectId = e.pick.item.object.id
+	local objectId = obj.id
 	local countLabel = this.picks:findChild(string.format(constants.picksCountLabelId, objectId))
 	if not countLabel then return end
 
