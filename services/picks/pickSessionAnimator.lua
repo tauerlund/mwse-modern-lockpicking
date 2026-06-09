@@ -242,9 +242,15 @@ function this.onEnterFrame(e)
 
 	local cursor = tes3.getCursorPosition()
 
-	local screenPoint = this.renderingStrategyController.getNiCamera():worldPointToScreenPoint(state.helper.worldTransform.translation)
+	local screenPoint = this.renderingStrategyController
+		.getNiCamera()
+		:worldPointToScreenPoint(state.helper.worldTransform.translation)
 
-	if screenPoint and cursor.y > screenPoint.y then
+	if not screenPoint then
+		return
+	end
+
+	if cursor.y > screenPoint.y then
 		local relX = cursor.x - screenPoint.x
 		local relY = cursor.y - screenPoint.y
 		local len = math.sqrt(relX * relX + relY * relY)

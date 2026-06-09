@@ -38,6 +38,14 @@ this.soundFileResolver = nil
 this.enums = nil
 
 ---@private
+---@type renderingStrategyController
+this.renderingStrategyController = nil
+
+---@private
+---@type niNode|nil
+this.pickHelper = nil
+
+---@private
 ---@type integer
 this.debounceInFrames = 3
 
@@ -63,13 +71,16 @@ function this.initialize(services)
 	this.soundFileResolver = services.soundFileResolver
 	this.enums = services.enums
 	this.eventRegistrar = services.eventRegistrar
+	this.renderingStrategyController = services.renderingStrategyController
 
 	local events = services.enums.events
 
 	this.eventHandlers = {
 		lifetime = {
 			[events.lockpickingStart] = this.onLockpickingStart,
+			[events.lockpickingStarted] = this.onLockpickingStarted,
 			[events.lockpickingEnd] = this.onLockpickingEnd,
+			[events.lockpickingEnded] = this.onLockpickingEnded,
 			[events.pickCycled] = this.onPickCycled,
 			[events.rotationStarted] = this.onRotationStarted,
 			[events.rotationEnded] = this.onRotationEnded,
@@ -115,6 +126,12 @@ function this.onLockpickingStart(_)
 end
 
 ---@private
+---@param e lockpickingStartedEventData
+function this.onLockpickingStarted(e)
+	this.pickHelper = e.session.pick.helper
+end
+
+---@private
 ---@param e lockpickingEndEventData
 function this.onLockpickingEnd(e)
 	local constants = this.enums.constants.sounds
@@ -125,6 +142,16 @@ function this.onLockpickingEnd(e)
 		})
 	end
 
+	this.pickHelper = nil
+	this.rotatingCylinder = false
+	this.jiggling = false
+	this.disable()
+end
+
+---@private
+---@param _ lockpickingEndedEventData
+function this.onLockpickingEnded(_)
+	this.pickHelper = nil
 	this.rotatingCylinder = false
 	this.jiggling = false
 	this.disable()
@@ -141,8 +168,9 @@ function this.disable()
 end
 
 ---@private
----@param _ pickCycledEventData
-function this.onPickCycled(_)
+---@param e pickCycledEventData
+function this.onPickCycled(e)
+	this.pickHelper = e.pick.helper
 	tes3.playSound({
 		reference = tes3.player,
 		soundPath = this.soundFileResolver.resolve(this.enums.constants.sounds.templates.changeLockpick).path,
@@ -175,6 +203,19 @@ function this.onEnterFrame(e)
 end
 
 ---@private
+---@return boolean
+function this.isInRotationZone()
+	if not this.pickHelper then
+		return false
+	end
+	local cursor = tes3.getCursorPosition()
+	local screenPoint = this.renderingStrategyController
+		.getNiCamera()
+		:worldPointToScreenPoint(this.pickHelper.worldTransform.translation)
+	return screenPoint ~= nil and cursor.y > screenPoint.y
+end
+
+---@private
 ---@param delta number
 function this.playLockpickRotationSound(delta)
 	local constants = this.enums.constants.sounds
@@ -184,7 +225,7 @@ function this.playLockpickRotationSound(delta)
 		state = this.lockpickRotationState,
 		template = constants.templates.rotateLockpick,
 		delta = delta,
-		condition = not this.rotatingCylinder and moved,
+		condition = not this.rotatingCylinder and moved and this.isInRotationZone(),
 	})
 	this.lastCursorPosition = currentCursorPosition
 end
