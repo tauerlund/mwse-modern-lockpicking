@@ -258,19 +258,23 @@ function this.breakPick()
 	this.session.pick.damaging = false
 	this.session.pick.animating = true
 
+	local events = this.enums.events
+
 	---@type pickBrokenEventData|pickBreakEventData
 	local eventData = {
 		pick = this.currentPick,
 		itemData = this.currentPickItemData
 	}
-	event.trigger(this.enums.events.pickBreak, eventData)
-	event.trigger(this.enums.events.pickBroken, eventData)
+	event.trigger(events.pickBreak, eventData)
+	event.trigger(events.pickBroken, eventData)
 
 	local direction = this.currentPick.item.count <= 1 and this.enums.cycleDirections.next or nil
 
 	this.timerManager.start({
 		durationInSeconds = this.enums.constants.picks.breakAnimation.duration + 0.5,
-		cancelOn = { this.enums.events.lockpickingEnded },
+		cancelOn = { events.lockpickingEnded },
+		pauseOn = { events.optionsMenuOpened },
+		resumeOn = { events.optionsMenuClosed },
 		callback = function ()
 			this.breaking = false
 			this.cyclePick(direction)

@@ -1,9 +1,37 @@
----@class nodeAnimator
+---@class nodeAnimator : initializedService
 local this = {}
+
+---@private
+---@type eventRegistrar
+this.eventRegistrar = nil
 
 ---@private
 ---@type nodeAnimation[]
 this.animations = {}
+
+---@private
+---@type eventHandlers
+this.eventHandlers = nil
+
+---@private
+this.paused = false
+
+---@public
+---@param services serviceCollection
+---@return boolean,string|nil
+function this.initialize(services)
+	this.eventRegistrar = services.eventRegistrar
+
+	local events = services.enums.events
+
+	this.eventHandlers = {
+		[tes3.event.enterFrame] = this.onEnterFrame,
+		[events.optionsMenuOpened] = this.onMenuOpened,
+		[events.optionsMenuClosed] = this.onMenuClosed,
+	}
+
+	return true, nil
+end
 
 ---@public
 ---@param params nodeAnimator.start.params
@@ -52,6 +80,10 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
+	if this.paused then
+		return
+	end
+
 	for index = #this.animations, 1, -1 do
 		this.update(index, this.animations[index], e.delta)
 	end
@@ -180,16 +212,22 @@ end
 
 ---@private
 function this.enable()
-	if not event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.register(tes3.event.enterFrame, this.onEnterFrame)
-	end
+	this.eventRegistrar.register(this.eventHandlers)
 end
 
 ---@private
 function this.disable()
-	if event.isRegistered(tes3.event.enterFrame, this.onEnterFrame) then
-		event.unregister(tes3.event.enterFrame, this.onEnterFrame)
-	end
+	this.eventRegistrar.unregister(this.eventHandlers)
+end
+
+---@private
+function this.onMenuOpened()
+	this.paused = true
+end
+
+---@private
+function this.onMenuClosed()
+	this.paused = false
 end
 
 return this

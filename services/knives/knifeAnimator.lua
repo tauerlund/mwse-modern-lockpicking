@@ -241,16 +241,20 @@ function this.start(knife)
 	this.knife = knife
 	this.blocked = true
 
+	local events = this.enums.events
+
 	this.nodeAnimator.start({
 		node = knife,
 		keyframes = this.startAnimationKeyFrames,
-		cancelOn = { this.enums.events.lockpickingEnded },
+		cancelOn = { events.lockpickingEnded },
 	})
 
 	this.timerManager.start({
 		durationInSeconds = this.enums.constants.knives.animation.startAnimationDuration,
 		callback = this.onStartTimerFinished,
-		cancelOn = { this.enums.events.lockpickingEnded },
+		cancelOn = { events.lockpickingEnded },
+		pauseOn = { events.optionsMenuOpened },
+		resumeOn = { events.optionsMenuClosed }
 	})
 end
 

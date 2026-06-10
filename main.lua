@@ -24,6 +24,7 @@ function this.initializeMod(_)
 
 	---@type initializedService[]
 	local initializedServices = {
+		services.nodeAnimator,
 		services.strategyLoader,
 		services.renderingStrategyController,
 		services.pickBreakAnimator,

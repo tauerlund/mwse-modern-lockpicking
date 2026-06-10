@@ -156,16 +156,20 @@ function this.onLockPickingActivated(e)
 		return
 	end
 
+	local events = this.enums.events
+
 	---@type lockpickingStartEventData
 	local eventData = {
 		session = this.session,
 	}
-	event.trigger(this.enums.events.lockpickingStart, eventData)
+	event.trigger(events.lockpickingStart, eventData)
 
 	this.timerManager.start({
 		durationInSeconds = 1.3,
 		callback = this.onStartTimerFinished,
-		cancelOn = { this.enums.events.lockpickingEnded },
+		cancelOn = { events.lockpickingEnded },
+		pauseOn = { events.optionsMenuOpened },
+		resumeOn = { events.optionsMenuClosed },
 	})
 end
 
@@ -292,11 +296,16 @@ end
 ---@param e lockpickingEndEventData
 function this.onLockpickingEnd(e)
 	this.disableInput()
+
+	local events = this.enums.events
+
 	this.timerManager.start({
 		durationInSeconds = 0.1,
 		callback = this.onEndTimerFinished,
 		data = e --[[@as timerData]],
-		cancelOn = { this.enums.events.lockpickingEnded }
+		cancelOn = { events.lockpickingEnded },
+		pauseOn = { events.optionsMenuOpened },
+		resumeOn = { events.optionsMenuClosed },
 	})
 end
 

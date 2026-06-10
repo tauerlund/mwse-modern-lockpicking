@@ -57,6 +57,8 @@ function this.onLockPick(e)
 
     e.block = true
 
+    local events = this.enums.events
+
     this.timerManager.start({
         callback = this.onStartTimerFinished,
         durationInSeconds = 0.5,
@@ -64,7 +66,9 @@ function this.onLockPick(e)
         data = {
             activator = e.reference
         },
-        cancelOn = { this.enums.events.lockpickingEnded }
+        cancelOn = { events.lockpickingEnded, events.lockpickingInterrupted },
+        pauseOn = { events.optionsMenuOpened },
+        resumeOn = { events.optionsMenuClosed },
     })
 end
 

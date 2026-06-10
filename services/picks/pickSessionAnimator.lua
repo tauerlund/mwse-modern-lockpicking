@@ -209,15 +209,19 @@ function this.start(pick, keyframes)
 	this.state.jiggleOffset = 0
 	pick.animating = true
 
+	local events = this.enums.events
+
 	this.nodeAnimator.start({
 		node = pick.mesh,
 		keyframes = keyframes,
-		cancelOn = { this.enums.events.lockpickingEnded, this.enums.events.pickCycled },
+		cancelOn = { events.lockpickingEnded, events.pickCycled },
 	})
 
 	this.timerManager.start({
 		durationInSeconds = keyframes[#keyframes].time,
-		cancelOn = { this.enums.events.lockpickingEnded, this.enums.events.pickCycled },
+		cancelOn = { events.lockpickingEnded, events.pickCycled },
+		pauseOn = { events.optionsMenuOpened },
+		resumeOn = { events.optionsMenuClosed },
 		callback = this.onStartTimerFinished,
 	})
 end

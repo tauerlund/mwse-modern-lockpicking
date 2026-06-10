@@ -3,4 +3,6 @@
 ---@field public durationInSeconds number
 ---@field public callback fun(data: timerData?)?
 ---@field public cancelOn string[]?
+---@field public pauseOn string[]?
+---@field public resumeOn string[]?
 ---@field public data? timerData
