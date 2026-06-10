@@ -32,10 +32,6 @@ local enum = {
 		fallDistance = 25,
 		bounceHeight = 6,
 	},
-
-	damage = {
-		baseRate = 20,
-	},
 }
 
 return enum
