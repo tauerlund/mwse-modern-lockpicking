@@ -76,6 +76,7 @@ function this.initialize(services)
 
 	this.eventHandlers = {
 		lifetime = {
+			[tes3.event.load] = this.onLoad,
 			[events.lockpickingActivated] = this.onLockPickingActivated,
 			[events.cylinderTargetReached] = this.onCylinderTargetReached,
 			[events.pickCycled] = this.onPickCycled,
@@ -93,6 +94,15 @@ function this.initialize(services)
 	this.eventRegistrar.register(this.eventHandlers.lifetime)
 
 	return true, nil
+end
+
+---@private
+---@param _ loadEventData
+function this.onLoad(_)
+	if not this.session then
+		return
+	end
+	this.endLockpicking(false)
 end
 
 ---@public
