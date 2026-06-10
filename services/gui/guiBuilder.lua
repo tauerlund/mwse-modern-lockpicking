@@ -208,7 +208,7 @@ function this:withCallback(evt, callback)
 	self.callbacks = self.callbacks or {}
 	if self.callbacks[evt] then
 		this.logger:warn("Callback for event '%s' already registered", evt)
-		return
+		return self
 	end
 
 	self.callbacks[evt] = function (e)
