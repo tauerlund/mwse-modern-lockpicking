@@ -2,6 +2,10 @@
 local this = {}
 
 ---@private
+---@type mwseLogger
+this.logger = mwse.Logger.new()
+
+---@private
 ---@type settings
 this.settings = nil
 
@@ -72,6 +76,14 @@ end
 
 ---@private
 function this.applyStrategy()
+	local strategyName = this.settings.activationStrategy or this.enums.activationStrategyNames.default
+
+	local newStrategy = this.activationStrategies[strategyName]
+	if not newStrategy then
+		this.logger:error("Strategy '%s' is invalid", strategyName)
+		return
+	end
+
 	if this.currentActivationStrategy then
 		this.currentActivationStrategy.disable()
 		this.currentActivationStrategy = nil
@@ -81,9 +93,7 @@ function this.applyStrategy()
 		return
 	end
 
-	local strategyName = this.settings.activationStrategy or this.enums.activationStrategyNames.default
-
-	this.currentActivationStrategy = this.activationStrategies[strategyName]
+	this.currentActivationStrategy = newStrategy
 	this.currentActivationStrategy.enable()
 end
 
