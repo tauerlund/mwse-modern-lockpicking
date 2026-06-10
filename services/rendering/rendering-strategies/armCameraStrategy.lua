@@ -29,7 +29,7 @@ this.wrapperRoot = nil
 this.pointLight = nil
 
 ---@private
-local LIGHT_AMPLITUDE = 0.05
+local LIGHT_AMPLITUDE = 64
 
 ---@public
 ---@param services serviceCollection
@@ -111,9 +111,11 @@ end
 ---@private
 function this.onEnterFrame()
 	if not this.pointLight then return end
+	-- Cursor is in pixels relative to the screen center; normalize to [-0.5, 0.5]
 	local cursor = tes3.getCursorPosition()
-	local x = (cursor.x - 0.5) * LIGHT_AMPLITUDE
-	local z = (cursor.y - 0.5) * LIGHT_AMPLITUDE
+	local viewportWidth, viewportHeight = tes3.getViewportSize()
+	local x = (cursor.x / viewportWidth) * LIGHT_AMPLITUDE
+	local z = (cursor.y / viewportHeight) * LIGHT_AMPLITUDE
 	local translation = tes3vector3.new(x, this.getTargetDistance() - 15, z)
 	this.pointLight.translation = translation
 	this.pointLight:update()
