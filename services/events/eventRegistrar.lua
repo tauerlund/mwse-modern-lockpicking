@@ -13,14 +13,13 @@ this.logger = mwse.Logger.new()
 function this.register(handlers)
     for evt, entry in pairs(handlers) do
         local handler, options = this.resolveEntry(entry)
-        if not handler then
-            return
-        end
 
-        if not event.isRegistered(evt, handler) then
-            event.register(evt, handler, options)
-        else
-            this.logger:debug("Attempted to register handler for '%s' that is already registered", evt)
+        if handler then
+            if not event.isRegistered(evt, handler) then
+                event.register(evt, handler, options)
+            else
+                this.logger:debug("Attempted to register handler for '%s' that is already registered", evt)
+            end
         end
     end
 end
@@ -32,14 +31,13 @@ end
 function this.unregister(handlers)
     for evt, entry in pairs(handlers) do
         local handler = this.resolveEntry(entry)
-        if not handler then
-            return
-        end
 
-        if event.isRegistered(evt, handler) then
-            event.unregister(evt, handler)
-        else
-            this.logger:debug("Attempted to unregister handler for '%s' that is already unregistered", evt)
+        if handler then
+            if event.isRegistered(evt, handler) then
+                event.unregister(evt, handler)
+            else
+                this.logger:debug("Attempted to unregister handler for '%s' that is already unregistered", evt)
+            end
         end
     end
 end
