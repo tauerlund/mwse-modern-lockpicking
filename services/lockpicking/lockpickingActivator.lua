@@ -76,11 +76,13 @@ end
 
 ---@private
 function this.applyStrategy()
-	local strategyName = this.settings.activationStrategy or this.enums.activationStrategyNames.default
+	local defaultStrategyName = this.enums.activationStrategyNames.default
+	local strategyName = this.settings.activationStrategy or defaultStrategyName
 
-	local newStrategy = this.activationStrategies[strategyName]
-	if not newStrategy then
+	local strategy = this.activationStrategies[strategyName]
+	if not strategy then
 		this.logger:error("Strategy '%s' is invalid", strategyName)
+		strategy = this.activationStrategies[defaultStrategyName]
 		return
 	end
 
@@ -93,7 +95,7 @@ function this.applyStrategy()
 		return
 	end
 
-	this.currentActivationStrategy = newStrategy
+	this.currentActivationStrategy = strategy
 	this.currentActivationStrategy.enable()
 end
 
