@@ -21,7 +21,7 @@ function this.validate(mesh)
 
     for _, name in ipairs({ names.cylinderHelper, names.knifeHelper, names.pickHelper }) do
         if not mesh:getObjectByName(name) then
-            return false, string.format("object '%s' is missing", mesh.name, name)
+            return false, string.format("object '%s' is missing '%s'", mesh.name, name)
         end
     end
     return true, nil
