@@ -29,6 +29,9 @@ this.wrapperRoot = nil
 this.pointLight = nil
 
 ---@private
+this.paused = false
+
+---@private
 local LIGHT_AMPLITUDE = 64
 
 ---@public
@@ -37,8 +40,13 @@ function this.initialize(services)
 	this.name = services.enums.renderingStrategyNames.armCamera
 	this.enums = services.enums
 	this.eventRegistrar = services.eventRegistrar
+
+	local events = this.enums.events
+
 	this.sessionHandlers = {
 		[tes3.event.enterFrame] = this.onEnterFrame,
+		[events.optionsMenuOpened] = this.onOptionsMenuOpened,
+		[events.optionsMenuClosed] = this.onOptionsMenuClosed,
 	}
 end
 
@@ -111,15 +119,29 @@ end
 
 ---@private
 function this.onEnterFrame()
-	if not this.pointLight then return end
+	if this.paused or not this.pointLight then
+		return
+	end
+
 	-- Cursor is in pixels relative to the screen center; normalize to [-0.5, 0.5]
 	local cursor = tes3.getCursorPosition()
 	local viewportWidth, viewportHeight = tes3.getViewportSize()
 	local x = (cursor.x / viewportWidth) * LIGHT_AMPLITUDE
 	local z = (cursor.y / viewportHeight) * LIGHT_AMPLITUDE
 	local translation = tes3vector3.new(x, this.getTargetDistance() - 15, z)
+
 	this.pointLight.translation = translation
 	this.pointLight:update()
+end
+
+---@private
+function this.onOptionsMenuOpened()
+	this.paused = true
+end
+
+---@private
+function this.onOptionsMenuClosed()
+	this.paused = false
 end
 
 ---@private
