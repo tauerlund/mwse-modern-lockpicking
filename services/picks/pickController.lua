@@ -2,16 +2,8 @@
 local this = {}
 
 ---@private
----@type lock
-this.lock = nil
-
----@private
 ---@type lockpickingSession
 this.session = nil
-
----@private
----@type tes3itemStack[]
-this.picks = nil
 
 ---@private
 ---@type pick
@@ -127,8 +119,6 @@ end
 ---@param e lockpickingStartedEventData
 function this.onLockpickingStarted(e)
 	this.session = e.session
-	this.picks = e.session.picks
-	this.lock = e.session.lock
 	this.currentPick = e.session.pick
 	this.currentPickItemData = this.tryResolvePickItemData()
 	this.enable()
@@ -145,8 +135,6 @@ end
 function this.onLockpickingEnded(_)
 	this.disable()
 	this.session = nil
-	this.picks = nil
-	this.lock = nil
 	this.currentPick = nil
 	this.sweetSpotRadius = nil
 	this.breaking = false
@@ -289,11 +277,12 @@ end
 ---@private
 ---@param direction? cycleDirections
 function this.cyclePick(direction)
+	local session = this.session
 	local previousPick = this.currentPick
 
 	local item = direction
 		and this.pickSelector.select({
-			picks = this.picks,
+			picks = session.picks,
 			direction = direction
 		})
 		or previousPick.item
@@ -302,7 +291,7 @@ function this.cyclePick(direction)
 		return
 	end
 
-	local pick = this.pickSpawner.spawn(this.lock, item)
+	local pick = this.pickSpawner.spawn(session.lock, item)
 
 	this.damageAccumulator = 0
 	this.session.pick.damaging = false

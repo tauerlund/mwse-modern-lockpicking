@@ -2,12 +2,12 @@
 local this = {}
 
 ---@private
----@type integer
-this.currentIndex = 1
+---@type lockpickingSession
+this.session = nil
 
 ---@private
----@type tes3itemStack[]
-this.picks = nil
+---@type integer
+this.currentIndex = 1
 
 ---@private
 ---@type { [string]: boolean }|nil
@@ -66,13 +66,25 @@ end
 ---@private
 ---@param e lockpickingStartEventData
 function this.onLockpickingStarted(e)
-    this.picks = e.session.picks
+    this.session = e.session
 end
 
 ---@private
 function this.onLockpickingEnded()
+    local picks = this.session and this.session.picks
+
+    local lastPick = picks
+        and picks[this.currentIndex]
+        and picks[this.currentIndex].object
+
+    if not lastPick or not lastPick:isValid() then
+        return
+    end
+
     local data = this.playerDataController.resolve()
-    data.lastPickId = this.picks[this.currentIndex].object.id
+    data.lastPickId = lastPick.id
+
+    this.session = nil
 end
 
 ---@public
