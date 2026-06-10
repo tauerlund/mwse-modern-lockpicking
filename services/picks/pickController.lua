@@ -53,6 +53,10 @@ this.eventRegistrar = nil
 this.timerManager = nil
 
 ---@private
+---@type boolean
+this.paused = false
+
+---@private
 ---@type eventHandlerGroups
 this.eventHandlers = {
 	lifetime = {},

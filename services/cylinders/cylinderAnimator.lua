@@ -28,6 +28,10 @@ this.enums = nil
 this.eventRegistrar = nil
 
 ---@private
+---@type boolean
+this.paused = false
+
+---@private
 ---@type eventHandlerGroups
 this.eventHandlers = {
 	lifetime = {},

@@ -54,7 +54,7 @@ function this.getBestLockpick()
 		return nil
 	end
 
-	return picks[table.size(picks)]
+	return picks[#picks]
 end
 
 ---@public
@@ -71,7 +71,7 @@ function this.getLockpicks()
 
 	table.sort(picks, this.sortByLowestQuality)
 
-	if table.size(picks) == 0 then
+	if #picks == 0 then
 		return nil
 	end
 

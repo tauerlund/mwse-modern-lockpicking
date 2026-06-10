@@ -29,6 +29,7 @@ this.wrapperRoot = nil
 this.pointLight = nil
 
 ---@private
+---@type boolean
 this.paused = false
 
 ---@private

@@ -41,6 +41,10 @@ this.session = nil
 this.eventRegistrar = nil
 
 ---@private
+---@type boolean
+this.paused = false
+
+---@private
 ---@type eventHandlerGroups
 this.eventHandlers = {
 	lifetime = {},
@@ -233,10 +237,7 @@ function this.onEnterFrame(e)
 		return
 	end
 
-	local state = this.state
-	if not state then
-		return
-	end
+	local state = this.state --[[@as pickSessionAnimatorState]]
 
 	local session = this.session
 

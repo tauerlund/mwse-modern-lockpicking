@@ -24,6 +24,10 @@ this.renderingStrategyController = nil
 this.eventRegistrar = nil
 
 ---@private
+---@type boolean
+this.paused = false
+
+---@private
 ---@type eventHandlerGroups
 this.eventHandlers = {
 	lifetime = {},
@@ -108,7 +112,7 @@ function this.onPickBroken(e)
 		},
 		handle = {
 			node = handleNode,
-			originalRotation = handleNode and handleNode.rotation:copy() or nil,
+			originalRotation = handleNode.rotation:copy(),
 			kickAngleX = random(constants.handleKickAngle, constants.handleKickAngleVariance),
 			kickAngleZ = (math.random() * 2 - 1) * constants.handleKickAngleSideMax,
 		},
@@ -197,13 +201,11 @@ function this.onEnterFrame(e)
 	tip.node.translation = tip.originalTranslation:lerp(tip.targetTranslation, t)
 	tip.node:update()
 
-	if handle.node then
-		this.rotationBuffer:toRotationX(-handle.kickAngleX * t)
-		this.rotationBuffer2:toRotationZ(handle.kickAngleZ * t)
+	this.rotationBuffer:toRotationX(-handle.kickAngleX * t)
+	this.rotationBuffer2:toRotationZ(handle.kickAngleZ * t)
 
-		handle.node.rotation = handle.originalRotation * this.rotationBuffer * this.rotationBuffer2
-		handle.node:update()
-	end
+	handle.node.rotation = handle.originalRotation * this.rotationBuffer * this.rotationBuffer2
+	handle.node:update()
 
 	ghost.mesh:update()
 

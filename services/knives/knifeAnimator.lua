@@ -46,6 +46,10 @@ this.currentAngle = 0
 this.blocked = false
 
 ---@private
+---@type boolean
+this.paused = false
+
+---@private
 ---@type { [rotationDirections]: number }
 this.angles = nil
 
