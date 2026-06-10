@@ -85,17 +85,10 @@ local this = {
     }
 }
 
----@private
-this.logger = mwse.Logger.new()
-
-for name, service in pairs(this) do
-    if type(service) ~= "table" then
-        this.logger:warn("Could not assign name to service '%s' because it is not a table", name)
-    elseif service.name ~= nil then
-        this.logger:warn("'%s' already has a service name assigned (%s)", name, service.name)
-    else
-        service.name = name
-    end
+---@public
+---@return service[]
+function this.unnamedServices()
+    return { this.enums, this.settings }
 end
 
 return this
