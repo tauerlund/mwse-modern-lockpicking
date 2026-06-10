@@ -61,7 +61,7 @@ return {
 	[keys.mcmActivationMethodAttack] = "Attack",
 	[keys.mcmAllowEquipPicksLabel] = "Allow Equipping Picks",
 	[keys.mcmAllowEquipPicksDesc] =
-	"When enabled, lockpicks can be equipped from the inventory like in the vanilla game.",
+	"When enabled, lockpicks can be equipped from the inventory like in the vanilla game. Note: disabling this while using Attack mode makes lockpicking impossible.",
 	[keys.mcmUseLockComplexityLabel] = "Respect lock complexity",
 	[keys.mcmUseLockComplexityDesc] =
 	"Blocks the player from entering the lockpicking mini-game if the lock is too complex (based on the same formula as the vanilla game).\n Note, this will also prevent lockpicks with too low quality to be selected for complex locks.",
