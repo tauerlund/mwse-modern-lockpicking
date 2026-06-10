@@ -13,7 +13,7 @@ this.eventRegistrar = nil
 ---@type eventHandlerGroups
 this.eventHandlers = {
 	lifetime = {},
-	session = {}
+	settings = {}
 }
 
 ---@public
@@ -27,10 +27,10 @@ function this.initialize(services)
 
 	this.eventHandlers = {
 		lifetime = {
-			[events.pickBreak] = this.onPickBroken,
+			[events.pickBreak] = this.onPickBreak,
 			[events.settingsUpdated] = this.onSettingsUpdated,
 		},
-		session = {
+		settings = {
 			[tes3.event.equip] = this.onEquip,
 		}
 	}
@@ -100,7 +100,7 @@ end
 
 ---@private
 ---@param e pickBrokenEventData
-function this.onPickBroken(e)
+function this.onPickBreak(e)
 	tes3.removeItem({
 		reference = tes3.player,
 		item = e.pick.item.object --[[@as tes3lockpick]],
@@ -125,12 +125,12 @@ end
 
 ---@private
 function this.disableLockpickEquip()
-	this.eventRegistrar.register(this.eventHandlers.session)
+	this.eventRegistrar.register(this.eventHandlers.settings)
 end
 
 ---@private
 function this.enableLockpickEquip()
-	this.eventRegistrar.unregister(this.eventHandlers.session)
+	this.eventRegistrar.unregister(this.eventHandlers.settings)
 end
 
 ---@private
