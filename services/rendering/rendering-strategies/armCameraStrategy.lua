@@ -188,13 +188,14 @@ function this.attachMesh(mesh)
 end
 
 ---@public
----@param _ niNode
-function this.detachMesh(_)
+---@param mesh niNode
+function this.detachMesh(mesh)
 	local root = this.getRootNode()
 
 	this.disable()
 
 	if this.wrapperRoot then
+		this.wrapperRoot:detachChild(mesh)
 		this.detachDynamicEffects(this.wrapperRoot)
 		this.wrapperRoot:updateEffects()
 	end

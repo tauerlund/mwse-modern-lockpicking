@@ -466,20 +466,6 @@ function this.onUiObjectTooltip(e)
 
 	local itemData = e.itemData
 
-	if not itemData then
-		for _, stack in pairs(tes3.player.object.inventory.items) do
-			if stack.object == e.object and stack.variables then
-				for _, v in ipairs(stack.variables) do
-					if v.data and v.data.modernLockpicking then
-						itemData = v
-						break
-					end
-				end
-			end
-			if itemData then break end
-		end
-	end
-
 	local conditionRatio = itemData and math.max(0, itemData.condition / e.object.maxCondition) or 1
 	usesTooltip.text = string.format(
 		"%s: %d%%",

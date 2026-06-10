@@ -52,8 +52,8 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
-	for index, animation in ipairs(this.animations) do
-		this.update(index, animation, e.delta)
+	for index = #this.animations, 1, -1 do
+		this.update(index, this.animations[index], e.delta)
 	end
 end
 
@@ -72,7 +72,7 @@ function this.update(index, animation, delta)
 			animation.currentFrame = nextFrame
 		end
 	else
-		this.stopAnimation(index)
+		this.stopAnimation(index, true)
 		return
 	end
 
@@ -80,7 +80,7 @@ function this.update(index, animation, delta)
 	local nextTransform = animation.keyframes[nextFrame]
 
 	local node = animation.node
-	local transition = math.remap(animation.phase, currentTransform.time, nextTransform.time, 0, 1)
+	local transition = math.clamp(math.remap(animation.phase, currentTransform.time, nextTransform.time, 0, 1), 0, 1)
 
 	if currentTransform.translation and nextTransform.translation then
 		node.translation = this.getUpdatedTranslation(currentTransform.translation, nextTransform.translation,
@@ -108,9 +108,15 @@ end
 
 ---@private
 ---@param index integer
-function this.stopAnimation(index)
+---@param snap boolean?
+function this.stopAnimation(index, snap)
 	local animation = this.animations[index]
 	this.unregisterCancellationHandlers(animation)
+
+	if snap then
+		local lastKeyframe = animation.keyframes[table.size(animation.keyframes)]
+		this.initializeTransforms(animation.node, lastKeyframe.translation, lastKeyframe.rotation)
+	end
 
 	table.remove(this.animations, index)
 	if table.size(this.animations) == 0 then
