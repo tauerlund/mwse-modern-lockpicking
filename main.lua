@@ -52,7 +52,7 @@ function this.initializeMod(_)
 		services.debuggingRenderer,
 	}
 
-	local success, reason = this.intializeServices(initializedServices)
+	local success, reason = this.initializeServices(initializedServices)
 
 	if not success then
 		this.logger:error("Initialization failed. Reason: %s", reason)
@@ -66,7 +66,7 @@ end
 ---@private
 ---@param initializedServices initializedService[]
 ---@return boolean, reason
-function this.intializeServices(initializedServices)
+function this.initializeServices(initializedServices)
 	for _, service in ipairs(initializedServices) do
 		if service.dependencies then
 			local dependencies = service.dependencies(this.services)
