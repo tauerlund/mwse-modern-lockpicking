@@ -1,0 +1,3 @@
+---@meta
+---@class lockpickingInterruptedEventData
+---@field public reason string

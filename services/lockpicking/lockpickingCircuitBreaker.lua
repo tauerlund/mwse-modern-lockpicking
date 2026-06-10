@@ -26,6 +26,8 @@ function this.initialize(services)
 
     this.eventHandlers = {
         [tes3.event.load] = this.onLoad,
+        [tes3.event.cellChanged] = this.onCellChanged,
+        [tes3.event.save] = this.onSave
     }
 
     this.eventRegistrar.register(this.eventHandlers)
@@ -39,9 +41,31 @@ function this.uninitialize()
 end
 
 ---@private
+---@param _ saveEventData
+function this.onSave(_)
+    this.triggerInterruptionEvent("the game was saved")
+end
+
+---@private
+---@param _ cellChangedEventData
+function this.onCellChanged(_)
+    this.triggerInterruptionEvent("the player changed cells")
+end
+
+---@private
 ---@param _ loadEventData
 function this.onLoad(_)
-    event.trigger(this.enums.events.lockpickingInterrupted)
+    this.triggerInterruptionEvent("a save game was loaded")
+end
+
+---@private
+---@param reason string
+function this.triggerInterruptionEvent(reason)
+    ---@type lockpickingInterruptedEventData
+    local eventData = {
+        reason = reason
+    }
+    event.trigger(this.enums.events.lockpickingInterrupted, eventData)
 end
 
 return this
