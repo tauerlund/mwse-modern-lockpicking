@@ -91,6 +91,7 @@ end
 ---@private
 ---@param node niNode
 function this.detachDynamicEffects(node)
+	---@type niDynamicEffect[]
 	local list = {}
 	local effects = node.effectList
 	while effects do
