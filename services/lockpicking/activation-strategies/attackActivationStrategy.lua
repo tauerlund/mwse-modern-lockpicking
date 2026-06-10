@@ -63,7 +63,8 @@ function this.onLockPick(e)
         ---@class attackActivationStrategy.startTimer.data
         data = {
             activator = e.reference
-        }
+        },
+        cancelOn = { this.enums.events.lockpickingEnded }
     })
 end
 

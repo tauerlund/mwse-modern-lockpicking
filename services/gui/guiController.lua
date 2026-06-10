@@ -54,7 +54,6 @@ function this.initialize(services)
 	local events        = this.enums.events
 
 	this.eventHandlers  = {
-		[tes3.event.load] = this.onLoad,
 		[tes3.event.uiObjectTooltip] = this.onUiObjectTooltip,
 		[tes3.event.uiActivated] = { this.uiActivated, { filter = "MenuOptions" } },
 		[events.lockpickingStart] = this.onLockpickingStart,

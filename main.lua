@@ -25,6 +25,7 @@ function this.initializeMod(_)
 		services.strategyLoader,
 		services.renderingStrategyController,
 		services.pickBreakAnimator,
+		services.lockpickingCircuitBreaker,
 		services.lockpickingController,
 		services.lockpickingActivator,
 		services.lockController,

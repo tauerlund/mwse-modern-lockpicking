@@ -18,6 +18,7 @@ local this = {
     knifeAnimator = require("tauer.modern-lockpicking.services.knives.knifeAnimator"),
     knifeSpawner = require("tauer.modern-lockpicking.services.knives.knifeSpawner"),
 
+    lockpickingCircuitBreaker = require("tauer.modern-lockpicking.services.lockpicking.lockpickingCircuitBreaker"),
     lockpickingActivator = require("tauer.modern-lockpicking.services.lockpicking.lockpickingActivator"),
     lockpickingController = require("tauer.modern-lockpicking.services.lockpicking.lockpickingController"),
 

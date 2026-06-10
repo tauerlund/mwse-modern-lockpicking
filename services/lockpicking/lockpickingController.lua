@@ -76,7 +76,7 @@ function this.initialize(services)
 
 	this.eventHandlers = {
 		lifetime = {
-			[tes3.event.load] = this.onLoad,
+			[events.lockpickingInterrupted] = this.onLockpickingInterrupted,
 			[events.lockpickingActivated] = this.onLockPickingActivated,
 			[events.cylinderTargetReached] = this.onCylinderTargetReached,
 			[events.pickCycled] = this.onPickCycled,
@@ -98,7 +98,7 @@ end
 
 ---@private
 ---@param _ loadEventData
-function this.onLoad(_)
+function this.onLockpickingInterrupted(_)
 	if not this.session then
 		return
 	end
@@ -143,6 +143,10 @@ end
 ---@private
 ---@param e lockpickingActivatedEventData
 function this.onLockPickingActivated(e)
+	if this.session then
+		return
+	end
+
 	this.session = this.createSession(e.activator)
 	if not this.session then
 		return
@@ -288,6 +292,7 @@ function this.onLockpickingEnd(e)
 		durationInSeconds = 0.1,
 		callback = this.onEndTimerFinished,
 		data = e --[[@as timerData]],
+		cancelOn = { this.enums.events.lockpickingEnded }
 	})
 end
 
