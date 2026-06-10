@@ -25,16 +25,22 @@ this.enums = nil
 function this.initialize(services)
     this.enums = services.enums
 
-    local constants = services.enums.constants.sounds
+    local paths = services.enums.constants.sounds.paths
 
-    for file in lfs.dir(string.format("%s/%s", constants.paths.sound, constants.paths.mod)) do
+    local directory = string.format("%s/%s", paths.sound, paths.mod)
+
+    if not lfs.directoryexists(directory) then
+        return false, string.format("could not find sound directory at '%s'", directory)
+    end
+
+    for file in lfs.dir(directory) do
         if file:match("%.wav$") then
             local name = file:match("^(.*)%.wav$")
             local template = name:gsub("%-%d+$", "")
 
             this.sounds[template] = this.sounds[template] or {}
 
-            local path = string.format("%s/%s", constants.paths.mod, file)
+            local path = string.format("%s/%s", paths.mod, file)
             ---@type soundFile
             local soundFile = {
                 path = path,
