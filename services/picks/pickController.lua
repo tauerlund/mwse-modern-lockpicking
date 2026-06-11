@@ -253,13 +253,18 @@ function this.breakPick()
 	event.trigger(events.pickBroken, eventData)
 
 	local direction = isLastOfStack and this.enums.cycleDirections.next or nil
+	local duration = this.enums.constants.picks.breakAnimation.duration +
+		this.enums.constants.picks.breakAnimation.cycleDelay
 
 	this.timerManager.start({
-		durationInSeconds = this.enums.constants.picks.breakAnimation.duration + this.enums.constants.picks.breakAnimation.cycleDelay,
+		durationInSeconds = duration,
 		cancelOn = { events.lockpickingEnded },
 		pauseOn = { events.optionsMenuOpened },
 		resumeOn = { events.optionsMenuClosed },
 		callback = function ()
+			if not this.session then
+				return
+			end
 			this.breaking = false
 			this.cyclePick(direction)
 		end,

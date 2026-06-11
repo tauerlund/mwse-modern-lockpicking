@@ -15,7 +15,7 @@ function this.register(handlers)
         local handler, options = this.resolveEntry(entry)
 
         if handler then
-            if not event.isRegistered(evt, handler) then
+            if not event.isRegistered(evt, handler, options) then
                 event.register(evt, handler, options)
             else
                 this.logger:debug("Attempted to register handler for '%s' that is already registered", evt)
@@ -30,11 +30,11 @@ end
 ---@see event.unregister
 function this.unregister(handlers)
     for evt, entry in pairs(handlers) do
-        local handler = this.resolveEntry(entry)
+        local handler, options = this.resolveEntry(entry)
 
         if handler then
-            if event.isRegistered(evt, handler) then
-                event.unregister(evt, handler)
+            if event.isRegistered(evt, handler, options) then
+                event.unregister(evt, handler, options)
             else
                 this.logger:debug("Attempted to unregister handler for '%s' that is already unregistered", evt)
             end
@@ -44,7 +44,7 @@ end
 
 ---@private
 ---@param entry callback|callbackWithOptions
----@return callback?, event.register.options?
+---@return callback?, table?
 function this.resolveEntry(entry)
     local entryType = type(entry)
 

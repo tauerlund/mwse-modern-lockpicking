@@ -56,6 +56,7 @@ function this.initialize(services)
 			[events.settingsUpdated] = this.onSettingsUpdated,
 			[events.lockpickingStarted] = this.onLockpickingStarted,
 			[events.lockpickingEnd] = this.onLockpickingEnd,
+			[events.lockpickingEnded] = this.onLockpickingEnded,
 		},
 		session = {
 			[tes3.event.enterFrame] = this.onEnterFrame,
@@ -91,6 +92,13 @@ end
 ---@private
 ---@param _ lockpickingEndEventData
 function this.onLockpickingEnd(_)
+	this.disable()
+	this.session = nil
+end
+
+---@private
+---@param _ lockpickingEndedEventData
+function this.onLockpickingEnded(_)
 	this.disable()
 	this.session = nil
 end
@@ -199,7 +207,7 @@ end
 ---@private
 ---@param e keyUpEventData
 function this.onRotationKeyUp(e)
-	if this.currentDirectionKey and this.currentDirectionKey ~= e.keyCode then
+	if not this.currentDirectionKey or this.currentDirectionKey ~= e.keyCode then
 		return
 	end
 
