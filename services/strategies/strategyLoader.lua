@@ -26,7 +26,11 @@ function this.loadAll(params)
 
     local files = this.services.fileHelper.getAllFilesInDirectory(path, this.services.enums.fileTypes.lua)
     if not files then
-        return params.requireNotEmpty and nil or {}
+        if params.requireNotEmpty then
+            this.logger:error("No strategies found in directory '%s'.", params.directory)
+            return nil
+        end
+        return {}
     end
 
     ---@type { [string]: strategy }
