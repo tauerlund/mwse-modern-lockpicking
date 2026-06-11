@@ -72,12 +72,6 @@ function this.uninitialize()
 end
 
 ---@private
----@param _ loadEventData
-function this.onLoad(_)
-	this.stop()
-end
-
----@private
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
 	this.start(e)
@@ -435,7 +429,7 @@ function this.onPickBroken(e)
 	local countLabel = this.picks:findChild(string.format(constants.picksCountLabelId, objectId))
 	if not countLabel then return end
 
-	local newCount = math.max(0, (tonumber(countLabel.text) or 1) - 1)
+	local newCount = e.pick.item.count
 
 	if newCount == 0 then
 		local nameLabel = this.picks:findChild(string.format(constants.picksLabelId, objectId))

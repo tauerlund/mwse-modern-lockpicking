@@ -68,9 +68,6 @@ end
 ---@private
 ---@param e pickCycledEventData
 function this.onPickCycled(e)
-	if not e.previousPick then
-		return
-	end
 	this.despawn(e.previousPick)
 end
 

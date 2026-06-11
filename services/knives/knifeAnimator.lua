@@ -172,7 +172,7 @@ function this.onLockpickingStart(e)
 end
 
 ---@private
----@param _ lockpickingEndedEventData
+---@param _ lockpickingEndEventData
 function this.onLockpickingEnd(_)
 	this.blocked = true
 end
