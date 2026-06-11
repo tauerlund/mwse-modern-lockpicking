@@ -277,19 +277,7 @@ function this.computeJiggleAmplitude()
 	local constants = this.enums.constants.picks
 	local base = constants.animation.jiggleAmplitude
 
-	if not state.item then
-		return base
-	end
-
-	local itemData = state.item.variables and state.item.variables[1]
-	if itemData then
-		for _, variable in ipairs(state.item.variables) do
-			if variable.condition < itemData.condition then
-				itemData = variable
-			end
-		end
-	end
-
+	local itemData = this.session.pick.itemData
 	local conditionRatio = itemData and math.max(0, itemData.condition / state.item.object.maxCondition) or 1
 	return base * (1 + constants.animation.jiggleDamageFactor * (1 - conditionRatio))
 end

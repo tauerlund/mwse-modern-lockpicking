@@ -5,3 +5,4 @@
 ---@field public helper niNode
 ---@field public damaging boolean
 ---@field public animating boolean
+---@field public itemData tes3itemData|nil

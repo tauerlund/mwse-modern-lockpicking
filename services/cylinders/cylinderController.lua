@@ -7,14 +7,6 @@ this.session = nil
 
 ---@private
 ---@type number
-this.sweetSpotRadius = nil
-
----@private
----@type number
-this.gradientWidth = nil
-
----@private
----@type number
 this.maxAngle = 0
 
 ---@private
@@ -59,7 +51,6 @@ function this.initialize(services)
 			[events.settingsUpdated] = this.onSettingsUpdated,
 			[events.lockpickingStarted] = this.onLockpickingStarted,
 			[events.lockpickingEnd] = this.onLockpickingEnd,
-			[events.sweetSpotUpdated] = this.onSweetSpotUpdated,
 		},
 		session = {
 			[tes3.event.enterFrame] = this.onEnterFrame,
@@ -93,19 +84,10 @@ function this.onLockpickingStarted(e)
 end
 
 ---@private
----@param e sweetSpotUpdatedEventData
-function this.onSweetSpotUpdated(e)
-	this.sweetSpotRadius = e.radius
-	this.gradientWidth = e.gradientWidth
-end
-
----@private
 ---@param _ lockpickingEndEventData
 function this.onLockpickingEnd(_)
 	this.disable()
 	this.session = nil
-	this.sweetSpotRadius = nil
-	this.gradientWidth = nil
 end
 
 ---@private
@@ -160,22 +142,23 @@ end
 ---@return number
 function this.computeMaxAngle()
 	local pick = this.session and this.session.pick
-	if not pick or not this.session.sweetSpotCenter or not this.sweetSpotRadius then
+	local sweetSpot = this.session and this.session.sweetSpot
+	if not pick or not sweetSpot then
 		return 0
 	end
 
 	local pickAngle = pick.helper.rotation:toEulerXYZ().y
-	local distance = math.abs(pickAngle - this.session.sweetSpotCenter)
-	if distance <= this.sweetSpotRadius then
+	local distance = math.abs(pickAngle - sweetSpot.center)
+	if distance <= sweetSpot.radius then
 		return math.huge
 	end
 
-	if not this.gradientWidth or this.gradientWidth == 0 then
+	if sweetSpot.gradientWidth == 0 then
 		return 0
 	end
 
-	local overshoot = distance - this.sweetSpotRadius
-	local fraction = math.max(0, 1 - overshoot / this.gradientWidth)
+	local overshoot = distance - sweetSpot.radius
+	local fraction = math.max(0, 1 - overshoot / sweetSpot.gradientWidth)
 
 	return this.enums.constants.cylinder.targetRotationRight * fraction
 end

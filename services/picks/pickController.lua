@@ -10,10 +10,6 @@ this.session = nil
 this.currentPick = nil
 
 ---@private
----@type number
-this.sweetSpotRadius = nil
-
----@private
 ---@type boolean
 this.breaking = false
 
@@ -83,7 +79,6 @@ function this.initialize(services)
 			[events.lockpickingStarted] = this.onLockpickingStarted,
 			[events.lockpickingEnd] = this.onLockpickingEnd,
 			[events.lockpickingEnded] = this.onLockpickingEnded,
-			[events.sweetSpotUpdated] = this.onSweetSpotUpdated,
 			[events.cylinderBlocked] = this.onCylinderBlocked,
 			[events.rotationEnded] = this.onRotationEnded,
 		},
@@ -129,15 +124,8 @@ function this.onLockpickingEnded(_)
 	this.disable()
 	this.session = nil
 	this.currentPick = nil
-	this.sweetSpotRadius = nil
 	this.breaking = false
 	this.damageAccumulator = 0
-end
-
----@private
----@param e sweetSpotUpdatedEventData
-function this.onSweetSpotUpdated(e)
-	this.sweetSpotRadius = e.radius
 end
 
 ---@private
@@ -226,6 +214,7 @@ function this.ensurePickItemData()
 			item = this.currentPick.item.object --[[@as tes3lockpick]],
 			updateGUI = true
 		})
+		this.currentPick.itemData = this.currentPickItemData
 	end
 	return this.currentPickItemData
 end
@@ -234,12 +223,12 @@ end
 ---@return number
 function this.computeDamageRate()
 	local settings = this.settings
-
-	if not this.sweetSpotRadius or this.sweetSpotRadius <= 0 then
+	local sweetSpot = this.session.sweetSpot
+	if not sweetSpot or sweetSpot.radius <= 0 then
 		return settings.difficulty.baseRate
 	end
 	local maxRadius = math.rad(settings.difficulty.maxSweetSpotRadius)
-	return settings.difficulty.baseRate * math.sqrt(maxRadius / this.sweetSpotRadius)
+	return settings.difficulty.baseRate * math.sqrt(maxRadius / sweetSpot.radius)
 end
 
 ---@private
@@ -320,9 +309,11 @@ function this.tryResolvePickItemData()
 				data = variable
 			end
 		end
+		this.currentPick.itemData = data
 		return data
 	end
 
+	this.currentPick.itemData = nil
 	return nil
 end
 

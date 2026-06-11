@@ -254,6 +254,7 @@ function this.triggerSweetSpotUpdated()
 		radius = radius,
 		gradientWidth = radius * this.settings.difficulty.gradientFactor,
 	}
+	this.session.sweetSpot = eventData
 	event.trigger(this.enums.events.sweetSpotUpdated, eventData)
 end
 

@@ -7,4 +7,5 @@
 ---@field public knife knife
 ---@field public pick pick?
 ---@field public sweetSpotCenter number
+---@field public sweetSpot { center: number, radius: number, gradientWidth: number }|nil
 ---@field public paused boolean
