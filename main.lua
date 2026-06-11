@@ -2,10 +2,12 @@
 local this = {}
 
 ---@private
+this.tests = require("tauer.modern-lockpicking.tests")
+
+---@private
 this.services = require("tauer.modern-lockpicking.services")
 
 ---@private
----@type initializer
 this.initializer = require("tauer.modern-lockpicking.initializer")
 
 ---@private
@@ -20,6 +22,10 @@ end
 ---@package
 ---@param _ initializedEventData
 function this.initializeMod(_)
+	if this.tests.enabled then
+		this.tests.run()
+	end
+
 	local services = this.services
 
 	---@type initializedService[]

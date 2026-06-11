@@ -1,0 +1,3 @@
+---@meta
+---@class test
+---@field public run fun(unitwind:UnitWind)
