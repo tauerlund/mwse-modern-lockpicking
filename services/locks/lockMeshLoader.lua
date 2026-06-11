@@ -86,7 +86,7 @@ end
 ---@private
 ---@param filePath string
 function this.removeExtension(filePath)
-    return string.gsub(filePath, this.enums.fileTypes.json, "")
+    return filePath:gsub(string.format("%%%s$", this.enums.fileTypes.json), "")
 end
 
 return this

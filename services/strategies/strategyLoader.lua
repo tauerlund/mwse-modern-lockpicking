@@ -67,11 +67,17 @@ end
 ---@return strategy
 function this.load(file, directory)
     local packageDirectory = directory:gsub("\\", ".")
-    local packageName = file:gsub(this.services.enums.fileTypes.lua, "")
+    local packageName = this.removeExtension(file)
 
     local package = string.format("%s.%s", packageDirectory, packageName)
 
     return require(package)
+end
+
+---@private
+---@param filePath string
+function this.removeExtension(filePath)
+    return filePath:gsub(string.format("%%%s$", this.services.enums.fileTypes.lua), "")
 end
 
 return this
