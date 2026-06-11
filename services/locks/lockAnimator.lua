@@ -85,7 +85,7 @@ function this.initialize(services)
 			[events.lockpickingStart] = this.onLockpickingStart,
 			[events.lockpickingStarted] = this.onLockpickingStarted,
 			[events.lockpickingEnded] = this.onLockpickingEnded,
-			[events.settingsUpdated] = this.onSettingsUpdated,
+			[events.renderingStrategyChanged] = this.onRenderingStrategyChanged,
 		},
 		session = {
 			[tes3.event.enterFrame] = this.onEnterFrame,
@@ -152,7 +152,7 @@ function this.onLockpickingEnded(_)
 end
 
 ---@private
-function this.onSettingsUpdated()
+function this.onRenderingStrategyChanged()
 	if not this.lock then
 		return
 	end

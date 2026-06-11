@@ -104,6 +104,8 @@ function this.onSettingsUpdated()
 	if mesh then
 		this.activeStrategy.attachMesh(mesh)
 	end
+
+	event.trigger(this.enums.events.renderingStrategyChanged)
 end
 
 ---@public
