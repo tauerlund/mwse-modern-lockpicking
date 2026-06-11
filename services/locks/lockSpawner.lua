@@ -54,7 +54,6 @@ function this.spawn(activator)
 	return {
 		mesh = mesh,
 		cylinder = mesh:getObjectByName(this.enums.objectNames.cylinderHelper),
-		container = activator,
 		blocked = false,
 		rotatingClockwise = false,
 		rotatingCounterclockwise = false,
