@@ -148,12 +148,15 @@ function this.onPickBroken(_)
 
 	this.session.picks = picks
 
-	local _, anyEligible = this.computeEligiblePicks(picks, this.session.activator)
+	local eligiblePicks, anyEligible = this.computeEligiblePicks(picks, this.session.activator)
+
 	if not anyEligible then
 		this.endLockpicking(false)
 		tes3.messageBox(this.translations.get(this.enums.translationKeys.messageBoxPicksTooWeak))
 		return
 	end
+
+	this.session.eligiblePicks = eligiblePicks
 end
 
 ---@private
