@@ -1,3 +1,6 @@
+local activationStrategyNames = require(
+    "tauer.modern-lockpicking.services.lockpicking.activation-strategies.enums.activationStrategyNames")
+
 ---@class mcmSettings
 local this = {}
 
@@ -15,7 +18,7 @@ this.defaults = {
         exit = { keyCode = tes3.scanCode.tab },
     },
     logLevel = "INFO",
-    activationStrategy = nil,
+    activationStrategy = activationStrategyNames.default,
     litRendering = true,
     enableDof = true,
     allowEquipPicks = true,
