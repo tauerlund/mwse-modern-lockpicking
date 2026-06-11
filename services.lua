@@ -74,6 +74,7 @@ local this = {
         ---@class constants
         constants = {
             cylinder = require("tauer.modern-lockpicking.services.cylinders.enums.constants"),
+            lockpicking = require("tauer.modern-lockpicking.services.lockpicking.enums.constants"),
             gui = require("tauer.modern-lockpicking.services.gui.enums.constants"),
             knives = require("tauer.modern-lockpicking.services.knives.enums.constants"),
             sounds = require("tauer.modern-lockpicking.services.sounds.enums.constants"),

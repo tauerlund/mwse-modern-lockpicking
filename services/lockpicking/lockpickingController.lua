@@ -135,7 +135,7 @@ end
 ---@param _ pickBrokenEventData
 function this.onPickBroken(_)
 	local picks = this.inventoryController.getLockpicks()
-	if not picks then
+	if #picks == 0 then
 		this.endLockpicking(false)
 		tes3.messageBox(this.translations.get(this.enums.translationKeys.messageBoxOutOfLockpicks))
 		return
@@ -172,7 +172,7 @@ function this.onLockPickingActivated(e)
 	event.trigger(events.lockpickingStart, eventData)
 
 	this.timerManager.start({
-		durationInSeconds = 1.3,
+		durationInSeconds = this.enums.constants.lockpicking.entryDelay,
 		callback = this.onStartTimerFinished,
 		cancelOn = { events.lockpickingEnded },
 		pauseOn = { events.optionsMenuOpened },
@@ -185,7 +185,7 @@ end
 ---@return lockpickingSession|nil
 function this.createSession(activator)
 	local picks = this.inventoryController.getLockpicks()
-	if not picks then
+	if #picks == 0 then
 		tes3.messageBox(this.translations.get(this.enums.translationKeys.messageBoxNoLockpicks))
 		return nil
 	end
@@ -314,7 +314,7 @@ function this.onLockpickingEnd(e)
 	local events = this.enums.events
 
 	this.timerManager.start({
-		durationInSeconds = 0.1,
+		durationInSeconds = this.enums.constants.lockpicking.exitDelay,
 		callback = this.onEndTimerFinished,
 		data = e --[[@as timerData]],
 		cancelOn = { events.lockpickingEnded },

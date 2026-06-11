@@ -191,6 +191,7 @@ end
 
 ---@public
 ---@param parameters sizeParameters
+---@return guiBuilder
 function this:withSize(parameters)
 	if parameters.width then
 		self.element.width = parameters.width

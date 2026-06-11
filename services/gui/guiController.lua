@@ -87,18 +87,9 @@ end
 ---@param e lockpickingStartEventData
 function this.start(e)
 	tes3ui.enterMenuMode("ModernLockpicking")
-
-	if not this.header then
-		this.header = this.createHeader(e)
-	end
-
-	if not this.controls then
-		this.controls = this.createControls()
-	end
-
-	if not this.picks then
-		this.picks = this.createPicks(e.session.pick, e.session.picks, e.session.eligiblePicks)
-	end
+	this.header = this.createHeader(e)
+	this.controls = this.createControls()
+	this.picks = this.createPicks(e.session.pick, e.session.picks, e.session.eligiblePicks)
 end
 
 ---@private

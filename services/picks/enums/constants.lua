@@ -22,6 +22,7 @@ local enum = {
 
 	breakAnimation = {
 		duration = 0.75,
+		cycleDelay = 0.5,
 		snapAngle = math.rad(-80),
 		snapAngleVariance = 1.25,
 		snapAngleSideMax = math.rad(20),

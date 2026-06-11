@@ -49,7 +49,7 @@ end
 ---@return tes3itemStack|nil
 function this.getBestLockpick()
 	local picks = this.getLockpicks()
-	if not picks then
+	if #picks == 0 then
 		return nil
 	end
 
@@ -57,7 +57,7 @@ function this.getBestLockpick()
 end
 
 ---@public
----@return tes3itemStack[]|nil
+---@return tes3itemStack[]
 function this.getLockpicks()
 	---@type tes3itemStack[]
 	local picks = {}
@@ -69,10 +69,6 @@ function this.getLockpicks()
 	end
 
 	table.sort(picks, this.sortByLowestQuality)
-
-	if #picks == 0 then
-		return nil
-	end
 
 	return picks
 end

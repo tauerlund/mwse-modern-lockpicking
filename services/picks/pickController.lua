@@ -255,7 +255,7 @@ function this.breakPick()
 	local direction = isLastOfStack and this.enums.cycleDirections.next or nil
 
 	this.timerManager.start({
-		durationInSeconds = this.enums.constants.picks.breakAnimation.duration + 0.5,
+		durationInSeconds = this.enums.constants.picks.breakAnimation.duration + this.enums.constants.picks.breakAnimation.cycleDelay,
 		cancelOn = { events.lockpickingEnded },
 		pauseOn = { events.optionsMenuOpened },
 		resumeOn = { events.optionsMenuClosed },

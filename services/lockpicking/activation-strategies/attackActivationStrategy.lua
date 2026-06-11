@@ -61,7 +61,7 @@ function this.onLockPick(e)
 
     this.timerManager.start({
         callback = this.onStartTimerFinished,
-        durationInSeconds = 0.5,
+        durationInSeconds = this.enums.constants.lockpicking.attackActivationDelay,
         ---@class attackActivationStrategy.startTimer.data
         data = {
             activator = e.reference

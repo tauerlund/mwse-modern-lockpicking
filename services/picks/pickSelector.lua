@@ -43,7 +43,7 @@ this.eventHandlers = nil
 function this.initialize(services)
     this.playerDataController = services.playerDataController
     this.inventoryController = services.inventoryController
-    this.settings = services.mcmSettings.mcm
+    this.settings = services.settings
     this.enums = services.enums
     this.eventRegistrar = services.eventRegistrar
 
