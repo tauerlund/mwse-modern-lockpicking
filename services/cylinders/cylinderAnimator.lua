@@ -86,6 +86,7 @@ end
 function this.onLockpickingStart(e)
 	this.lock = e.session.lock
 	this.cylinder = e.session.lock.cylinder
+	this.lock.cylinderAngle = 0
 	this.enable()
 end
 
@@ -129,11 +130,10 @@ function this.onEnterFrame(e)
 	local constants = this.enums.constants.cylinder
 
 	if not (lock.rotatingClockwise or lock.rotatingCounterclockwise) then
-		local rotation = this.cylinder.rotation:toEulerXYZ().y
-		if math.isclose(rotation, 0, 0.04) then
+		if math.isclose(this.phase, 0, 0.04) then
 			return
 		end
-		local multiplier = rotation <= 0 and 1 or -1
+		local multiplier = this.phase <= 0 and 1 or -1
 		this.updatePhase(multiplier, constants.resetSpeed, e.delta)
 	else
 		local multiplier = lock.rotatingCounterclockwise and 1 or -1
@@ -159,6 +159,7 @@ function this.rotate()
 
 	cylinder.rotation = this.rotationBuffer
 	cylinder:update()
+	this.lock.cylinderAngle = this.phase
 end
 
 return this

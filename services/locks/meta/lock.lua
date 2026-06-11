@@ -5,4 +5,5 @@
 ---@field public blocked boolean
 ---@field public rotatingClockwise boolean
 ---@field public rotatingCounterclockwise boolean
+---@field public cylinderAngle number
 ---@field public container tes3containerInstance

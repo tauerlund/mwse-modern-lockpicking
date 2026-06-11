@@ -177,7 +177,7 @@ function this.onEnterFrame(_)
 	local constants = this.enums.constants.cylinder
 	local events = this.enums.events
 
-	local rotation = this.cylinder.rotation:toEulerXYZ().y
+	local rotation = this.lock.cylinderAngle
 
 	if rotation <= constants.targetRotationLeft or rotation >= constants.targetRotationRight then
 		event.trigger(events.cylinderTargetReached)

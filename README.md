@@ -47,5 +47,4 @@ MWSE Lua mod that introduces a Skyrim-like lockpicking system in The Elder Scrol
 
 ## :beetle: Bugs:
 
-- [ ] Managed to rotate the cylinder 360 degrees somehow
 - [ ] Cylinder can be rotated while a new pick is spawning
