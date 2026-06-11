@@ -14,7 +14,6 @@ local enum = {
 	sweetSpotUpdated = "tauer.modern-lockpicking.sweetSpotUpdated",
 	cylinderBlocked = "tauer.modern-lockpicking.cylinderBlocked",
 	pickBroken = "tauer.modern-lockpicking.pickBroken",
-	pickBreak = "tauer.modern-lockpicking.pickBreak",
 	optionsMenuOpened = "tauer.modern-lockpicking.optionsMenuOpened",
 	optionsMenuClosed = "tauer.modern-lockpicking.optionsMenuClosed"
 }

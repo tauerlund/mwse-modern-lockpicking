@@ -3,6 +3,7 @@ local this = {
     modName = "modName",
     messageBoxNoLockpicks = "messageBox.noLockpicks",
     messageBoxOutOfLockpicks = "messageBox.outOfLockpicks",
+    messageBoxPicksTooWeak = "messageBox.picksTooWeak",
     interfaceControlsHeader = "interface.controls.header",
     interfaceControlsRotatePick = "interface.controls.rotatePick",
     interfaceControlsRotateLock = "interface.controls.rotateLock",

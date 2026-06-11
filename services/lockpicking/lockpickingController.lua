@@ -142,6 +142,13 @@ function this.onPickBroken(_)
 	end
 
 	this.session.picks = picks
+
+	local _, anyEligible = this.computeEligiblePicks(picks, this.session.activator)
+	if not anyEligible then
+		this.endLockpicking(false)
+		tes3.messageBox(this.translations.get(this.enums.translationKeys.messageBoxPicksTooWeak))
+		return
+	end
 end
 
 ---@private
@@ -185,7 +192,7 @@ function this.createSession(activator)
 
 	local lock = this.lockSpawner.spawn(activator)
 	local knife = this.knifeSpawner.spawn(lock)
-	local eligiblePicks = this.computeEligiblePicks(picks, activator)
+	local eligiblePicks, _ = this.computeEligiblePicks(picks, activator)
 	local item = this.pickSelector.select({
 		picks = picks,
 		eligiblePicks = eligiblePicks
@@ -206,18 +213,23 @@ end
 ---@private
 ---@param picks tes3itemStack[]
 ---@param activator tes3reference
----@return { [string]: boolean }
+---@return { [string]: boolean }, boolean
 function this.computeEligiblePicks(picks, activator)
 	local eligiblePicks = {}
+	local anyEligible = false
 	local lockNode = activator.lockNode
 	for _, pick in ipairs(picks) do
-		if not this.settings.useLockComplexity or not lockNode then
-			eligiblePicks[pick.object.id] = true
-		else
-			eligiblePicks[pick.object.id] = this.skillController.getSuccessChance(pick, lockNode) > 0
+		local eligible = not this.settings.useLockComplexity
+			or not lockNode
+			or this.skillController.getSuccessChance(pick, lockNode) > 0
+
+		eligiblePicks[pick.object.id] = eligible
+
+		if eligible then
+			anyEligible = true
 		end
 	end
-	return eligiblePicks
+	return eligiblePicks, anyEligible
 end
 
 ---@private

@@ -4,6 +4,7 @@ return {
 	[keys.modName] = "Modern Lockpicking",
 	[keys.messageBoxNoLockpicks] = "You have no lockpicks.",
 	[keys.messageBoxOutOfLockpicks] = "You are out of lockpicks.",
+	[keys.messageBoxPicksTooWeak] = "Your remaining lockpicks are too weak for this lock.",
 	[keys.interfaceControlsHeader] = "Controls",
 	[keys.interfaceControlsRotatePick] = "Rotate Pick",
 	[keys.interfaceControlsRotateLock] = "Rotate Lock",

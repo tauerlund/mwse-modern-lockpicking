@@ -53,6 +53,10 @@ this.eventRegistrar = nil
 this.timerManager = nil
 
 ---@private
+---@type inventoryController
+this.inventoryController = nil
+
+---@private
 ---@type boolean
 this.paused = false
 
@@ -73,6 +77,7 @@ function this.initialize(services)
 	this.enums = services.enums
 	this.eventRegistrar = services.eventRegistrar
 	this.timerManager = services.timerManager
+	this.inventoryController = services.inventoryController
 
 	local events = services.enums.events
 
@@ -264,15 +269,17 @@ function this.breakPick()
 
 	local events = this.enums.events
 
-	---@type pickBrokenEventData|pickBreakEventData
+	local isLastOfStack = this.currentPick.item.count <= 1
+	this.inventoryController.removePick(this.currentPick, this.currentPickItemData)
+
+	---@type pickBrokenEventData
 	local eventData = {
 		pick = this.currentPick,
 		itemData = this.currentPickItemData
 	}
-	event.trigger(events.pickBreak, eventData)
 	event.trigger(events.pickBroken, eventData)
 
-	local direction = this.currentPick.item.count <= 1 and this.enums.cycleDirections.next or nil
+	local direction = isLastOfStack and this.enums.cycleDirections.next or nil
 
 	this.timerManager.start({
 		durationInSeconds = this.enums.constants.picks.breakAnimation.duration + 0.5,

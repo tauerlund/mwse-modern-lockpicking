@@ -77,14 +77,14 @@ function this.onLockpickingEnded()
         and picks[this.currentIndex]
         and picks[this.currentIndex].object
 
+    this.session = nil
+
     if not lastPick or not lastPick:isValid() then
         return
     end
 
     local data = this.playerDataController.resolve()
     data.lastPickId = lastPick.id
-
-    this.session = nil
 end
 
 ---@public
@@ -103,15 +103,23 @@ function this.select(params)
         return picks[this.currentIndex]
     end
 
+    -- Clamp in case picks array shrank after a break (e.g. last element was the broken pick)
+    if this.currentIndex > #picks then
+        this.currentIndex = 1
+    end
+
     local startIndex = this.currentIndex
-    repeat
+    for _ = 1, #picks do
         if direction == this.enums.cycleDirections.next then
             this.currentIndex = this.incrementIndex(picks)
         else
             this.currentIndex = this.decrementIndex(picks)
         end
-    until (picks[this.currentIndex].count > 0 and this.isEligible(picks[this.currentIndex]))
-        or this.currentIndex == startIndex
+        if (picks[this.currentIndex].count > 0 and this.isEligible(picks[this.currentIndex]))
+            or this.currentIndex == startIndex then
+            break
+        end
+    end
 
     return picks[this.currentIndex]
 end

@@ -27,7 +27,6 @@ function this.initialize(services)
 
 	this.eventHandlers = {
 		lifetime = {
-			[events.pickBreak] = this.onPickBreak,
 			[events.settingsUpdated] = this.onSettingsUpdated,
 		},
 		settings = {
@@ -98,13 +97,14 @@ function this.sortByLowestQuality(a, b)
 	return pickA.quality < pickB.quality
 end
 
----@private
----@param e pickBrokenEventData
-function this.onPickBreak(e)
+---@public
+---@param pick pick
+---@param itemData tes3itemData|nil
+function this.removePick(pick, itemData)
 	tes3.removeItem({
 		reference = tes3.player,
-		item = e.pick.item.object --[[@as tes3lockpick]],
-		itemData = e.itemData,
+		item = pick.item.object --[[@as tes3lockpick]],
+		itemData = itemData,
 		updateGUI = true,
 	})
 end

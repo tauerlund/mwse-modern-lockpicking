@@ -1,4 +1,0 @@
----@meta
----@class pickBreakEventData
----@field public pick pick
----@field public itemData tes3itemData?
