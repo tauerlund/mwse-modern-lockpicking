@@ -37,18 +37,28 @@ function this.loadAll(params)
     local strategies = {}
 
     for _, file in pairs(files) do
-        local strategy = this.load(file, params.directory)
+        local strategy, reason = this.load(file, params.directory)
+        if not strategy then
+            this.logger:error("Strategy file '%s' could not be loaded: %s", file, reason or "unknown")
+            return nil
+        end
+
         local validator = params.validator
 
         if validator then
-            local valid, reason = validator.validate(strategy)
+            local valid, validationReason = validator.validate(strategy)
             if not valid then
-                this.logger:error("Strategy '%s' invalid! Reason: %s.", strategy.name, reason or "unknown")
+                this.logger:error("Strategy '%s' invalid! Reason: %s.", file, validationReason or "unknown")
                 return nil
             end
         end
 
         strategy.initialize(this.services)
+
+        if not strategy.name then
+            this.logger:error("Strategy file '%s' did not set a name during initialization.", file)
+            return nil
+        end
 
         strategies[strategy.name] = strategy
     end
@@ -64,14 +74,23 @@ end
 ---@private
 ---@param file string
 ---@param directory string
----@return strategy
+---@return strategy|nil strategy, string|nil reason
 function this.load(file, directory)
     local packageDirectory = directory:gsub("\\", ".")
     local packageName = this.removeExtension(file)
 
     local package = string.format("%s.%s", packageDirectory, packageName)
 
-    return require(package)
+    local success, result = pcall(require, package)
+    if not success then
+        return nil, result
+    end
+
+    if type(result) ~= "table" or type(result.initialize) ~= "function" then
+        return nil, "file did not return a strategy table with an 'initialize' function"
+    end
+
+    return result, nil
 end
 
 ---@private
