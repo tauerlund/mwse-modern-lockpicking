@@ -221,7 +221,7 @@ end
 
 ---@public
 ---@return tes3uiElement
-function this:wuild()
+function this:build()
 	if self.callbacks then
 		for evt, callback in pairs(self.callbacks) do
 			self:registerCallback(evt, callback)

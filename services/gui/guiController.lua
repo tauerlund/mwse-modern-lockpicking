@@ -121,7 +121,7 @@ function this.createHeader(e)
 		:withFlowDirection(tes3.flowDirection.topToBottom)
 		:withMinSize({ width = 0, height = 0 })
 		:withAutoSize()
-		:wuild()
+		:build()
 
 	local block = this.guiBuilder.createBlock({ parent = header })
 		:withFlowDirection(tes3.flowDirection.topToBottom)
@@ -133,16 +133,16 @@ function this.createHeader(e)
 		:withChildAlignment({
 			x = 0.5,
 		})
-		:wuild()
+		:build()
 
 	this.guiBuilder.createLabel({ parent = block })
 		:withText(e.session.activator.baseObject.name)
 		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
-		:wuild()
+		:build()
 
 	this.guiBuilder.createDivider({ parent = block })
 		:withProportional({ width = 1.0 })
-		:wuild()
+		:build()
 
 	local lockLevel = tes3.getLockLevel({
 		reference = e.session.activator --[[@as tes3reference]],
@@ -154,7 +154,7 @@ function this.createHeader(e)
 	this.guiBuilder.createLabel({ parent = block })
 		:withText(this.createLockLevelText(lockLevel))
 		:withColor(this.getLockLevelColor(lockLevel, securitySkill))
-		:wuild()
+		:build()
 
 	return header
 end
@@ -194,7 +194,7 @@ function this.createControls()
 		})
 		:withPositionAlign({ x = 0.5, y = 0.95 })
 		:withAutoSize()
-		:wuild()
+		:build()
 
 	local outerBlock = this.guiBuilder.createBlock({ parent = controls })
 		:withAutoSize()
@@ -202,12 +202,12 @@ function this.createControls()
 		:withChildAlignment({
 			x = 0.5,
 		})
-		:wuild()
+		:build()
 
 	this.guiBuilder.createLabel({ parent = outerBlock })
 		:withText(this.translations.get(enums.translationKeys.interfaceControlsHeader))
 		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
-		:wuild()
+		:build()
 
 	local innerBlock = this.guiBuilder.createThinBorder({ parent = outerBlock })
 		:withFlowDirection(tes3.flowDirection.leftToRight)
@@ -223,7 +223,7 @@ function this.createControls()
 			y = 0.5,
 		})
 		:withCallback(enums.events.settingsUpdated, this.onKeyBindsUpdated)
-		:wuild()
+		:build()
 
 	local controlTexts = this.getControlTexts()
 
@@ -231,7 +231,7 @@ function this.createControls()
 		this.guiBuilder.createLabel({ parent = innerBlock, id = string.format(constants.controlsLabelId, i) })
 			:withText(text)
 			:withColor(tes3ui.getPalette(tes3.palette.normalColor))
-			:wuild()
+			:build()
 
 		if i < #controlTexts then
 			this.guiBuilder.createThinBorder({ parent = innerBlock })
@@ -240,7 +240,7 @@ function this.createControls()
 					left = 12,
 					right = 12,
 				})
-				:wuild()
+				:build()
 		end
 	end
 
@@ -299,7 +299,7 @@ function this.createPicks(activePick, picks, eligiblePicks)
 		:withFlowDirection(tes3.flowDirection.topToBottom)
 		:withPositionAlign({ x = 0.75, y = 0.25 })
 		:withAutoSize()
-		:wuild()
+		:build()
 
 	local upperBlock = this.guiBuilder.createBlock({ parent = picksMenu })
 		:withFlowDirection(tes3.flowDirection.topToBottom)
@@ -307,12 +307,12 @@ function this.createPicks(activePick, picks, eligiblePicks)
 		:withPadding({
 			all = 8,
 		})
-		:wuild()
+		:build()
 
 	this.guiBuilder.createLabel({ parent = upperBlock })
 		:withText(this.translations.get(enums.translationKeys.interfacePicksHeader))
 		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
-		:wuild()
+		:build()
 
 	local lowerBlock = this.guiBuilder.createThinBorder({ parent = picksMenu })
 		:withFlowDirection(tes3.flowDirection.leftToRight)
@@ -320,17 +320,17 @@ function this.createPicks(activePick, picks, eligiblePicks)
 			all = 8,
 		})
 		:withAutoSize()
-		:wuild()
+		:build()
 
 	local pickLabelContainer = this.guiBuilder.createBlock({ parent = lowerBlock })
 		:withFlowDirection(tes3.flowDirection.topToBottom)
 		:withAutoSize()
-		:wuild()
+		:build()
 
 	local pickCountLabelContainer = this.guiBuilder.createBlock({ parent = lowerBlock })
 		:withFlowDirection(tes3.flowDirection.topToBottom)
 		:withAutoSize()
-		:wuild()
+		:build()
 
 	local pickPalette = constants.pickPalette
 
@@ -364,7 +364,7 @@ function this.createPicks(activePick, picks, eligiblePicks)
 				right = horizontalBorder,
 			})
 			:withCallback(events.pickCycled, onPickCycled)
-			:wuild()
+			:build()
 
 		this.guiBuilder.createLabel({
 			parent = pickCountLabelContainer,
@@ -377,7 +377,7 @@ function this.createPicks(activePick, picks, eligiblePicks)
 				bottom = verticalBorder,
 			})
 			:withCallback(events.pickCycled, onPickCycled)
-			:wuild()
+			:build()
 	end
 
 	return picksMenu
