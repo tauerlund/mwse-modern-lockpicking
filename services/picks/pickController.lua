@@ -168,6 +168,10 @@ function this.onKeyDown(e)
 		return
 	end
 
+	if this.breaking or this.currentPick.animating then
+		return
+	end
+
 	if this.pickCycleDirections[e.keyCode] then
 		this.cyclePick(this.pickCycleDirections[e.keyCode])
 	end

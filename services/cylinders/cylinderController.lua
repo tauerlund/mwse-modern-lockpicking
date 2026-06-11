@@ -2,20 +2,8 @@
 local this = {}
 
 ---@private
----@type lock|nil
-this.lock = nil
-
----@private
----@type cylinder
-this.cylinder = nil
-
----@private
----@type niNode
-this.pickHelper = nil
-
----@private
----@type number
-this.sweetSpotCenter = nil
+---@type lockpickingSession|nil
+this.session = nil
 
 ---@private
 ---@type number
@@ -76,7 +64,6 @@ function this.initialize(services)
 			[events.lockpickingStarted] = this.onLockpickingStarted,
 			[events.lockpickingEnd] = this.onLockpickingEnd,
 			[events.sweetSpotUpdated] = this.onSweetSpotUpdated,
-			[events.pickCycled] = this.onPickCycled,
 			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
 			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
 		},
@@ -117,34 +104,22 @@ end
 ---@private
 ---@param e lockpickingStartedEventData
 function this.onLockpickingStarted(e)
-	this.lock = e.session.lock
-	this.cylinder = e.session.lock.cylinder
-	this.pickHelper = e.session.pick.helper
+	this.session = e.session
 	this.enable()
 end
 
 ---@private
 ---@param e sweetSpotUpdatedEventData
 function this.onSweetSpotUpdated(e)
-	this.sweetSpotCenter = e.center
 	this.sweetSpotRadius = e.radius
 	this.gradientWidth = e.gradientWidth
-end
-
----@private
----@param e pickCycledEventData
-function this.onPickCycled(e)
-	this.pickHelper = e.pick.helper
 end
 
 ---@private
 ---@param _ lockpickingEndEventData
 function this.onLockpickingEnd(_)
 	this.disable()
-	this.lock = nil
-	this.cylinder = nil
-	this.pickHelper = nil
-	this.sweetSpotCenter = nil
+	this.session = nil
 	this.sweetSpotRadius = nil
 	this.gradientWidth = nil
 end
@@ -159,10 +134,10 @@ function this.disable()
 	this.eventRegistrar.unregister(this.eventHandlers.session)
 
 	this.currentDirectionKey = nil
-	if this.lock then
-		this.lock.rotatingCounterclockwise = false
-		this.lock.rotatingClockwise = false
-		this.lock.blocked = false
+	if this.session then
+		this.session.lock.rotatingCounterclockwise = false
+		this.session.lock.rotatingClockwise = false
+		this.session.lock.blocked = false
 	end
 	this.maxAngle = 0
 end
@@ -170,14 +145,19 @@ end
 ---@private
 ---@param _ enterFrameEventData
 function this.onEnterFrame(_)
-	if this.paused or this.lock.blocked or not (this.lock.rotatingCounterclockwise or this.lock.rotatingClockwise) then
+	local lock = this.session.lock
+	if this.paused or lock.blocked or not (lock.rotatingCounterclockwise or lock.rotatingClockwise) then
+		return
+	end
+
+	if this.session.pick.animating then
 		return
 	end
 
 	local constants = this.enums.constants.cylinder
 	local events = this.enums.events
 
-	local rotation = this.lock.cylinderAngle
+	local rotation = lock.cylinderAngle
 
 	if rotation <= constants.targetRotationLeft or rotation >= constants.targetRotationRight then
 		event.trigger(events.cylinderTargetReached)
@@ -185,9 +165,9 @@ function this.onEnterFrame(_)
 	end
 
 	if this.maxAngle == 0 or math.abs(rotation) >= this.maxAngle then
-		this.lock.rotatingCounterclockwise = false
-		this.lock.rotatingClockwise = false
-		this.lock.blocked = true
+		lock.rotatingCounterclockwise = false
+		lock.rotatingClockwise = false
+		lock.blocked = true
 		event.trigger(events.cylinderBlocked)
 	end
 end
@@ -195,12 +175,13 @@ end
 ---@private
 ---@return number
 function this.computeMaxAngle()
-	if not this.pickHelper or not this.sweetSpotCenter or not this.sweetSpotRadius then
+	local pick = this.session and this.session.pick
+	if not pick or not this.session.sweetSpotCenter or not this.sweetSpotRadius then
 		return 0
 	end
 
-	local pickAngle = this.pickHelper.rotation:toEulerXYZ().y
-	local distance = math.abs(pickAngle - this.sweetSpotCenter)
+	local pickAngle = pick.helper.rotation:toEulerXYZ().y
+	local distance = math.abs(pickAngle - this.session.sweetSpotCenter)
 	if distance <= this.sweetSpotRadius then
 		return math.huge
 	end
@@ -234,7 +215,12 @@ end
 ---@private
 ---@param e keyDownEventData
 function this.onRotationKeyDown(e)
-	if this.lock.rotatingCounterclockwise or this.lock.rotatingClockwise or this.lock.blocked then
+	local lock = this.session.lock
+	if lock.rotatingCounterclockwise or lock.rotatingClockwise or lock.blocked then
+		return
+	end
+
+	if this.session.pick.animating then
 		return
 	end
 
@@ -242,8 +228,8 @@ function this.onRotationKeyDown(e)
 	this.maxAngle = this.computeMaxAngle()
 
 	local direction = this.rotationKeyCodeToRotationDirectionMap[e.keyCode]
-	this.lock.rotatingCounterclockwise = direction == this.enums.rotationDirections.counterClockwise
-	this.lock.rotatingClockwise = direction == this.enums.rotationDirections.clockwise
+	lock.rotatingCounterclockwise = direction == this.enums.rotationDirections.counterClockwise
+	lock.rotatingClockwise = direction == this.enums.rotationDirections.clockwise
 
 	---@type rotationEventData
 	local eventData = { direction = direction }
@@ -257,9 +243,10 @@ function this.onRotationKeyUp(e)
 		return
 	end
 
-	this.lock.blocked = false
-	this.lock.rotatingCounterclockwise = false
-	this.lock.rotatingClockwise = false
+	local lock = this.session.lock
+	lock.blocked = false
+	lock.rotatingCounterclockwise = false
+	lock.rotatingClockwise = false
 	this.currentDirectionKey = nil
 
 	---@type rotationEventData
