@@ -38,6 +38,10 @@ this.translations = nil
 this.skillController = nil
 
 ---@private
+---@type formulas
+this.formulas = nil
+
+---@private
 ---@type enums
 this.enums = nil
 
@@ -69,6 +73,7 @@ function this.initialize(services)
 	this.inventoryController = services.inventoryController
 	this.translations = services.translations
 	this.skillController = services.skillController
+	this.formulas = services.formulas
 	this.enums = services.enums
 	this.eventRegistrar = services.eventRegistrar
 
@@ -236,13 +241,13 @@ end
 ---@private
 ---@return number
 function this.computeSweetSpotRadius()
-	local difficulty = this.settings.difficulty
-	local statsModifier = this.skillController.getStatsModifier()
-	local lockLevel = this.session.activator.lockNode and this.session.activator.lockNode.level or 1
-	local quality = this.session.pick.item.object.quality
-	local radius = math.pi * quality ^ difficulty.qualityFactor * statsModifier * difficulty.securityFactor /
-		(math.max(1, lockLevel) * difficulty.lockLevelFactor)
-	return math.min(radius, math.rad(difficulty.maxSweetSpotRadius))
+	local lockNode = this.session.activator.lockNode
+	return this.formulas.computeSweetSpotRadius({
+		quality = this.session.pick.item.object.quality,
+		statsModifier = this.skillController.getStatsModifier(),
+		lockLevel = lockNode and lockNode.level or 1,
+		difficulty = this.settings.difficulty,
+	})
 end
 
 ---@private

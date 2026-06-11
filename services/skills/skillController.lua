@@ -6,6 +6,10 @@ local this = {}
 this.enums = nil
 
 ---@private
+---@type formulas
+this.formulas = nil
+
+---@private
 ---@type eventRegistrar
 this.eventRegistrar = nil
 
@@ -18,6 +22,7 @@ this.eventHandlers = nil
 ---@return boolean,string|nil
 function this.initialize(services)
 	this.enums = services.enums
+	this.formulas = services.formulas
 	this.eventRegistrar = services.eventRegistrar
 
 	local events = services.enums.events
@@ -41,7 +46,8 @@ end
 ---@param lock tes3lockNode
 ---@return number
 function this.getSuccessChance(pick, lock)
-	return (this.getStatsModifier() * pick.object.quality * this.getFatigueModifier()) - lock.level
+	return this.formulas.computeSuccessChance(this.getStatsModifier(), pick.object.quality, this.getFatigueModifier(),
+		lock.level)
 end
 
 ---@public

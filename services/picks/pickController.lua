@@ -41,6 +41,10 @@ this.pickSpawner = nil
 this.enums = nil
 
 ---@private
+---@type formulas
+this.formulas = nil
+
+---@private
 ---@type eventRegistrar
 this.eventRegistrar = nil
 
@@ -67,6 +71,7 @@ function this.initialize(services)
 	this.pickSelector = services.pickSelector
 	this.pickSpawner = services.pickSpawner
 	this.enums = services.enums
+	this.formulas = services.formulas
 	this.eventRegistrar = services.eventRegistrar
 	this.timerManager = services.timerManager
 	this.inventoryController = services.inventoryController
@@ -222,13 +227,8 @@ end
 ---@private
 ---@return number
 function this.computeDamageRate()
-	local settings = this.settings
 	local sweetSpot = this.session.sweetSpot
-	if not sweetSpot or sweetSpot.radius <= 0 then
-		return settings.difficulty.baseRate
-	end
-	local maxRadius = math.rad(settings.difficulty.maxSweetSpotRadius)
-	return settings.difficulty.baseRate * math.sqrt(maxRadius / sweetSpot.radius)
+	return this.formulas.computeDamageRate(sweetSpot and sweetSpot.radius, this.settings.difficulty)
 end
 
 ---@private

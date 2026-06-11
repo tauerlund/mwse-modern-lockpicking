@@ -26,6 +26,10 @@ this.settings = nil
 this.enums = nil
 
 ---@private
+---@type formulas
+this.formulas = nil
+
+---@private
 ---@type eventHandlerGroups
 this.eventHandlers = {
 	lifetime = {},
@@ -43,6 +47,7 @@ function this.initialize(services)
 	this.eventRegistrar = services.eventRegistrar
 	this.settings = services.settings
 	this.enums = services.enums
+	this.formulas = services.formulas
 
 	local events = services.enums.events
 
@@ -148,19 +153,7 @@ function this.computeMaxAngle()
 	end
 
 	local pickAngle = pick.helper.rotation:toEulerXYZ().y
-	local distance = math.abs(pickAngle - sweetSpot.center)
-	if distance <= sweetSpot.radius then
-		return math.huge
-	end
-
-	if sweetSpot.gradientWidth == 0 then
-		return 0
-	end
-
-	local overshoot = distance - sweetSpot.radius
-	local fraction = math.max(0, 1 - overshoot / sweetSpot.gradientWidth)
-
-	return this.enums.constants.cylinder.targetRotationRight * fraction
+	return this.formulas.computeMaxAngle(pickAngle, sweetSpot, this.enums.constants.cylinder.targetRotationRight)
 end
 
 ---@private
