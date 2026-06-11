@@ -31,11 +31,11 @@ this.initialRotation = nil
 
 ---@private
 ---@type number
-this.currentRotX = 0
+this.currentPitch = 0
 
 ---@private
 ---@type number
-this.currentRotY = 0
+this.currentYaw = 0
 
 ---@private
 ---@type number
@@ -51,11 +51,12 @@ this.mouseConstants = {
 	lerpSpeed = 5,
 }
 
+-- In menu camera space, pitch is a rotation around X and yaw around Z.
 ---@private
-this.rotationBufferX = tes3matrix33.new()
+this.rotationBufferPitch = tes3matrix33.new()
 
 ---@private
-this.rotationBufferY = tes3matrix33.new()
+this.rotationBufferYaw = tes3matrix33.new()
 
 ---@private
 ---@type eventRegistrar
@@ -129,8 +130,8 @@ function this.onLockpickingStarted(e)
 	this.session = e.session
 	this.lock = e.session.lock
 	this.initialRotation = e.session.lock.mesh.rotation:copy()
-	this.currentRotX = 0
-	this.currentRotY = 0
+	this.currentPitch = 0
+	this.currentYaw = 0
 
 	local cursor = tes3.getCursorPosition()
 	this.startCursorX = cursor.x
@@ -145,8 +146,8 @@ function this.onLockpickingEnded(_)
 	this.session = nil
 	this.lock = nil
 	this.initialRotation = nil
-	this.currentRotX = 0
-	this.currentRotY = 0
+	this.currentPitch = 0
+	this.currentYaw = 0
 
 	this.disable()
 end
@@ -182,20 +183,20 @@ function this.onEnterFrame(e)
 	local cursor = tes3.getCursorPosition()
 	local viewportWidth, viewportHeight = tes3.getViewportSize()
 
-	local currentRotX = this.currentRotX
-	local currentRotY = this.currentRotY
+	local currentPitch = this.currentPitch
+	local currentYaw = this.currentYaw
 
-	local targetRotX = ((cursor.y - this.startCursorY) / viewportHeight) * constants.amplitude
-	local targetRotY = ((this.startCursorX - cursor.x) / viewportWidth) * constants.amplitude
+	local targetPitch = ((cursor.y - this.startCursorY) / viewportHeight) * constants.amplitude
+	local targetYaw = ((this.startCursorX - cursor.x) / viewportWidth) * constants.amplitude
 
 	local t = math.min(1, constants.lerpSpeed * e.delta)
-	this.currentRotX = currentRotX + (targetRotX - currentRotX) * t
-	this.currentRotY = currentRotY + (targetRotY - currentRotY) * t
+	this.currentPitch = currentPitch + (targetPitch - currentPitch) * t
+	this.currentYaw = currentYaw + (targetYaw - currentYaw) * t
 
-	this.rotationBufferX:toRotationX(this.currentRotX)
-	this.rotationBufferY:toRotationZ(this.currentRotY)
+	this.rotationBufferPitch:toRotationX(this.currentPitch)
+	this.rotationBufferYaw:toRotationZ(this.currentYaw)
 
-	this.lock.mesh.rotation = this.rotationBufferX * this.rotationBufferY * this.initialRotation
+	this.lock.mesh.rotation = this.rotationBufferPitch * this.rotationBufferYaw * this.initialRotation
 	this.lock.mesh:update()
 end
 

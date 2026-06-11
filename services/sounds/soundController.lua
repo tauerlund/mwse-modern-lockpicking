@@ -188,7 +188,7 @@ end
 function this.playLockpickRotationSound(delta)
 	local constants = this.enums.constants.sounds
 	local currentCursorPosition = tes3.getCursorPosition().x
-	local moved = math.abs(currentCursorPosition - this.lastCursorPosition) > constants.lockpickRotationMaxDelta
+	local moved = math.abs(currentCursorPosition - this.lastCursorPosition) > constants.lockpickRotationMovementThreshold
 
 	local session = this.session
 

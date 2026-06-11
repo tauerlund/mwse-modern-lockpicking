@@ -13,7 +13,7 @@ this.eventRegistrar = nil
 ---@type eventHandlerGroups
 this.eventHandlers = {
 	lifetime = {},
-	settings = {}
+	equipBlocking = {}
 }
 
 ---@public
@@ -29,7 +29,7 @@ function this.initialize(services)
 		lifetime = {
 			[events.settingsUpdated] = this.onSettingsUpdated,
 		},
-		settings = {
+		equipBlocking = {
 			[tes3.event.equip] = this.onEquip,
 		}
 	}
@@ -113,20 +113,20 @@ end
 ---@private
 function this.applySettings()
 	if this.settings.allowEquipPicks then
-		this.enableLockpickEquip()
+		this.unblockEquip()
 	else
-		this.disableLockpickEquip()
+		this.blockEquip()
 	end
 end
 
 ---@private
-function this.disableLockpickEquip()
-	this.eventRegistrar.register(this.eventHandlers.settings)
+function this.blockEquip()
+	this.eventRegistrar.register(this.eventHandlers.equipBlocking)
 end
 
 ---@private
-function this.enableLockpickEquip()
-	this.eventRegistrar.unregister(this.eventHandlers.settings)
+function this.unblockEquip()
+	this.eventRegistrar.unregister(this.eventHandlers.equipBlocking)
 end
 
 ---@private

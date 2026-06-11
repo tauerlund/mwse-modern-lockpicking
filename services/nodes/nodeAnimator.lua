@@ -36,7 +36,7 @@ end
 ---@public
 ---@param params nodeAnimator.start.params
 function this.start(params)
-	local keyFramesLength = table.size(params.keyframes)
+	local keyFramesLength = #params.keyframes
 	if keyFramesLength < 2 then
 		return
 	end
@@ -146,12 +146,12 @@ function this.stopAnimation(index, snap)
 	this.unregisterCancellationHandlers(animation)
 
 	if snap then
-		local lastKeyframe = animation.keyframes[table.size(animation.keyframes)]
+		local lastKeyframe = animation.keyframes[#animation.keyframes]
 		this.initializeTransforms(animation.node, lastKeyframe.translation, lastKeyframe.rotation)
 	end
 
 	table.remove(this.animations, index)
-	if table.size(this.animations) == 0 then
+	if #this.animations == 0 then
 		this.disable()
 	end
 end

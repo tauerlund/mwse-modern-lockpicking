@@ -13,7 +13,9 @@ local enum = {
         jiggleLockpick = "jiggle-lockpick",
         breakLockpick = "break-lockpick"
     },
-    lockpickRotationMaxDelta = 0.1,
+    -- Minimum cursor X movement (in pixels per debounced frame) before the
+    -- lockpick rotation sound is considered for playing.
+    lockpickRotationMovementThreshold = 0.1,
     wav = {
         headerSize = 96,
         sampleRate = 22050,
