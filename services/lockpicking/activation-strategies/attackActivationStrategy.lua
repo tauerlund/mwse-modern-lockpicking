@@ -10,6 +10,10 @@ this.name = nil
 this.enums = nil
 
 ---@private
+---@type settings
+this.settings = nil
+
+---@private
 ---@type timerManager
 this.timerManager = nil
 
@@ -26,6 +30,7 @@ this.eventHandlers = nil
 function this.initialize(services)
     this.name = services.enums.activationStrategyNames.attack
     this.enums = services.enums
+    this.settings = services.settings
     this.timerManager = services.timerManager
     this.eventRegistrar = services.eventRegistrar
 
@@ -51,7 +56,7 @@ function this.onLockPick(e)
         return
     end
 
-    if e.chance <= 0 then
+    if this.settings.useLockComplexity and e.chance <= 0 then
         return
     end
 
