@@ -46,5 +46,3 @@ MWSE Lua mod that introduces a Skyrim-like lockpicking system in The Elder Scrol
 - [x] Dynamic lock mesh overrides via JSON config files
 
 ## :beetle: Bugs:
-
-- [ ] Cylinder can be rotated while a new pick is spawning
