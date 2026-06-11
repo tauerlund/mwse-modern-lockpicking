@@ -7,3 +7,4 @@
 ---@field public knife knife
 ---@field public pick pick?
 ---@field public sweetSpotCenter number
+---@field public paused boolean

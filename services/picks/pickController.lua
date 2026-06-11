@@ -57,10 +57,6 @@ this.timerManager = nil
 this.inventoryController = nil
 
 ---@private
----@type boolean
-this.paused = false
-
----@private
 ---@type eventHandlerGroups
 this.eventHandlers = {
 	lifetime = {},
@@ -90,8 +86,6 @@ function this.initialize(services)
 			[events.sweetSpotUpdated] = this.onSweetSpotUpdated,
 			[events.cylinderBlocked] = this.onCylinderBlocked,
 			[events.rotationEnded] = this.onRotationEnded,
-			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
-			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
 		},
 		session = {
 			[tes3.event.keyDown] = this.onKeyDown,
@@ -107,16 +101,6 @@ end
 ---@public
 function this.uninitialize()
 	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
-end
-
----@private
-function this.onOptionsMenuOpened()
-	this.paused = true
-end
-
----@private
-function this.onOptionsMenuClosed()
-	this.paused = false
 end
 
 ---@private
@@ -169,7 +153,7 @@ end
 ---@private
 ---@param e keyDownEventData
 function this.onKeyDown(e)
-	if this.paused then
+	if this.session.paused then
 		return
 	end
 
@@ -204,7 +188,7 @@ end
 function this.onEnterFrame(e)
 	local session = this.session
 
-	if this.paused or not session then
+	if not session or session.paused then
 		return
 	end
 

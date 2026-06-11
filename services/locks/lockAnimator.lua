@@ -18,6 +18,10 @@ this.enums = nil
 this.renderingStrategyController = nil
 
 ---@private
+---@type lockpickingSession|nil
+this.session = nil
+
+---@private
 ---@type lock|nil
 this.lock = nil
 
@@ -40,10 +44,6 @@ this.startCursorX = 0
 ---@private
 ---@type number
 this.startCursorY = 0
-
----@private
----@type boolean
-this.paused = false
 
 ---@private
 this.mouseConstants = {
@@ -85,8 +85,6 @@ function this.initialize(services)
 			[events.lockpickingStart] = this.onLockpickingStart,
 			[events.lockpickingStarted] = this.onLockpickingStarted,
 			[events.lockpickingEnded] = this.onLockpickingEnded,
-			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
-			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
 			[events.settingsUpdated] = this.onSettingsUpdated,
 		},
 		session = {
@@ -102,16 +100,6 @@ end
 ---@public
 function this.uninitialize()
 	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
-end
-
----@private
-function this.onOptionsMenuOpened()
-	this.paused = true
-end
-
----@private
-function this.onOptionsMenuClosed()
-	this.paused = false
 end
 
 ---@private
@@ -138,6 +126,7 @@ end
 ---@private
 ---@param e lockpickingStartedEventData
 function this.onLockpickingStarted(e)
+	this.session = e.session
 	this.lock = e.session.lock
 	this.initialRotation = e.session.lock.mesh.rotation:copy()
 	this.currentRotX = 0
@@ -153,6 +142,7 @@ end
 ---@private
 ---@param _ lockpickingEndedEventData
 function this.onLockpickingEnded(_)
+	this.session = nil
 	this.lock = nil
 	this.initialRotation = nil
 	this.currentRotX = 0
@@ -183,7 +173,7 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
-	if this.paused or not this.lock then
+	if not this.lock or (this.session and this.session.paused) then
 		return
 	end
 

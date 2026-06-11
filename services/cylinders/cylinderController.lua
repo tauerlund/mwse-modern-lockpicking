@@ -26,10 +26,6 @@ this.currentDirectionKey = nil
 this.rotationKeyCodeToRotationDirectionMap = nil
 
 ---@private
----@type boolean
-this.paused = false
-
----@private
 ---@type settings
 this.settings = nil
 
@@ -64,8 +60,6 @@ function this.initialize(services)
 			[events.lockpickingStarted] = this.onLockpickingStarted,
 			[events.lockpickingEnd] = this.onLockpickingEnd,
 			[events.sweetSpotUpdated] = this.onSweetSpotUpdated,
-			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
-			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
 		},
 		session = {
 			[tes3.event.enterFrame] = this.onEnterFrame,
@@ -84,16 +78,6 @@ end
 ---@public
 function this.uninitialize()
 	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
-end
-
----@private
-function this.onOptionsMenuOpened()
-	this.paused = true
-end
-
----@private
-function this.onOptionsMenuClosed()
-	this.paused = false
 end
 
 ---@private
@@ -146,7 +130,7 @@ end
 ---@param _ enterFrameEventData
 function this.onEnterFrame(_)
 	local lock = this.session.lock
-	if this.paused or lock.blocked or not (lock.rotatingCounterclockwise or lock.rotatingClockwise) then
+	if this.session.paused or lock.blocked or not (lock.rotatingCounterclockwise or lock.rotatingClockwise) then
 		return
 	end
 

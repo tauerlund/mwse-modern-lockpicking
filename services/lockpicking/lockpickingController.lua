@@ -50,10 +50,6 @@ this.session = nil
 this.eventRegistrar = nil
 
 ---@private
----@type boolean
-this.paused = false
-
----@private
 ---@type eventHandlerGroups
 this.eventHandlers = {
 	lifetime = {},
@@ -116,12 +112,16 @@ end
 
 ---@private
 function this.onOptionsMenuOpened()
-	this.paused = true
+	if this.session then
+		this.session.paused = true
+	end
 end
 
 ---@private
 function this.onOptionsMenuClosed()
-	this.paused = false
+	if this.session then
+		this.session.paused = false
+	end
 end
 
 ---@private
@@ -207,6 +207,7 @@ function this.createSession(activator)
 		knife = knife,
 		pick = pick,
 		sweetSpotCenter = math.random() * math.pi - (math.pi / 2),
+		paused = false,
 	}
 end
 
@@ -287,7 +288,7 @@ end
 ---@private
 ---@param e keyUpEventData
 function this.onKeyUp(e)
-	if this.paused then
+	if this.session.paused then
 		return
 	end
 

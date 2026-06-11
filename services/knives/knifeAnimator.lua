@@ -42,12 +42,12 @@ this.sourceAngle = 0
 this.currentAngle = 0
 
 ---@private
----@type boolean
-this.blocked = false
+---@type lockpickingSession|nil
+this.session = nil
 
 ---@private
 ---@type boolean
-this.paused = false
+this.blocked = false
 
 ---@private
 ---@type { [rotationDirections]: number }
@@ -137,8 +137,6 @@ function this.initialize(services)
 			[events.rotationStarted] = this.onRotationStarted,
 			[events.rotationEnded] = this.onRotationEnded,
 			[events.cylinderBlocked] = this.onCylinderBlocked,
-			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
-			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
 		},
 		session = {
 			[tes3.event.enterFrame] = this.onEnterFrame,
@@ -155,18 +153,9 @@ function this.uninitialize()
 end
 
 ---@private
-function this.onOptionsMenuOpened()
-	this.paused = true
-end
-
----@private
-function this.onOptionsMenuClosed()
-	this.paused = false
-end
-
----@private
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
+	this.session = e.session
 	this.start(e.session.knife)
 	this.enable()
 end
@@ -180,6 +169,7 @@ end
 ---@private
 ---@param _ lockpickingEndedEventData
 function this.onLockpickingEnded(_)
+	this.session = nil
 	this.phase = 0
 	this.targetAngle = 0
 	this.sourceAngle = 0
@@ -226,7 +216,7 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
-	if this.paused or this.blocked then
+	if this.blocked or (this.session and this.session.paused) then
 		return
 	end
 

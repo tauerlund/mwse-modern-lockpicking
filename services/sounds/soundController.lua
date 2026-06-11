@@ -22,10 +22,6 @@ this.cylinderRotationState = { counter = 0, cooldown = 0 }
 this.jiggleState = { counter = 0, cooldown = 0 }
 
 ---@private
----@type boolean
-this.paused = false
-
----@private
 ---@type soundFileResolver
 this.soundFileResolver = nil
 
@@ -76,8 +72,6 @@ function this.initialize(services)
 			[events.pickCycled] = this.onPickCycled,
 			[events.cylinderBlocked] = this.onCylinderBlocked,
 			[events.pickBroken] = this.onPickBroken,
-			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
-			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
 		},
 		session = {
 			[tes3.event.enterFrame] = this.onEnterFrame,
@@ -91,16 +85,6 @@ end
 ---@public
 function this.uninitialize()
 	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
-end
-
----@private
-function this.onOptionsMenuOpened()
-	this.paused = true
-end
-
----@private
-function this.onOptionsMenuClosed()
-	this.paused = false
 end
 
 ---@private
@@ -172,7 +156,7 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
-	if this.paused then
+	if this.session and this.session.paused then
 		return
 	end
 

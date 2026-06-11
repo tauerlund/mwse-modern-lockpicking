@@ -2,6 +2,10 @@
 local this = {}
 
 ---@private
+---@type lockpickingSession|nil
+this.session = nil
+
+---@private
 ---@type lock|nil
 this.lock = nil
 
@@ -28,10 +32,6 @@ this.enums = nil
 this.eventRegistrar = nil
 
 ---@private
----@type boolean
-this.paused = false
-
----@private
 ---@type eventHandlerGroups
 this.eventHandlers = {
 	lifetime = {},
@@ -52,8 +52,6 @@ function this.initialize(services)
 			[events.lockpickingStart] = this.onLockpickingStart,
 			[events.lockpickingEnd] = this.onLockpickingEnd,
 			[events.lockpickingEnded] = this.onLockpickingEnded,
-			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
-			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
 		},
 		session = {
 			[tes3.event.enterFrame] = this.onEnterFrame
@@ -72,18 +70,9 @@ function this.uninitialize()
 end
 
 ---@private
-function this.onOptionsMenuOpened()
-	this.paused = true
-end
-
----@private
-function this.onOptionsMenuClosed()
-	this.paused = false
-end
-
----@private
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
+	this.session = e.session
 	this.lock = e.session.lock
 	this.cylinder = e.session.lock.cylinder
 	this.lock.cylinderAngle = 0
@@ -101,6 +90,7 @@ end
 function this.onLockpickingEnded(_)
 	this.phase = 0
 	this.ending = false
+	this.session = nil
 	this.lock = nil
 	this.disable()
 end
@@ -123,7 +113,7 @@ function this.onEnterFrame(e)
 		return
 	end
 
-	if this.paused or this.ending or lock.blocked then
+	if this.ending or lock.blocked or (this.session and this.session.paused) then
 		return
 	end
 

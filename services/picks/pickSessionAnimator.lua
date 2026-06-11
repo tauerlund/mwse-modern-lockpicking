@@ -41,10 +41,6 @@ this.session = nil
 this.eventRegistrar = nil
 
 ---@private
----@type boolean
-this.paused = false
-
----@private
 ---@type eventHandlerGroups
 this.eventHandlers = {
 	lifetime = {},
@@ -98,8 +94,6 @@ function this.initialize(services)
 			[events.rotationStarted] = this.onRotationStarted,
 			[events.rotationEnded] = this.onRotationEnded,
 			[events.cylinderBlocked] = this.onCylinderBlocked,
-			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
-			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
 		},
 		session = {
 			[tes3.event.enterFrame] = this.onEnterFrame,
@@ -113,16 +107,6 @@ end
 ---@public
 function this.uninitialize()
 	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
-end
-
----@private
-function this.onOptionsMenuOpened()
-	this.paused = true
-end
-
----@private
-function this.onOptionsMenuClosed()
-	this.paused = false
 end
 
 ---@private
@@ -237,7 +221,7 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
-	if this.paused or not this.state then
+	if not this.state or this.session.paused then
 		return
 	end
 

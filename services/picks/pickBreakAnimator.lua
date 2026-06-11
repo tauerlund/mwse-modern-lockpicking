@@ -16,16 +16,16 @@ this.rotationBuffer2 = tes3matrix33.new()
 this.enums = nil
 
 ---@private
+---@type lockpickingSession|nil
+this.session = nil
+
+---@private
 ---@type renderingStrategyController
 this.renderingStrategyController = nil
 
 ---@private
 ---@type eventRegistrar
 this.eventRegistrar = nil
-
----@private
----@type boolean
-this.paused = false
 
 ---@private
 ---@type eventHandlerGroups
@@ -46,10 +46,9 @@ function this.initialize(services)
 
 	this.eventHandlers = {
 		lifetime = {
+			[events.lockpickingStarted] = this.onLockpickingStarted,
 			[events.pickBroken] = this.onPickBroken,
 			[events.lockpickingEnded] = this.onLockpickingEnded,
-			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
-			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
 		},
 		session = {
 			[tes3.event.enterFrame] = this.onEnterFrame,
@@ -66,13 +65,9 @@ function this.uninitialize()
 end
 
 ---@private
-function this.onOptionsMenuOpened()
-	this.paused = true
-end
-
----@private
-function this.onOptionsMenuClosed()
-	this.paused = false
+---@param e lockpickingStartedEventData
+function this.onLockpickingStarted(e)
+	this.session = e.session
 end
 
 ---@private
@@ -168,12 +163,8 @@ end
 ---@private
 ---@param e enterFrameEventData
 function this.onEnterFrame(e)
-	if this.paused then
-		return
-	end
-
 	local state = this.state
-	if not state then
+	if not state or (this.session and this.session.paused) then
 		return
 	end
 
@@ -216,6 +207,7 @@ end
 
 ---@private
 function this.onLockpickingEnded(_)
+	this.session = nil
 	this.cleanup()
 end
 
