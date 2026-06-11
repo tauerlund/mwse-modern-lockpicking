@@ -2,7 +2,7 @@
 local enum = {
 	targetDistance = 80,
 	paths = {
-		defaultLockMesh = "tauer\\lock.nif",
+		defaultLockMesh = "tauer\\lock_new.nif",
 	},
 	rootName = "ModernLockpicking:Root",
 	cameraRootZBufferName = "ModernLockpicking:NoDepth",
