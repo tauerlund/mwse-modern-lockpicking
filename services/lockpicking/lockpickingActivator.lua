@@ -33,6 +33,10 @@ this.eventRegistrar = nil
 ---@type eventHandlers
 this.eventHandlers = nil
 
+---@private
+---@type activationStrategy
+this.defaultStrategy = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return initializedService[]
@@ -63,6 +67,8 @@ function this.initialize(services)
 		[events.settingsUpdated] = this.onSettingsUpdated,
 	}
 
+	this.defaultStrategy = this.activationStrategies[this.enums.activationStrategyNames.default]
+
 	this.eventRegistrar.register(this.eventHandlers)
 	this.applyStrategy()
 
@@ -76,14 +82,12 @@ end
 
 ---@private
 function this.applyStrategy()
-	local defaultStrategyName = this.enums.activationStrategyNames.default
-	local strategyName = this.settings.activationStrategy or defaultStrategyName
+	local strategyName = this.settings.activationStrategy
 
 	local strategy = this.activationStrategies[strategyName]
 	if not strategy then
 		this.logger:error("Strategy '%s' is invalid", strategyName)
-		strategy = this.activationStrategies[defaultStrategyName]
-		return
+		strategy = this.defaultStrategy
 	end
 
 	if this.currentActivationStrategy then
