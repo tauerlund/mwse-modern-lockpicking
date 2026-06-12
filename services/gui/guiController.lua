@@ -436,6 +436,10 @@ end
 ---@private
 ---@param e uiObjectTooltipEventData
 function this.onUiObjectTooltip(e)
+	if not this.settings.enabled then
+		return
+	end
+
 	if e.object.objectType ~= tes3.objectType.lockpick then
 		return
 	end

@@ -112,10 +112,10 @@ end
 
 ---@private
 function this.applySettings()
-	if this.settings.allowEquipPicks then
-		this.unblockEquip()
-	else
+	if this.settings.enabled and not this.settings.allowEquipPicks then
 		this.blockEquip()
+	else
+		this.unblockEquip()
 	end
 end
 
