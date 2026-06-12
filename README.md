@@ -2,11 +2,11 @@
 
 An MWSE Lua mod that replaces Morrowind's chance-based lockpicking with a Skyrim-style minigame. Instead of rolling against your Security skill, you pick locks by hand: move the pick with the mouse to find the sweet spot, then rotate the cylinder using a knife as tension wrench. Security, Agility, Luck and pick quality decide how big the sweet spot is and how quickly your picks wear down.
 
-## :link: Dependencies:
+## :link: Dependencies
 
 - [mwse](https://github.com/MWSE/MWSE)
 
-## :white_check_mark: Features:
+## :white_check_mark: Features
 
 #### Gameplay
 
@@ -42,6 +42,6 @@ An MWSE Lua mod that replaces Morrowind's chance-based lockpicking with a Skyrim
 
 - Animation upon successful lockpicking
 
-## :beetle: Bugs:
+## :beetle: Bugs
 
 See [issues](https://github.com/tauerlund/mwse-modern-lockpicking/issues).
