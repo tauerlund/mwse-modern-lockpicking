@@ -75,13 +75,15 @@ end
 function this.onPickBroken(e)
 	local ghostMesh = this.spawnGhost(e.pick.mesh)
 
-	local tipNode = this.findNodeBySuffix(ghostMesh, "1")
-	local handleNode = this.findNodeBySuffix(ghostMesh, "0")
+	local firstPiece = this.findNodeBySuffix(ghostMesh, "0")
+	local secondPiece = this.findNodeBySuffix(ghostMesh, "1")
 
-	if not tipNode or not handleNode then
+	if not firstPiece or not secondPiece then
 		ghostMesh.parent:detachChild(ghostMesh)
 		return
 	end
+
+	local tipNode, handleNode = this.assignBreakRoles(ghostMesh, firstPiece, secondPiece)
 
 	local constants = this.enums.constants.picks.breakAnimation
 	local position = ghostMesh.translation
@@ -89,6 +91,15 @@ function this.onPickBroken(e)
 	local function random(base, variance)
 		return base * (1 + (math.random() * 2 - 1) * variance)
 	end
+
+	local attachmentRotation = this.renderingStrategyController.getGhostAttachmentNode().worldTransform.rotation
+
+	local function toScreenRotation(node)
+		return node.parent.worldTransform.rotation:transpose() * attachmentRotation
+	end
+
+	local tipToScreen = toScreenRotation(tipNode)
+	local handleToScreen = toScreenRotation(handleNode)
 
 	this.state = {
 		breakPhase = 0,
@@ -99,14 +110,18 @@ function this.onPickBroken(e)
 		},
 		tip = {
 			node = tipNode,
+			toScreen = tipToScreen,
+			fromScreen = tipToScreen:transpose(),
 			originalRotation = tipNode.rotation:copy(),
 			originalTranslation = tipNode.translation:copy(),
-			targetTranslation = tipNode.translation + constants.snapTranslation,
+			targetTranslation = tipNode.translation + tipToScreen * constants.snapTranslation,
 			angleX = random(constants.snapAngle, constants.snapAngleVariance),
 			angleZ = (math.random() * 2 - 1) * constants.snapAngleSideMax,
 		},
 		handle = {
 			node = handleNode,
+			toScreen = handleToScreen,
+			fromScreen = handleToScreen:transpose(),
 			originalRotation = handleNode.rotation:copy(),
 			kickAngleX = random(constants.handleKickAngle, constants.handleKickAngleVariance),
 			kickAngleZ = (math.random() * 2 - 1) * constants.handleKickAngleSideMax,
@@ -142,6 +157,29 @@ function this.spawnGhost(liveMesh)
 	liveMesh:update()
 
 	return ghostMesh
+end
+
+--- Assigns the two pick shapes to their animation roles: the "tip" gets the
+--- big snap rotation and drop, the "handle" gets the small recoil kick. The
+--- vanilla pick meshes disagree on whether the "0" or "1" shape is the rear
+--- shaft (Apprentice/Journeyman: "1"; Master/Grandmaster/Secret Master:
+--- "0"), so the roles are assigned by geometry instead of by name: the
+--- piece whose bounds sit farther back along the pick's local -Y axis is
+--- the one that snaps away, matching how the pick points +Y into the lock.
+---@private
+---@param ghostMesh niNode
+---@param firstPiece niNode
+---@param secondPiece niNode
+---@return niNode, niNode
+function this.assignBreakRoles(ghostMesh, firstPiece, secondPiece)
+	local forward = ghostMesh.worldTransform.rotation * tes3vector3.new(0, 1, 0)
+	local origin = ghostMesh.worldTransform.translation
+	local firstReach = (firstPiece.worldBoundOrigin - origin):dot(forward)
+	local secondReach = (secondPiece.worldBoundOrigin - origin):dot(forward)
+	if firstReach < secondReach then
+		return firstPiece, secondPiece
+	end
+	return secondPiece, firstPiece
 end
 
 ---@private
@@ -188,14 +226,20 @@ function this.onEnterFrame(e)
 	this.rotationBuffer:toRotationX(tip.angleX * t)
 	this.rotationBuffer2:toRotationZ(tip.angleZ * t)
 
-	tip.node.rotation = tip.originalRotation * this.rotationBuffer * this.rotationBuffer2
+	tip.node.rotation = tip.toScreen
+		* this.rotationBuffer
+		* this.rotationBuffer2
+		* tip.fromScreen
+		* tip.originalRotation
+
 	tip.node.translation = tip.originalTranslation:lerp(tip.targetTranslation, t)
 	tip.node:update()
 
 	this.rotationBuffer:toRotationX(-handle.kickAngleX * t)
 	this.rotationBuffer2:toRotationZ(handle.kickAngleZ * t)
 
-	handle.node.rotation = handle.originalRotation * this.rotationBuffer * this.rotationBuffer2
+	handle.node.rotation = handle.toScreen * this.rotationBuffer * this.rotationBuffer2 * handle.fromScreen *
+		handle.originalRotation
 	handle.node:update()
 
 	ghost.mesh:update()

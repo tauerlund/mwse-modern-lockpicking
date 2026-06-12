@@ -23,15 +23,15 @@ local enum = {
 	breakAnimation = {
 		duration = 0.75,
 		cycleDelay = 0.5,
-		snapAngle = math.rad(-80),
-		snapAngleVariance = 1.25,
+		snapAngle = math.rad(-120),
+		snapAngleVariance = 0.45,
 		snapAngleSideMax = math.rad(20),
 		snapTranslation = tes3vector3.new(0, 0, -2),
 		handleKickAngle = math.rad(8),
 		handleKickAngleVariance = 0.3,
 		handleKickAngleSideMax = math.rad(5),
-		fallDistance = 25,
-		bounceHeight = 6,
+		fallDistance = 30,
+		bounceHeight = 8,
 	},
 }
 

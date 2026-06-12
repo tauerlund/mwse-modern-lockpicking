@@ -2,5 +2,5 @@
 ---@class pickBreakAnimatorState
 ---@field breakPhase number
 ---@field ghost { mesh: niNode, originalTranslation: tes3vector3, fallTargetTranslation: tes3vector3 }
----@field tip { node: niNode, originalRotation: tes3matrix33, originalTranslation: tes3vector3, targetTranslation: tes3vector3, angleX: number, angleZ: number }
----@field handle { node: niNode|nil, originalRotation: tes3matrix33|nil, kickAngleX: number, kickAngleZ: number }
+---@field tip { node: niNode, toScreen: tes3matrix33, fromScreen: tes3matrix33, originalRotation: tes3matrix33, originalTranslation: tes3vector3, targetTranslation: tes3vector3, angleX: number, angleZ: number }
+---@field handle { node: niNode|nil, toScreen: tes3matrix33|nil, fromScreen: tes3matrix33|nil, originalRotation: tes3matrix33|nil, kickAngleX: number, kickAngleZ: number }
