@@ -43,3 +43,5 @@ An MWSE Lua mod that replaces Morrowind's chance-based lockpicking with a Skyrim
 - Animation upon successful lockpicking
 
 ## :beetle: Bugs:
+
+See [issues](https://github.com/tauerlund/mwse-modern-lockpicking/issues).
