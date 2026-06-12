@@ -114,8 +114,11 @@ function this.onPickBroken(e)
 			originalRotation = tipNode.rotation:copy(),
 			originalTranslation = tipNode.translation:copy(),
 			targetTranslation = tipNode.translation + tipToScreen * constants.snapTranslation,
-			angleX = this.formulas.randomVariance(constants.snapAngle, constants.snapAngleVariance,
-				math.random() * 2 - 1),
+			angleX = this.formulas.randomVariance({
+				base = constants.snapAngle,
+				variance = constants.snapAngleVariance,
+				roll = math.random() * 2 - 1,
+			}),
 			angleZ = (math.random() * 2 - 1) * constants.snapAngleSideMax,
 		},
 		handle = {
@@ -123,8 +126,11 @@ function this.onPickBroken(e)
 			toScreen = handleToScreen,
 			fromScreen = handleToScreen:transpose(),
 			originalRotation = handleNode.rotation:copy(),
-			kickAngleX = this.formulas.randomVariance(constants.handleKickAngle, constants.handleKickAngleVariance,
-				math.random() * 2 - 1),
+			kickAngleX = this.formulas.randomVariance({
+				base = constants.handleKickAngle,
+				variance = constants.handleKickAngleVariance,
+				roll = math.random() * 2 - 1,
+			}),
 			kickAngleZ = (math.random() * 2 - 1) * constants.handleKickAngleSideMax,
 		},
 	}

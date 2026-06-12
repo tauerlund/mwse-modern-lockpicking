@@ -69,39 +69,43 @@ function this.run(unitwind)
     local sweetSpot = { center = 0.25, radius = 0.5, gradientWidth = 0.25 }
 
     unitwind:test("Max angle is unlimited inside the sweet spot", function ()
-        local maxAngle = this.formulas.maxAngle(0.25, sweetSpot, 2.0)
+        local maxAngle = this.formulas.maxAngle({ pickAngle = 0.25, sweetSpot = sweetSpot, targetRotation = 2.0 })
 
         unitwind:expect(maxAngle).toBe(math.huge)
     end)
 
     unitwind:test("Max angle is unlimited exactly at the sweet spot edge", function ()
-        local maxAngle = this.formulas.maxAngle(0.75, sweetSpot, 2.0)
+        local maxAngle = this.formulas.maxAngle({ pickAngle = 0.75, sweetSpot = sweetSpot, targetRotation = 2.0 })
 
         unitwind:expect(maxAngle).toBe(math.huge)
     end)
 
     unitwind:test("Max angle falls linearly across the gradient", function ()
         -- Halfway into the gradient: overshoot 0.125 of gradientWidth 0.25.
-        local maxAngle = this.formulas.maxAngle(0.875, sweetSpot, 2.0)
+        local maxAngle = this.formulas.maxAngle({ pickAngle = 0.875, sweetSpot = sweetSpot, targetRotation = 2.0 })
 
         unitwind:expect(maxAngle).toBe(1.0)
     end)
 
     unitwind:test("Max angle reaches exactly zero at the edge of the gradient", function ()
-        local maxAngle = this.formulas.maxAngle(1.0, sweetSpot, 2.0)
+        local maxAngle = this.formulas.maxAngle({ pickAngle = 1.0, sweetSpot = sweetSpot, targetRotation = 2.0 })
 
         unitwind:expect(maxAngle).toBe(0)
     end)
 
     unitwind:test("Max angle stays zero beyond the gradient", function ()
-        local maxAngle = this.formulas.maxAngle(3.0, sweetSpot, 2.0)
+        local maxAngle = this.formulas.maxAngle({ pickAngle = 3.0, sweetSpot = sweetSpot, targetRotation = 2.0 })
 
         unitwind:expect(maxAngle).toBe(0)
     end)
 
     unitwind:test("Max angle is symmetric around the sweet spot center", function ()
-        local clockwise = this.formulas.maxAngle(0.875, sweetSpot, 2.0)
-        local counterclockwise = this.formulas.maxAngle(-0.375, sweetSpot, 2.0)
+        local clockwise = this.formulas.maxAngle({ pickAngle = 0.875, sweetSpot = sweetSpot, targetRotation = 2.0 })
+        local counterclockwise = this.formulas.maxAngle({
+            pickAngle = -0.375,
+            sweetSpot = sweetSpot,
+            targetRotation = 2.0,
+        })
 
         unitwind:expect(counterclockwise).toBe(clockwise)
     end)
@@ -110,7 +114,7 @@ function this.run(unitwind)
         ---@type sweetSpotUpdatedEventData
         local hardSpot = { center = 0.25, radius = 0.5, gradientWidth = 0 }
 
-        local maxAngle = this.formulas.maxAngle(1.0, hardSpot, 2.0)
+        local maxAngle = this.formulas.maxAngle({ pickAngle = 1.0, sweetSpot = hardSpot, targetRotation = 2.0 })
 
         unitwind:expect(maxAngle).toBe(0)
     end)
@@ -145,13 +149,23 @@ function this.run(unitwind)
     --- Success chance ---
 
     unitwind:test("Success chance follows the vanilla security formula", function ()
-        local chance = this.formulas.successChance(61, 1.25, 1.0, 50)
+        local chance = this.formulas.successChance({
+            statsModifier = 61,
+            quality = 1.25,
+            fatigueModifier = 1.0,
+            lockLevel = 50,
+        })
 
         unitwind:expect(chance).toBe(61 * 1.25 - 50)
     end)
 
     unitwind:test("Success chance is zero at the eligibility boundary", function ()
-        local chance = this.formulas.successChance(40, 1.0, 1.25, 50)
+        local chance = this.formulas.successChance({
+            statsModifier = 40,
+            quality = 1.0,
+            fatigueModifier = 1.25,
+            lockLevel = 50,
+        })
 
         unitwind:expect(chance).toBe(0)
     end)
@@ -177,7 +191,7 @@ function this.run(unitwind)
         local up = tes3vector3.new(0, 0, 1)
         local plane = this.createTopPlane(direction, up, halfAngle, 1, 7)
 
-        local verticalTan = this.formulas.verticalTanFromCullingPlane(plane, direction, up)
+        local verticalTan = this.formulas.verticalTanFromCullingPlane({ plane = plane, direction = direction, up = up })
 
         this.expectNear(unitwind, verticalTan, math.tan(halfAngle))
     end)
@@ -189,8 +203,16 @@ function this.run(unitwind)
         local inward = this.createTopPlane(direction, up, halfAngle, 1, 0)
         local outwardScaled = this.createTopPlane(direction, up, halfAngle, -3, 12)
 
-        local fromInward = this.formulas.verticalTanFromCullingPlane(inward, direction, up)
-        local fromOutward = this.formulas.verticalTanFromCullingPlane(outwardScaled, direction, up)
+        local fromInward = this.formulas.verticalTanFromCullingPlane({
+            plane = inward,
+            direction = direction,
+            up = up,
+        })
+        local fromOutward = this.formulas.verticalTanFromCullingPlane({
+            plane = outwardScaled,
+            direction = direction,
+            up = up,
+        })
 
         this.expectNear(unitwind, fromInward, fromOutward)
     end)
@@ -218,7 +240,7 @@ function this.run(unitwind)
     --- DOF focus distance ---
 
     unitwind:test("DOF focus is the lock's depth in meters", function ()
-        local focus = this.formulas.dofFocusDistance(80, 0.0142)
+        local focus = this.formulas.dofFocusDistance({ distance = 80, unitsToMeters = 0.0142 })
 
         this.expectNear(unitwind, focus, 1.136)
     end)
@@ -226,19 +248,19 @@ function this.run(unitwind)
     --- Pick break animation ---
 
     unitwind:test("Random variance spans base times one plus-minus variance", function ()
-        unitwind:expect(this.formulas.randomVariance(-80, 0.25, 0)).toBe(-80)
-        unitwind:expect(this.formulas.randomVariance(-80, 0.25, 1)).toBe(-100)
-        unitwind:expect(this.formulas.randomVariance(-80, 0.25, -1)).toBe(-60)
+        unitwind:expect(this.formulas.randomVariance({ base = -80, variance = 0.25, roll = 0 })).toBe(-80)
+        unitwind:expect(this.formulas.randomVariance({ base = -80, variance = 0.25, roll = 1 })).toBe(-100)
+        unitwind:expect(this.formulas.randomVariance({ base = -80, variance = 0.25, roll = -1 })).toBe(-60)
     end)
 
     unitwind:test("Random variance keeps the direction up to a variance of 1", function ()
-        local extreme = this.formulas.randomVariance(-80, 1.0, -1)
+        local extreme = this.formulas.randomVariance({ base = -80, variance = 1.0, roll = -1 })
 
         unitwind:expect(extreme).toBe(0)
     end)
 
     unitwind:test("Random variance above 1 flips the direction on extreme rolls", function ()
-        local flipped = this.formulas.randomVariance(-80, 1.5, -1)
+        local flipped = this.formulas.randomVariance({ base = -80, variance = 1.5, roll = -1 })
 
         unitwind:expect(flipped > 0).toBe(true)
     end)

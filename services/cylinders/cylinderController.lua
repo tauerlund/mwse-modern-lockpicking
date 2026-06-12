@@ -161,7 +161,11 @@ function this.computeMaxAngle()
 	end
 
 	local pickAngle = pick.helper.rotation:toEulerXYZ().y
-	return this.formulas.maxAngle(pickAngle, sweetSpot, this.enums.constants.cylinder.targetRotationRight)
+	return this.formulas.maxAngle({
+		pickAngle = pickAngle,
+		sweetSpot = sweetSpot,
+		targetRotation = this.enums.constants.cylinder.targetRotationRight,
+	})
 end
 
 ---@private

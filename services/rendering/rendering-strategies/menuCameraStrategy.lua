@@ -94,8 +94,11 @@ end
 function this.getTargetDistance()
 	local constants = this.enums.constants.locks
 	local camera = this.getNiCamera()
-	local topPlane = camera.cullingPlanes[5]
-	local verticalTan = this.formulas.verticalTanFromCullingPlane(topPlane, camera.worldDirection, camera.worldUp)
+	local verticalTan = this.formulas.verticalTanFromCullingPlane({
+		plane = camera.cullingPlanes[5],
+		direction = camera.worldDirection,
+		up = camera.worldUp,
+	})
 	return this.formulas.lockTargetDistance(constants.targetDistance, constants.referenceVerticalTan, verticalTan,
 		this.settings.lockDistanceFactor)
 end
