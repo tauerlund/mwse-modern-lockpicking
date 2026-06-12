@@ -12,7 +12,7 @@ function this.run(unitwind)
     --- Sweet spot radius ---
 
     unitwind:test("Sweet spot radius follows the difficulty formula", function ()
-        local radius = this.formulas.computeSweetSpotRadius({
+        local radius = this.formulas.sweetSpotRadius({
             quality = 1.0,
             statsModifier = 30,
             lockLevel = 50,
@@ -23,7 +23,7 @@ function this.run(unitwind)
     end)
 
     unitwind:test("Sweet spot radius clamps at maxSweetSpotRadius", function ()
-        local radius = this.formulas.computeSweetSpotRadius({
+        local radius = this.formulas.sweetSpotRadius({
             quality = 5.0,
             statsModifier = 100,
             lockLevel = 1,
@@ -41,9 +41,9 @@ function this.run(unitwind)
         }
 
         params.lockLevel = 0
-        local unleveled = this.formulas.computeSweetSpotRadius(params)
+        local unleveled = this.formulas.sweetSpotRadius(params)
         params.lockLevel = 1
-        local levelOne = this.formulas.computeSweetSpotRadius(params)
+        local levelOne = this.formulas.sweetSpotRadius(params)
 
         unitwind:expect(unleveled).toBe(levelOne)
     end)
@@ -56,9 +56,9 @@ function this.run(unitwind)
         }
 
         params.lockLevel = 50
-        local easy = this.formulas.computeSweetSpotRadius(params)
+        local easy = this.formulas.sweetSpotRadius(params)
         params.lockLevel = 100
-        local hard = this.formulas.computeSweetSpotRadius(params)
+        local hard = this.formulas.sweetSpotRadius(params)
 
         unitwind:expect(hard < easy).toBe(true)
     end)
@@ -69,39 +69,39 @@ function this.run(unitwind)
     local sweetSpot = { center = 0.25, radius = 0.5, gradientWidth = 0.25 }
 
     unitwind:test("Max angle is unlimited inside the sweet spot", function ()
-        local maxAngle = this.formulas.computeMaxAngle(0.25, sweetSpot, 2.0)
+        local maxAngle = this.formulas.maxAngle(0.25, sweetSpot, 2.0)
 
         unitwind:expect(maxAngle).toBe(math.huge)
     end)
 
     unitwind:test("Max angle is unlimited exactly at the sweet spot edge", function ()
-        local maxAngle = this.formulas.computeMaxAngle(0.75, sweetSpot, 2.0)
+        local maxAngle = this.formulas.maxAngle(0.75, sweetSpot, 2.0)
 
         unitwind:expect(maxAngle).toBe(math.huge)
     end)
 
     unitwind:test("Max angle falls linearly across the gradient", function ()
         -- Halfway into the gradient: overshoot 0.125 of gradientWidth 0.25.
-        local maxAngle = this.formulas.computeMaxAngle(0.875, sweetSpot, 2.0)
+        local maxAngle = this.formulas.maxAngle(0.875, sweetSpot, 2.0)
 
         unitwind:expect(maxAngle).toBe(1.0)
     end)
 
     unitwind:test("Max angle reaches exactly zero at the edge of the gradient", function ()
-        local maxAngle = this.formulas.computeMaxAngle(1.0, sweetSpot, 2.0)
+        local maxAngle = this.formulas.maxAngle(1.0, sweetSpot, 2.0)
 
         unitwind:expect(maxAngle).toBe(0)
     end)
 
     unitwind:test("Max angle stays zero beyond the gradient", function ()
-        local maxAngle = this.formulas.computeMaxAngle(3.0, sweetSpot, 2.0)
+        local maxAngle = this.formulas.maxAngle(3.0, sweetSpot, 2.0)
 
         unitwind:expect(maxAngle).toBe(0)
     end)
 
     unitwind:test("Max angle is symmetric around the sweet spot center", function ()
-        local clockwise = this.formulas.computeMaxAngle(0.875, sweetSpot, 2.0)
-        local counterclockwise = this.formulas.computeMaxAngle(-0.375, sweetSpot, 2.0)
+        local clockwise = this.formulas.maxAngle(0.875, sweetSpot, 2.0)
+        local counterclockwise = this.formulas.maxAngle(-0.375, sweetSpot, 2.0)
 
         unitwind:expect(counterclockwise).toBe(clockwise)
     end)
@@ -110,7 +110,7 @@ function this.run(unitwind)
         ---@type sweetSpotUpdatedEventData
         local hardSpot = { center = 0.25, radius = 0.5, gradientWidth = 0 }
 
-        local maxAngle = this.formulas.computeMaxAngle(1.0, hardSpot, 2.0)
+        local maxAngle = this.formulas.maxAngle(1.0, hardSpot, 2.0)
 
         unitwind:expect(maxAngle).toBe(0)
     end)
@@ -118,26 +118,26 @@ function this.run(unitwind)
     --- Damage rate ---
 
     unitwind:test("Damage rate is the base rate when there is no sweet spot yet", function ()
-        local rate = this.formulas.computeDamageRate(nil, this.createDifficulty({ baseRate = 2 }))
+        local rate = this.formulas.damageRate(nil, this.createDifficulty({ baseRate = 2 }))
 
         unitwind:expect(rate).toBe(2)
     end)
 
     unitwind:test("Damage rate is the base rate at the maximum sweet spot radius", function ()
-        local rate = this.formulas.computeDamageRate(math.rad(45), this.createDifficulty())
+        local rate = this.formulas.damageRate(math.rad(45), this.createDifficulty())
 
         unitwind:expect(rate).toBe(1)
     end)
 
     unitwind:test("Damage rate grows as the sweet spot shrinks", function ()
         -- A quarter of the max radius gives sqrt(4) = 2x the base rate.
-        local rate = this.formulas.computeDamageRate(math.rad(45) / 4, this.createDifficulty())
+        local rate = this.formulas.damageRate(math.rad(45) / 4, this.createDifficulty())
 
         unitwind:expect(rate).toBe(2)
     end)
 
     unitwind:test("Damage rate falls back to the base rate at zero radius", function ()
-        local rate = this.formulas.computeDamageRate(0, this.createDifficulty())
+        local rate = this.formulas.damageRate(0, this.createDifficulty())
 
         unitwind:expect(rate).toBe(1)
     end)
@@ -145,13 +145,13 @@ function this.run(unitwind)
     --- Success chance ---
 
     unitwind:test("Success chance follows the vanilla security formula", function ()
-        local chance = this.formulas.computeSuccessChance(61, 1.25, 1.0, 50)
+        local chance = this.formulas.successChance(61, 1.25, 1.0, 50)
 
         unitwind:expect(chance).toBe(61 * 1.25 - 50)
     end)
 
     unitwind:test("Success chance is zero at the eligibility boundary", function ()
-        local chance = this.formulas.computeSuccessChance(40, 1.0, 1.25, 50)
+        local chance = this.formulas.successChance(40, 1.0, 1.25, 50)
 
         unitwind:expect(chance).toBe(0)
     end)

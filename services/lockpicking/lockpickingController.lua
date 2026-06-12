@@ -252,7 +252,7 @@ end
 ---@return number
 function this.computeSweetSpotRadius()
 	local lockNode = this.session.activator.lockNode
-	return this.formulas.computeSweetSpotRadius({
+	return this.formulas.sweetSpotRadius({
 		quality = this.session.pick.item.object.quality,
 		statsModifier = this.skillController.getStatsModifier(),
 		lockLevel = lockNode and lockNode.level or 1,

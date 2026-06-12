@@ -1,4 +1,4 @@
---- Stateless gameplay formulas. Pure functions of their arguments — no session, no settings, no tes3.
+--- Stateless gameplay formulas
 ---@class formulas
 local this = {}
 
@@ -12,9 +12,10 @@ local this = {}
 ---@public
 ---@param params sweetSpotRadiusParams
 ---@return number
-function this.computeSweetSpotRadius(params)
+function this.sweetSpotRadius(params)
 	local difficulty = params.difficulty
-	local radius = math.pi * params.quality ^ difficulty.qualityFactor * params.statsModifier * difficulty.securityFactor /
+	local radius = math.pi * params.quality ^ difficulty.qualityFactor * params.statsModifier * difficulty
+		.securityFactor /
 		(math.max(1, params.lockLevel) * difficulty.lockLevelFactor)
 	return math.min(radius, math.rad(difficulty.maxSweetSpotRadius))
 end
@@ -26,7 +27,7 @@ end
 ---@param sweetSpot sweetSpotUpdatedEventData
 ---@param targetRotation number
 ---@return number
-function this.computeMaxAngle(pickAngle, sweetSpot, targetRotation)
+function this.maxAngle(pickAngle, sweetSpot, targetRotation)
 	local distance = math.abs(pickAngle - sweetSpot.center)
 	if distance <= sweetSpot.radius then
 		return math.huge
@@ -46,7 +47,7 @@ end
 ---@param sweetSpotRadius number|nil
 ---@param difficulty difficultySettings
 ---@return number
-function this.computeDamageRate(sweetSpotRadius, difficulty)
+function this.damageRate(sweetSpotRadius, difficulty)
 	if not sweetSpotRadius or sweetSpotRadius <= 0 then
 		return difficulty.baseRate
 	end
@@ -62,7 +63,7 @@ end
 ---@param fatigueModifier number
 ---@param lockLevel number
 ---@return number
-function this.computeSuccessChance(statsModifier, quality, fatigueModifier, lockLevel)
+function this.successChance(statsModifier, quality, fatigueModifier, lockLevel)
 	return (statsModifier * quality * fatigueModifier) - lockLevel
 end
 

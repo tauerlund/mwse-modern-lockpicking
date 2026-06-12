@@ -228,7 +228,7 @@ end
 ---@return number
 function this.computeDamageRate()
 	local sweetSpot = this.session.sweetSpot
-	return this.formulas.computeDamageRate(sweetSpot and sweetSpot.radius, this.settings.difficulty)
+	return this.formulas.damageRate(sweetSpot and sweetSpot.radius, this.settings.difficulty)
 end
 
 ---@private

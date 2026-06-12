@@ -46,7 +46,7 @@ end
 ---@param lock tes3lockNode
 ---@return number
 function this.getSuccessChance(pick, lock)
-	return this.formulas.computeSuccessChance(this.getStatsModifier(), pick.object.quality, this.getFatigueModifier(),
+	return this.formulas.successChance(this.getStatsModifier(), pick.object.quality, this.getFatigueModifier(),
 		lock.level)
 end
 
