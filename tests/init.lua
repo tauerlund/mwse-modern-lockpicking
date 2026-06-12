@@ -2,7 +2,7 @@
 local this = {}
 
 ---@public
-this.enabled = true
+this.enabled = false
 
 ---@private
 this.root = "Data Files\\MWSE\\mods\\tauer\\modern-lockpicking\\tests"
@@ -27,9 +27,6 @@ function this.run()
         enabled = true,
         highlight = false,
         exitAfter = false,
-        beforeEach = function (self)
-
-        end
     }) --[[@as UnitWind]]
 
     local tests = this.resolveTests()
