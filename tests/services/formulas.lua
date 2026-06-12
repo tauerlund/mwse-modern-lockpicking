@@ -156,6 +156,73 @@ function this.run(unitwind)
         unitwind:expect(chance).toBe(0)
     end)
 
+    --- Camera vertical tangent ---
+
+    unitwind:test("Vertical tangent of a 90 degree FOV on a square viewport is 1", function ()
+        local verticalTan = this.formulas.verticalTanFromHorizontalFov(90, 1000, 1000)
+
+        this.expectNear(unitwind, verticalTan, 1)
+    end)
+
+    unitwind:test("Vertical tangent matches across aspect ratios when the vertical FOV is equal", function ()
+        local ultrawide = this.formulas.verticalTanFromHorizontalFov(math.deg(2 * math.atan(2)), 3200, 900)
+        local widescreen = this.formulas.verticalTanFromHorizontalFov(90, 1600, 900)
+
+        this.expectNear(unitwind, ultrawide, widescreen)
+    end)
+
+    unitwind:test("Vertical tangent from the top culling plane recovers the half-angle", function ()
+        local halfAngle = math.rad(25)
+        local direction = tes3vector3.new(0.6, 0.8, 0)
+        local up = tes3vector3.new(0, 0, 1)
+        local plane = this.createTopPlane(direction, up, halfAngle, 1, 7)
+
+        local verticalTan = this.formulas.verticalTanFromCullingPlane(plane, direction, up)
+
+        this.expectNear(unitwind, verticalTan, math.tan(halfAngle))
+    end)
+
+    unitwind:test("Vertical tangent from the culling plane ignores normal orientation and length", function ()
+        local halfAngle = math.rad(30)
+        local direction = tes3vector3.new(0, 1, 0)
+        local up = tes3vector3.new(0, 0, 1)
+        local inward = this.createTopPlane(direction, up, halfAngle, 1, 0)
+        local outwardScaled = this.createTopPlane(direction, up, halfAngle, -3, 12)
+
+        local fromInward = this.formulas.verticalTanFromCullingPlane(inward, direction, up)
+        local fromOutward = this.formulas.verticalTanFromCullingPlane(outwardScaled, direction, up)
+
+        this.expectNear(unitwind, fromInward, fromOutward)
+    end)
+
+    --- Lock target distance ---
+
+    unitwind:test("Lock distance is the base distance at the reference tangent", function ()
+        local distance = this.formulas.lockTargetDistance(80, 0.5, 0.5, 1.0)
+
+        unitwind:expect(distance).toBe(80)
+    end)
+
+    unitwind:test("Lock distance halves when the vertical tangent doubles", function ()
+        local distance = this.formulas.lockTargetDistance(80, 0.5, 1.0, 1.0)
+
+        unitwind:expect(distance).toBe(40)
+    end)
+
+    unitwind:test("Lock distance scales linearly with the player's distance factor", function ()
+        local distance = this.formulas.lockTargetDistance(80, 0.5, 0.5, 1.5)
+
+        unitwind:expect(distance).toBe(120)
+    end)
+
+    --- DOF focus distance ---
+
+    unitwind:test("DOF focus is the lock's depth in meters", function ()
+        local focus = this.formulas.dofFocusDistance(80, 0.0142)
+
+        this.expectNear(unitwind, focus, 1.136)
+    end)
+
     unitwind:finish()
 end
 
@@ -178,6 +245,21 @@ function this.createDifficulty(overrides)
         difficulty[key] = value
     end
     return difficulty
+end
+
+--- Top culling plane for a camera frame: the normal sits in the direction/up
+--- plane, tilted from the up axis by the vertical half-angle. scale flips or
+--- stretches the normal; w stands in for an arbitrary plane distance.
+---@private
+---@param direction tes3vector3
+---@param up tes3vector3
+---@param halfAngle number
+---@param scale number
+---@param w number
+---@return tes3vector4
+function this.createTopPlane(direction, up, halfAngle, scale, w)
+    local normal = (direction * math.sin(halfAngle) - up * math.cos(halfAngle)) * scale
+    return tes3vector4.new(normal.x, normal.y, normal.z, w)
 end
 
 --- Compares floats via fixed-point formatting so failures log both numbers.

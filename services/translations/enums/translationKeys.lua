@@ -65,6 +65,8 @@ local this = {
     mcmHeaderVisuals = "mcm.header.visuals",
     mcmVisualsLabelEnableDof = "mcm.visuals.label.enableDof",
     mcmVisualsDescEnableDof = "mcm.visuals.desc.enableDof",
+    mcmVisualsLabelLockDistance = "mcm.visuals.label.lockDistance",
+    mcmVisualsDescLockDistance = "mcm.visuals.desc.lockDistance",
 }
 
 return this

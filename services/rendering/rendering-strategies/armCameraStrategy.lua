@@ -14,6 +14,14 @@ this.enums = nil
 this.eventRegistrar = nil
 
 ---@private
+---@type settings
+this.settings = nil
+
+---@private
+---@type formulas
+this.formulas = nil
+
+---@private
 ---@type eventHandlerGroups
 this.eventHandlers = {
 	lifetime = {},
@@ -45,6 +53,8 @@ function this.initialize(services)
 	this.name = services.enums.renderingStrategyNames.armCamera
 	this.enums = services.enums
 	this.eventRegistrar = services.eventRegistrar
+	this.settings = services.settings
+	this.formulas = services.formulas
 
 	local events = this.enums.events
 
@@ -238,10 +248,11 @@ end
 ---@public
 ---@return number
 function this.getTargetDistance()
-	local menuFov = tes3.worldController.menuCamera.cameraData.fov
-	local armFov = mge.camera.fov
-	local base = this.enums.constants.locks.targetDistance
-	return base * math.tan(math.rad(menuFov) * 0.5) / math.tan(math.rad(armFov) * 0.5)
+	local constants = this.enums.constants.locks
+	local viewportWidth, viewportHeight = tes3.getViewportSize()
+	local verticalTan = this.formulas.verticalTanFromHorizontalFov(mge.camera.fov, viewportWidth, viewportHeight)
+	return this.formulas.lockTargetDistance(constants.targetDistance, constants.referenceVerticalTan, verticalTan,
+		this.settings.lockDistanceFactor)
 end
 
 return this

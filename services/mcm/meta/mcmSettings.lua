@@ -29,6 +29,7 @@
 ---@field public activationStrategy activationStrategyNames
 ---@field public litRendering boolean
 ---@field public enableDof boolean
+---@field public lockDistanceFactor number
 ---@field public allowEquipPicks boolean
 ---@field public useLockComplexity boolean
 ---@field public difficulty difficultySettings

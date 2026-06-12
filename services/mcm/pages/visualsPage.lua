@@ -31,6 +31,20 @@ function this.initialize(template, services)
 			table = settings,
 		}),
 	})
+
+	page:createSlider({
+		label = translations.get(translationKeys.mcmVisualsLabelLockDistance),
+		description = translations.get(translationKeys.mcmVisualsDescLockDistance),
+		min = 0.5,
+		max = 2.0,
+		step = 0.05,
+		jump = 0.25,
+		decimalPlaces = 2,
+		variable = mwse.mcm.createTableVariable({
+			id = "lockDistanceFactor",
+			table = settings,
+		}),
+	})
 end
 
 return this

@@ -1,7 +1,7 @@
 ---@enum renderingConstants
 local enum = {
-    focusDistance = 0.8,
     focalLength = 4,
+    unitsToMeters = 0.0142,
 }
 
 return enum

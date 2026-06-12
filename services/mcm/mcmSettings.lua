@@ -21,6 +21,7 @@ this.defaults = {
     activationStrategy = activationStrategyNames.default,
     litRendering = true,
     enableDof = true,
+    lockDistanceFactor = 1.0,
     allowEquipPicks = true,
     useLockComplexity = true,
     difficulty = {

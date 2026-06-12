@@ -24,6 +24,14 @@ this.enums = nil
 this.eventRegistrar = nil
 
 ---@private
+---@type renderingStrategyController
+this.renderingStrategyController = nil
+
+---@private
+---@type formulas
+this.formulas = nil
+
+---@private
 ---@type eventHandlers
 this.eventHandlers = nil
 
@@ -34,6 +42,8 @@ function this.initialize(services)
     this.settings = services.settings
     this.enums = services.enums
     this.eventRegistrar = services.eventRegistrar
+    this.renderingStrategyController = services.renderingStrategyController
+    this.formulas = services.formulas
 
     local events = services.enums.events
 
@@ -41,6 +51,7 @@ function this.initialize(services)
         [events.lockpickingStart] = this.onLockpickingStart,
         [events.lockpickingEnded] = this.onLockpickingEnded,
         [events.settingsUpdated] = this.onSettingsUpdated,
+        [events.renderingStrategyChanged] = this.onRenderingStrategyChanged,
     }
 
     this.eventRegistrar.register(this.eventHandlers)
@@ -65,7 +76,8 @@ function this.applyDof()
     end
     if this.settings.enableDof then
         local constants = this.enums.constants.rendering
-        this.depthOfField["focus_distance"] = constants.focusDistance
+        this.depthOfField["focus_distance"] = this.formulas.dofFocusDistance(
+            this.renderingStrategyController.getTargetDistance(), constants.unitsToMeters)
         this.depthOfField["focal_length"] = constants.focalLength
         this.depthOfField.enabled = true
     else
@@ -104,6 +116,14 @@ end
 
 ---@private
 function this.onSettingsUpdated()
+    if not this.sessionActive then
+        return
+    end
+    this.applyDof()
+end
+
+---@private
+function this.onRenderingStrategyChanged()
     if not this.sessionActive then
         return
     end

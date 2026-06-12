@@ -9,11 +9,21 @@ this.name = nil
 ---@type enums
 this.enums = nil
 
+---@private
+---@type settings
+this.settings = nil
+
+---@private
+---@type formulas
+this.formulas = nil
+
 ---@public
 ---@param services serviceCollection
 function this.initialize(services)
 	this.name = services.enums.renderingStrategyNames.menuCamera
 	this.enums = services.enums
+	this.settings = services.settings
+	this.formulas = services.formulas
 end
 
 ---@private
@@ -82,7 +92,12 @@ end
 ---@public
 ---@return number
 function this.getTargetDistance()
-	return this.enums.constants.locks.targetDistance
+	local constants = this.enums.constants.locks
+	local camera = this.getNiCamera()
+	local topPlane = camera.cullingPlanes[5]
+	local verticalTan = this.formulas.verticalTanFromCullingPlane(topPlane, camera.worldDirection, camera.worldUp)
+	return this.formulas.lockTargetDistance(constants.targetDistance, constants.referenceVerticalTan, verticalTan,
+		this.settings.lockDistanceFactor)
 end
 
 return this

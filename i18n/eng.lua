@@ -79,4 +79,7 @@ return {
 	[keys.mcmVisualsLabelEnableDof] = "Depth of Field",
 	[keys.mcmVisualsDescEnableDof] =
 	"When enabled, a bokeh depth of field effect is applied during lockpicking.",
+	[keys.mcmVisualsLabelLockDistance] = "Lock Distance",
+	[keys.mcmVisualsDescLockDistance] =
+	"Scales how far away the lock is placed during lockpicking. The distance automatically adapts to your screen aspect ratio and field of view; lower this to bring the lock closer, raise it to push the lock farther away.",
 }
