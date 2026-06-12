@@ -10,8 +10,11 @@ this.eventRegistrar = nil
 this.animations = {}
 
 ---@private
----@type eventHandlers
-this.eventHandlers = nil
+---@type eventHandlerGroups
+this.eventHandlers = {
+	lifetime = {},
+	animation = {}
+}
 
 ---@private
 this.paused = false
@@ -25,12 +28,23 @@ function this.initialize(services)
 	local events = services.enums.events
 
 	this.eventHandlers = {
-		[tes3.event.enterFrame] = this.onEnterFrame,
-		[events.optionsMenuOpened] = this.onMenuOpened,
-		[events.optionsMenuClosed] = this.onMenuClosed,
+		lifetime = {
+			[events.optionsMenuOpened] = this.onMenuOpened,
+			[events.optionsMenuClosed] = this.onMenuClosed,
+		},
+		animation = {
+			[tes3.event.enterFrame] = this.onEnterFrame,
+		}
 	}
 
+	this.eventRegistrar.register(this.eventHandlers.lifetime)
+
 	return true, nil
+end
+
+---@public
+function this.uninitialize()
+	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
 end
 
 ---@public
@@ -212,12 +226,12 @@ end
 
 ---@private
 function this.enable()
-	this.eventRegistrar.register(this.eventHandlers)
+	this.eventRegistrar.register(this.eventHandlers.animation)
 end
 
 ---@private
 function this.disable()
-	this.eventRegistrar.unregister(this.eventHandlers)
+	this.eventRegistrar.unregister(this.eventHandlers.animation)
 end
 
 ---@private
