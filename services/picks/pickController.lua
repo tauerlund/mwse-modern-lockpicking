@@ -242,13 +242,17 @@ function this.breakPick()
 
 	local events = this.enums.events
 
-	local isLastOfStack = this.currentPick.item.count <= 1
+	local item = this.currentPick.item.object --[[@as tes3lockpick]]
+	local remainingCount = this.currentPick.item.count - 1
+	local isLastOfStack = remainingCount <= 0
 	this.inventoryController.removePick(this.currentPick, this.currentPickItemData)
 
 	---@type pickBrokenEventData
 	local eventData = {
 		pick = this.currentPick,
-		itemData = this.currentPickItemData
+		itemData = this.currentPickItemData,
+		item = item,
+		remainingCount = remainingCount,
 	}
 	event.trigger(events.pickBroken, eventData)
 

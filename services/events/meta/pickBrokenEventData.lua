@@ -2,3 +2,5 @@
 ---@class pickBrokenEventData
 ---@field public pick pick
 ---@field public itemData tes3itemData?
+---@field public item tes3lockpick Captured before the pick was removed from the inventory; safe to read even when the stack is gone
+---@field public remainingCount integer Number of picks of this type left in the inventory after the break

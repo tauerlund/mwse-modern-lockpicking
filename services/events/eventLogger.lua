@@ -103,9 +103,7 @@ end
 ---@private
 ---@param e pickBrokenEventData
 function this.onPickBroken(e)
-    local obj = e.pick.item.object
-    local name = obj and obj:isValid() and obj.name or "?"
-    this.logger:debug("%s broke", name)
+    this.logger:debug("%s broke", e.item.name)
 end
 
 return this
