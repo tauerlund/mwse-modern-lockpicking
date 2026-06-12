@@ -267,8 +267,8 @@ function this.updateTilt(delta)
 	local targetTiltZ = ((this.startCursorX - cursor.x) / viewportWidth) * constants.amplitude
 
 	local t = math.min(1, constants.lerpSpeed * delta)
-	this.currentTiltX = this.currentTiltX + (targetTiltX - this.currentTiltX) * t
-	this.currentTiltZ = this.currentTiltZ + (targetTiltZ - this.currentTiltZ) * t
+	this.currentTiltX = math.lerp(this.currentTiltX, targetTiltX, t)
+	this.currentTiltZ = math.lerp(this.currentTiltZ, targetTiltZ, t)
 end
 
 ---@private

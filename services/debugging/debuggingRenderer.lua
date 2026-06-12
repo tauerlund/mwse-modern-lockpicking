@@ -92,7 +92,7 @@ function this.onSweetSpotUpdated(e)
 
 	local constants = this.enums.constants.cylinder
 	local function clamp(angle)
-		return math.max(constants.targetRotationLeft, math.min(constants.targetRotationRight, angle))
+		return math.clamp(angle, constants.targetRotationLeft, constants.targetRotationRight)
 	end
 
 	this.addLine(clamp(e.center - e.radius), false)

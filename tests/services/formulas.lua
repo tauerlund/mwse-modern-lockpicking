@@ -223,6 +223,37 @@ function this.run(unitwind)
         this.expectNear(unitwind, focus, 1.136)
     end)
 
+    --- Pick break animation ---
+
+    unitwind:test("Random variance spans base times one plus-minus variance", function ()
+        unitwind:expect(this.formulas.randomVariance(-80, 0.25, 0)).toBe(-80)
+        unitwind:expect(this.formulas.randomVariance(-80, 0.25, 1)).toBe(-100)
+        unitwind:expect(this.formulas.randomVariance(-80, 0.25, -1)).toBe(-60)
+    end)
+
+    unitwind:test("Random variance keeps the direction up to a variance of 1", function ()
+        local extreme = this.formulas.randomVariance(-80, 1.0, -1)
+
+        unitwind:expect(extreme).toBe(0)
+    end)
+
+    unitwind:test("Random variance above 1 flips the direction on extreme rolls", function ()
+        local flipped = this.formulas.randomVariance(-80, 1.5, -1)
+
+        unitwind:expect(flipped > 0).toBe(true)
+    end)
+
+    unitwind:test("Break fall offset starts at rest and lands exactly at the fall distance", function ()
+        this.expectNear(unitwind, this.formulas.breakFallOffset(30, 8, 0), 0)
+        this.expectNear(unitwind, this.formulas.breakFallOffset(30, 8, 1), -30)
+    end)
+
+    unitwind:test("Break fall offset bounces upward before falling", function ()
+        local early = this.formulas.breakFallOffset(30, 8, 0.25)
+
+        unitwind:expect(early > 0).toBe(true)
+    end)
+
     unitwind:finish()
 end
 
@@ -262,13 +293,15 @@ function this.createTopPlane(direction, up, halfAngle, scale, w)
     return tes3vector4.new(normal.x, normal.y, normal.z, w)
 end
 
---- Compares floats via fixed-point formatting so failures log both numbers.
+--- Compares floats via formatting so failures log both numbers. Six
+--- significant figures: engine vectors store single-precision floats, so
+--- values that round-trip through them only carry ~7 significant digits.
 ---@private
 ---@param unitwind UnitWind
 ---@param actual number
 ---@param expected number
 function this.expectNear(unitwind, actual, expected)
-    unitwind:expect(string.format("%.9f", actual)).toBe(string.format("%.9f", expected))
+    unitwind:expect(string.format("%.6g", actual)).toBe(string.format("%.6g", expected))
 end
 
 return this

@@ -201,8 +201,8 @@ function this.onEnterFrame(e)
 	local targetYaw = ((this.startCursorX - cursor.x) / viewportWidth) * constants.amplitude
 
 	local t = math.min(1, constants.lerpSpeed * e.delta)
-	this.currentPitch = currentPitch + (targetPitch - currentPitch) * t
-	this.currentYaw = currentYaw + (targetYaw - currentYaw) * t
+	this.currentPitch = math.lerp(currentPitch, targetPitch, t)
+	this.currentYaw = math.lerp(currentYaw, targetYaw, t)
 
 	this.rotationBufferPitch:toRotationX(this.currentPitch)
 	this.rotationBufferYaw:toRotationZ(this.currentYaw)

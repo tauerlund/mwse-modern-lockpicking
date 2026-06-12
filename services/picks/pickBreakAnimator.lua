@@ -24,6 +24,10 @@ this.session = nil
 this.renderingStrategyController = nil
 
 ---@private
+---@type formulas
+this.formulas = nil
+
+---@private
 ---@type eventRegistrar
 this.eventRegistrar = nil
 
@@ -41,6 +45,7 @@ function this.initialize(services)
 	this.enums = services.enums
 	this.renderingStrategyController = services.renderingStrategyController
 	this.eventRegistrar = services.eventRegistrar
+	this.formulas = services.formulas
 
 	local events = services.enums.events
 
@@ -86,11 +91,6 @@ function this.onPickBroken(e)
 	local tipNode, handleNode = this.assignBreakRoles(ghostMesh, firstPiece, secondPiece)
 
 	local constants = this.enums.constants.picks.breakAnimation
-	local position = ghostMesh.translation
-
-	local function random(base, variance)
-		return base * (1 + (math.random() * 2 - 1) * variance)
-	end
 
 	local attachmentRotation = this.renderingStrategyController.getGhostAttachmentNode().worldTransform.rotation
 
@@ -105,8 +105,7 @@ function this.onPickBroken(e)
 		breakPhase = 0,
 		ghost = {
 			mesh = ghostMesh,
-			originalTranslation = position:copy(),
-			fallTargetTranslation = tes3vector3.new(position.x, position.y, position.z - constants.fallDistance),
+			originalTranslation = ghostMesh.translation:copy(),
 		},
 		tip = {
 			node = tipNode,
@@ -115,7 +114,8 @@ function this.onPickBroken(e)
 			originalRotation = tipNode.rotation:copy(),
 			originalTranslation = tipNode.translation:copy(),
 			targetTranslation = tipNode.translation + tipToScreen * constants.snapTranslation,
-			angleX = random(constants.snapAngle, constants.snapAngleVariance),
+			angleX = this.formulas.randomVariance(constants.snapAngle, constants.snapAngleVariance,
+				math.random() * 2 - 1),
 			angleZ = (math.random() * 2 - 1) * constants.snapAngleSideMax,
 		},
 		handle = {
@@ -123,7 +123,8 @@ function this.onPickBroken(e)
 			toScreen = handleToScreen,
 			fromScreen = handleToScreen:transpose(),
 			originalRotation = handleNode.rotation:copy(),
-			kickAngleX = random(constants.handleKickAngle, constants.handleKickAngleVariance),
+			kickAngleX = this.formulas.randomVariance(constants.handleKickAngle, constants.handleKickAngleVariance,
+				math.random() * 2 - 1),
 			kickAngleZ = (math.random() * 2 - 1) * constants.handleKickAngleSideMax,
 		},
 	}
@@ -213,13 +214,10 @@ function this.onEnterFrame(e)
 	local tip = state.tip
 	local handle = state.handle
 
-	-- Ease-out quadratic for snap; quadratic phase for gravity falloff
-	local t = 1 - (1 - state.breakPhase) ^ 2
-	local fallT = state.breakPhase * state.breakPhase
+	local t = math.ease.quadOut(state.breakPhase)
 
-	-- Ghost falls down with an initial upward bounce arc
-	local pos = ghost.originalTranslation:lerp(ghost.fallTargetTranslation, fallT)
-	pos.z = pos.z + constants.bounceHeight * math.sin(math.pi * state.breakPhase)
+	local pos = ghost.originalTranslation:copy()
+	pos.z = pos.z + this.formulas.breakFallOffset(constants.fallDistance, constants.bounceHeight, state.breakPhase)
 	ghost.mesh.translation = pos
 
 	-- Tip snaps away from handle

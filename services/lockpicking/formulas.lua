@@ -105,6 +105,30 @@ function this.dofFocusDistance(distance, unitsToMeters)
 	return distance * unitsToMeters
 end
 
+--- Randomized magnitude: scales base by (1 + roll * variance) for a roll in
+--- [-1, 1]. The result keeps the sign of base as long as variance <= 1;
+--- larger variances let extreme rolls flip the direction.
+---@public
+---@param base number
+---@param variance number
+---@param roll number
+---@return number
+function this.randomVariance(base, variance, roll)
+	return base * (1 + roll * variance)
+end
+
+--- Vertical offset of the falling broken pick: a gravity-like quadratic drop
+--- with a sine bounce arc on top. Starts at 0 and ends exactly at
+--- -fallDistance, since the bounce term vanishes at both ends.
+---@public
+---@param fallDistance number
+---@param bounceHeight number
+---@param phase number
+---@return number
+function this.breakFallOffset(fallDistance, bounceHeight, phase)
+	return bounceHeight * math.sin(math.pi * phase) - fallDistance * phase * phase
+end
+
 --- Based on the formula described here: https://en.uesp.net/wiki/Morrowind:Security
 --- A pick is eligible for a lock when this is greater than zero.
 ---@public
