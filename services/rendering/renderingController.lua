@@ -77,7 +77,7 @@ function this.applyDof()
     if this.settings.enableDof then
         local constants = this.enums.constants.rendering
         this.depthOfField["focus_distance"] = this.formulas.dofFocusDistance(
-            this.renderingStrategyController.getTargetDistance(), constants.unitsToMeters)
+            this.renderingStrategyController.getTargetDistance() - constants.focusBias, constants.unitsToMeters)
         this.depthOfField["focal_length"] = constants.focalLength
         this.depthOfField.enabled = true
     else
