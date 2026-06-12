@@ -342,6 +342,8 @@ end
 ---@private
 ---@param success boolean
 function this.endLockpicking(success)
+	this.disableInput()
+
 	---@type lockpickingEndedEventData
 	local eventData = {
 		session = this.session,
