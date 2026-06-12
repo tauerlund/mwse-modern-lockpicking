@@ -2,10 +2,6 @@
 local this = {}
 
 ---@private
----@type tes3reference
-this.activator = nil
-
----@private
 ---@type eventRegistrar
 this.eventRegistrar = nil
 
@@ -13,16 +9,20 @@ this.eventRegistrar = nil
 ---@type eventHandlers
 this.eventHandlers = nil
 
+---@private
+---@type enums
+this.enums = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
 function this.initialize(services)
+	this.enums = services.enums
 	this.eventRegistrar = services.eventRegistrar
 
 	local events = services.enums.events
 
 	this.eventHandlers = {
-		[events.lockpickingStarted] = this.onLockpickingStarted,
 		[events.lockpickingEnded] = this.onLockpickingEnded,
 	}
 
@@ -36,29 +36,42 @@ function this.uninitialize()
 end
 
 ---@private
----@param e lockpickingStartedEventData
-function this.onLockpickingStarted(e)
-	this.activator = e.session.activator
-end
-
----@private
 ---@param e lockpickingEndedEventData
 function this.onLockpickingEnded(e)
-	if not this.activator then
-		return
+	local activator = e.session.activator
+
+	if e.session.rotationAttempted and not tes3.hasOwnershipAccess({ target = activator }) then
+		local gmst = tes3.findGMST(tes3.gmst.iCrimeTresspass)
+		local crimeGoldAmount = gmst
+			and gmst.value ~= nil
+			and gmst.value
+			or this.enums.constants.locks.crimeGoldAmount
+
+		tes3.triggerCrime({
+			type = tes3.crimeType.trespass,
+			value = crimeGoldAmount --[[@as number]]
+		})
 	end
 
 	if e.success then
-		local activator = this.activator
 		tes3.unlock({
-			reference = activator --[[@as tes3reference]]
+			reference = activator
 		})
-		timer.delayOneFrame(function ()
-			tes3.player:activate(activator --[[@as tes3reference]])
-		end)
+		this.activateWithDelay(activator)
 	end
+end
 
-	this.activator = nil
+--- Activation needs to be delayed by 3 frames for crime detection to trigger when the activator is a door leading to another cell
+---@private
+---@param activator tes3reference
+function this.activateWithDelay(activator)
+	timer.delayOneFrame(function ()
+		timer.delayOneFrame(function ()
+			timer.delayOneFrame(function ()
+				tes3.player:activate(activator --[[@as tes3reference]])
+			end)
+		end)
+	end)
 end
 
 return this

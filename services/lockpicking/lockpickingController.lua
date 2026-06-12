@@ -97,6 +97,7 @@ function this.initialize(services)
 			[events.settingsUpdated] = this.onSettingsUpdated,
 			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
 			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
+			[events.rotationStarted] = this.onRotationStarted,
 		},
 		session = {
 			[tes3.event.keyUp] = this.onKeyUp,
@@ -214,6 +215,7 @@ function this.createSession(activator)
 	})
 	local pick = this.pickSpawner.spawn(lock, item)
 
+	---@type lockpickingSession
 	return {
 		activator = activator,
 		picks = picks,
@@ -223,6 +225,7 @@ function this.createSession(activator)
 		pick = pick,
 		sweetSpotCenter = math.random() * math.pi - (math.pi / 2),
 		paused = false,
+		rotationAttempted = false,
 	}
 end
 
@@ -336,6 +339,12 @@ function this.onLockpickingEnd(e)
 		pauseOn = { events.optionsMenuOpened },
 		resumeOn = { events.optionsMenuClosed },
 	})
+end
+
+---@private
+---@param _ rotationEventData
+function this.onRotationStarted(_)
+	this.session.rotationAttempted = true
 end
 
 ---@private

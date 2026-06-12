@@ -6,6 +6,7 @@ local enum = {
 	},
 	rootName = "ModernLockpicking:Root",
 	cameraRootZBufferName = "ModernLockpicking:NoDepth",
+	crimeGoldAmount = 5,
 }
 
 return enum
