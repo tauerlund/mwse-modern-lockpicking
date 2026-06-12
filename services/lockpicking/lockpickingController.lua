@@ -62,6 +62,13 @@ this.eventHandlers = {
 
 ---@public
 ---@param services serviceCollection
+---@return initializedService[]
+function this.dependencies(services)
+	return { services.pickBreakAnimator }
+end
+
+---@public
+---@param services serviceCollection
 ---@return boolean,string|nil
 function this.initialize(services)
 	this.settings = services.settings
