@@ -120,11 +120,10 @@ function this.onEnterFrame(e)
 	local constants = this.enums.constants.cylinder
 
 	if not (lock.rotatingClockwise or lock.rotatingCounterclockwise) then
-		if math.isclose(this.phase, 0, 0.04) then
+		if this.phase == 0 then
 			return
 		end
-		local multiplier = this.phase <= 0 and 1 or -1
-		this.updatePhase(multiplier, constants.resetSpeed, e.delta)
+		this.resetPhase(constants.resetSpeed, e.delta)
 	else
 		local multiplier = lock.rotatingCounterclockwise and 1 or -1
 		this.updatePhase(multiplier, constants.rotateSpeed, e.delta)
@@ -139,6 +138,19 @@ end
 ---@param delta number
 function this.updatePhase(multiplier, speed, delta)
 	this.phase = this.phase + (multiplier * speed * delta)
+end
+
+---@private
+---@param speed number
+---@param delta number
+function this.resetPhase(speed, delta)
+	local step = speed * delta
+	if step >= math.abs(this.phase) then
+		this.phase = 0
+	else
+		local multiplier = this.phase <= 0 and 1 or -1
+		this.phase = this.phase + (multiplier * step)
+	end
 end
 
 ---@private
