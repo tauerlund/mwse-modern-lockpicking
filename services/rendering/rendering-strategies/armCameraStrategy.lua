@@ -14,7 +14,11 @@ this.enums = nil
 this.eventRegistrar = nil
 
 ---@private
-this.sessionHandlers = {}
+---@type eventHandlerGroups
+this.eventHandlers = {
+	lifetime = {},
+	session = {}
+}
 
 ---@private
 ---@type niNode|nil
@@ -44,11 +48,17 @@ function this.initialize(services)
 
 	local events = this.enums.events
 
-	this.sessionHandlers = {
-		[tes3.event.enterFrame] = this.onEnterFrame,
-		[events.optionsMenuOpened] = this.onOptionsMenuOpened,
-		[events.optionsMenuClosed] = this.onOptionsMenuClosed,
+	this.eventHandlers = {
+		lifetime = {
+			[events.optionsMenuOpened] = this.onOptionsMenuOpened,
+			[events.optionsMenuClosed] = this.onOptionsMenuClosed,
+		},
+		session = {
+			[tes3.event.enterFrame] = this.onEnterFrame,
+		}
 	}
+
+	this.eventRegistrar.register(this.eventHandlers.lifetime)
 end
 
 ---@private
@@ -147,12 +157,12 @@ end
 
 ---@private
 function this.enable()
-	this.eventRegistrar.register(this.sessionHandlers)
+	this.eventRegistrar.register(this.eventHandlers.session)
 end
 
 ---@private
 function this.disable()
-	this.eventRegistrar.unregister(this.sessionHandlers)
+	this.eventRegistrar.unregister(this.eventHandlers.session)
 end
 
 ---@public
