@@ -2,7 +2,7 @@
 local this = {}
 
 ---@public
-this.enabled = false
+this.enabled = true
 
 ---@private
 this.root = "Data Files\\MWSE\\mods\\tauer\\modern-lockpicking\\tests"
