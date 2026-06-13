@@ -82,4 +82,7 @@ return {
 	[keys.mcmVisualsLabelLockDistance] = "Lock Distance",
 	[keys.mcmVisualsDescLockDistance] =
 	"Scales how far away the lock is placed during lockpicking. The distance automatically adapts to your screen aspect ratio and field of view; lower this to bring the lock closer, raise it to push the lock farther away.",
+	[keys.mcmVisualsLabelShowPickHealth] = "Show Pick Health",
+	[keys.mcmVisualsDescShowPickHealth] =
+	"When enabled, displays the active pick's current health in the lockpick list during lockpicking.",
 }

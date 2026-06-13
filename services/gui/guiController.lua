@@ -26,6 +26,22 @@ this.controls = nil
 this.picks = nil
 
 ---@private
+---@type tes3uiElement
+this.healthBlock = nil
+
+---@private
+---@type tes3uiElement
+this.healthLabel = nil
+
+---@private
+---@type pick|nil
+this.activePick = nil
+
+---@private
+---@type integer
+this.lastPickCondition = -1
+
+---@private
 ---@type number
 this.usesTooltipId = -1217 -- ID of the "Uses" row in the vanilla item tooltip, found by inspecting tooltip children
 
@@ -38,8 +54,11 @@ this.enums = nil
 this.eventRegistrar = nil
 
 ---@private
----@type eventHandlers
-this.eventHandlers = nil
+---@type eventHandlerGroups
+this.eventHandlers = {
+	lifetime = {},
+	session = {},
+}
 
 ---@public
 ---@param services serviceCollection
@@ -54,21 +73,37 @@ function this.initialize(services)
 	local events        = this.enums.events
 
 	this.eventHandlers  = {
-		[tes3.event.uiObjectTooltip] = this.onUiObjectTooltip,
-		[tes3.event.uiActivated] = { this.uiActivated, { filter = "MenuOptions" } },
-		[events.lockpickingStart] = this.onLockpickingStart,
-		[events.lockpickingEnded] = this.onLockpickingEnded,
-		[events.pickBroken] = this.onPickBroken,
+		lifetime = {
+			[tes3.event.uiObjectTooltip] = this.onUiObjectTooltip,
+			[tes3.event.uiActivated] = { this.uiActivated, { filter = "MenuOptions" } },
+			[events.lockpickingStart] = this.onLockpickingStart,
+			[events.lockpickingEnded] = this.onLockpickingEnded,
+			[events.pickBroken] = this.onPickBroken,
+			[events.pickCycled] = this.onPickCycled,
+		},
+		session = {
+			[tes3.event.enterFrame] = this.onEnterFrame,
+		},
 	}
 
-	this.eventRegistrar.register(this.eventHandlers)
+	this.eventRegistrar.register(this.eventHandlers.lifetime)
 
 	return true, nil
 end
 
 ---@public
 function this.uninitialize()
-	this.eventRegistrar.unregister(this.eventHandlers)
+	this.eventRegistrar.unregister(this.eventHandlers.lifetime)
+end
+
+---@private
+function this.enable()
+	this.eventRegistrar.register(this.eventHandlers.session)
+end
+
+---@private
+function this.disable()
+	this.eventRegistrar.unregister(this.eventHandlers.session)
 end
 
 ---@private
@@ -90,6 +125,7 @@ function this.start(e)
 	this.header = this.createHeader(e)
 	this.controls = this.createControls()
 	this.picks = this.createPicks(e.session.pick, e.session.picks, e.session.eligiblePicks)
+	this.enable()
 end
 
 ---@private
@@ -365,11 +401,38 @@ function this.createPicks(activePick, picks, eligiblePicks)
 			:build()
 	end
 
+	this.activePick = activePick
+	this.lastPickCondition = activePick.itemData and activePick.itemData.condition or -1
+
+	this.healthBlock = this.guiBuilder.createBlock({ parent = picksMenu })
+		:withFlowDirection(tes3.flowDirection.topToBottom)
+		:withAutoSize()
+		:withPadding({ all = 8 })
+		:withCallback(enums.events.settingsUpdated, function(element)
+			element.visible = this.settings.showPickHealth
+			if this.picks then this.picks:updateLayout() end
+		end)
+		:build()
+
+	this.healthBlock.visible = this.settings.showPickHealth
+
+	this.healthLabel = this.guiBuilder.createLabel({ parent = this.healthBlock })
+		:withColor(tes3ui.getPalette(tes3.palette.normalColor))
+		:build()
+
+	this.updateHealthLabel(activePick)
+
 	return picksMenu
 end
 
 ---@private
 function this.stop()
+	this.disable()
+	this.healthBlock = nil
+	this.healthLabel = nil
+	this.activePick = nil
+	this.lastPickCondition = -1
+
 	if this.header then
 		this.header:destroy()
 		this.header = nil
@@ -403,6 +466,47 @@ function this.onKeyBindsUpdated(element)
 end
 
 ---@private
+---@param pick pick
+function this.updateHealthLabel(pick)
+	local ratio = pick.itemData
+		and math.clamp(pick.itemData.condition / pick.item.object.maxCondition, 0, 1)
+		or 1
+	this.healthLabel.text = string.format(
+		"%s: %d%%",
+		this.translations.get(this.enums.translationKeys.tooltipPickHealth),
+		math.round(ratio * 100))
+	this.healthLabel.color = { 1 - ratio, ratio, 0 }
+	this.healthLabel:updateLayout()
+end
+
+---@private
+---@param e pickCycledEventData
+function this.onPickCycled(e)
+	this.activePick = e.pick
+	this.lastPickCondition = e.pick.itemData and e.pick.itemData.condition or -1
+	if not this.healthLabel or not this.settings.showPickHealth then
+		return
+	end
+	this.updateHealthLabel(e.pick)
+end
+
+---@private
+function this.onEnterFrame()
+	if not this.healthLabel or not this.activePick then
+		return
+	end
+	if not this.settings.showPickHealth then
+		return
+	end
+	local condition = this.activePick.itemData and this.activePick.itemData.condition or -1
+	if condition == this.lastPickCondition then
+		return
+	end
+	this.lastPickCondition = condition
+	this.updateHealthLabel(this.activePick)
+end
+
+---@private
 ---@param e pickBrokenEventData
 function this.onPickBroken(e)
 	if not this.picks then
@@ -413,7 +517,9 @@ function this.onPickBroken(e)
 
 	local objectId = e.item.id
 	local countLabel = this.picks:findChild(string.format(constants.picksCountLabelId, objectId))
-	if not countLabel then return end
+	if not countLabel then
+		return
+	end
 
 	local newCount = e.remainingCount
 

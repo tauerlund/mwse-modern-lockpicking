@@ -32,6 +32,15 @@ function this.initialize(template, services)
 		}),
 	})
 
+	page:createOnOffButton({
+		label = translations.get(translationKeys.mcmVisualsLabelShowPickHealth),
+		description = translations.get(translationKeys.mcmVisualsDescShowPickHealth),
+		variable = mwse.mcm.createTableVariable({
+			id = "showPickHealth",
+			table = settings,
+		}),
+	})
+
 	page:createSlider({
 		label = translations.get(translationKeys.mcmVisualsLabelLockDistance),
 		description = translations.get(translationKeys.mcmVisualsDescLockDistance),

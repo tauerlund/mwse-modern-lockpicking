@@ -22,6 +22,7 @@ this.defaults = {
     litRendering = true,
     enableDof = true,
     lockDistanceFactor = 1.0,
+    showPickHealth = true,
     allowEquipPicks = true,
     useLockComplexity = true,
     difficulty = {
