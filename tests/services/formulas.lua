@@ -2,7 +2,7 @@
 local this = {}
 
 ---@private
-this.formulas = require("tauer.modern-lockpicking.services.lockpicking.formulas")
+this.formulas = require("tauer.modern-lockpicking.services.shared.formulas")
 
 ---@public
 ---@param unitwind UnitWind
