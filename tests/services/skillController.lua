@@ -16,40 +16,44 @@ function this.run(unitwind)
     unitwind:mock(tes3, "mobilePlayer", this.mobilePlayer)
 
     unitwind:test("Stats modifier combines security, agility and luck", function ()
+        -- Arrange
         local skillController = this.setup({ security = 50, agility = 40, luck = 30 })
-
+        -- Act
         local result = skillController.getStatsModifier()
-
+        -- Assert
         unitwind:expect(result).toBe(50 + 40 / 5 + 30 / 10)
     end)
 
     unitwind:test("Success chance follows the vanilla security formula at full fatigue", function ()
+        -- Arrange
         local skillController = this.setup({ security = 40, normalizedFatigue = 1.0 })
         local pick = { object = { quality = 1.0 } }
         local lock = { level = 25 }
-
+        -- Act
         local result = skillController.getSuccessChance(pick, lock)
-
+        -- Assert
         unitwind:expect(result).toBe(40 * 1.25 - 25)
     end)
 
     unitwind:test("Success chance at zero fatigue uses the 0.75 floor", function ()
+        -- Arrange
         local skillController = this.setup({ security = 40, normalizedFatigue = 0 })
         local pick = { object = { quality = 1.0 } }
         local lock = { level = 30 }
-
+        -- Act
         local result = skillController.getSuccessChance(pick, lock)
-
+        -- Assert
         unitwind:expect(result).toBe(0)
     end)
 
     unitwind:test("Success chance scales with pick quality", function ()
+        -- Arrange
         local skillController = this.setup({ security = 40, normalizedFatigue = 1.0 })
         local pick = { object = { quality = 5.0 } }
         local lock = { level = 100 }
-
+        -- Act
         local result = skillController.getSuccessChance(pick, lock)
-
+        -- Assert
         unitwind:expect(result).toBe(40 * 5.0 * 1.25 - 100)
     end)
 
@@ -78,7 +82,7 @@ function this.setup(params)
     mobilePlayer.fatigue = { normalized = params.normalizedFatigue or 1.0 }
 
     local services = {
-        formulas = require("tauer.modern-lockpicking.services.lockpicking.formulas"),
+        formulas = require("tauer.modern-lockpicking.services.shared.formulas"),
         enums = {
             events = require("tauer.modern-lockpicking.services.events.enums.events"),
         },

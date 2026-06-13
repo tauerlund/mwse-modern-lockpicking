@@ -24,135 +24,147 @@ function this.run(unitwind)
     unitwind:start("Modern Lockpicking: pickSelector")
 
     unitwind:test("Initial selection returns first pick when nothing is saved or equipped", function ()
+        -- Arrange
         local pickSelector = this.setup()
         local picks = this.createPicks({ "apprentice" }, { "journeyman" }, { "master" })
-
+        -- Act
         local result = pickSelector.select({ picks = picks })
-
+        -- Assert
         unitwind:expect(result).toBe(picks[1])
     end)
 
     unitwind:test("Initial selection skips empty stacks", function ()
+        -- Arrange
         local pickSelector = this.setup()
         local picks = this.createPicks({ "apprentice", 0 }, { "journeyman" })
-
+        -- Act
         local result = pickSelector.select({ picks = picks })
-
+        -- Assert
         unitwind:expect(result).toBe(picks[2])
     end)
 
     unitwind:test("Initial selection prefers the last used pick in default mode", function ()
+        -- Arrange
         local pickSelector = this.setup({ lastPickId = "journeyman" })
         local picks = this.createPicks({ "apprentice" }, { "journeyman" }, { "master" })
-
+        -- Act
         local result = pickSelector.select({ picks = picks })
-
+        -- Assert
         unitwind:expect(result).toBe(picks[2])
     end)
 
     unitwind:test("Initial selection ignores the last used pick when it is ineligible", function ()
+        -- Arrange
         local pickSelector = this.setup({ lastPickId = "apprentice" })
         local picks = this.createPicks({ "apprentice" }, { "journeyman" })
-
+        -- Act
         local result = pickSelector.select({
             picks = picks,
             eligiblePicks = { journeyman = true },
         })
-
+        -- Assert
         unitwind:expect(result).toBe(picks[2])
     end)
 
     unitwind:test("Initial selection prefers the equipped pick in attack mode", function ()
+        -- Arrange
         local pickSelector = this.setup({
             activationStrategy = this.enums.activationStrategyNames.attack,
             equippedPickId = "master",
             lastPickId = "apprentice",
         })
         local picks = this.createPicks({ "apprentice" }, { "journeyman" }, { "master" })
-
+        -- Act
         local result = pickSelector.select({ picks = picks })
-
+        -- Assert
         unitwind:expect(result).toBe(picks[3])
     end)
 
     unitwind:test("Initial selection falls back to the first pick when nothing is eligible", function ()
+        -- Arrange
         local pickSelector = this.setup()
         local picks = this.createPicks({ "apprentice" }, { "journeyman" })
-
+        -- Act
         local result = pickSelector.select({
             picks = picks,
             eligiblePicks = {},
         })
-
+        -- Assert
         unitwind:expect(result).toBe(picks[1])
     end)
 
     --- Cycling ---
 
     unitwind:test("Cycling next advances to the next pick", function ()
+        -- Arrange
         local pickSelector = this.setup()
         local picks = this.createPicks({ "apprentice" }, { "journeyman" })
         pickSelector.select({ picks = picks })
-
+        -- Act
         local result = pickSelector.select({ picks = picks, direction = this.nextDirection })
-
+        -- Assert
         unitwind:expect(result).toBe(picks[2])
     end)
 
     unitwind:test("Cycling next wraps around at the end", function ()
+        -- Arrange
         local pickSelector = this.setup({ lastPickId = "master" })
         local picks = this.createPicks({ "apprentice" }, { "journeyman" }, { "master" })
         pickSelector.select({ picks = picks })
-
+        -- Act
         local result = pickSelector.select({ picks = picks, direction = this.nextDirection })
-
+        -- Assert
         unitwind:expect(result).toBe(picks[1])
     end)
 
     unitwind:test("Cycling previous wraps around at the start", function ()
+        -- Arrange
         local pickSelector = this.setup()
         local picks = this.createPicks({ "apprentice" }, { "journeyman" }, { "master" })
         pickSelector.select({ picks = picks })
-
+        -- Act
         local result = pickSelector.select({ picks = picks, direction = this.previousDirection })
-
+        -- Assert
         unitwind:expect(result).toBe(picks[3])
     end)
 
     unitwind:test("Cycling skips ineligible picks", function ()
+        -- Arrange
         local pickSelector = this.setup()
         local picks = this.createPicks({ "apprentice" }, { "journeyman" }, { "master" })
         pickSelector.select({
             picks = picks,
             eligiblePicks = { apprentice = true, master = true },
         })
-
+        -- Act
         local result = pickSelector.select({ picks = picks, direction = this.nextDirection })
-
+        -- Assert
         unitwind:expect(result).toBe(picks[3])
     end)
 
     unitwind:test("Cycling skips empty stacks", function ()
+        -- Arrange
         local pickSelector = this.setup()
         local picks = this.createPicks({ "apprentice" }, { "journeyman", 0 }, { "master" })
         pickSelector.select({ picks = picks })
-
+        -- Act
         local result = pickSelector.select({ picks = picks, direction = this.nextDirection })
-
+        -- Assert
         unitwind:expect(result).toBe(picks[3])
     end)
 
     unitwind:test("Cycling returns to the starting pick when no other pick is selectable", function ()
+        -- Arrange
         local pickSelector = this.setup()
         local picks = this.createPicks({ "apprentice" }, { "journeyman" }, { "master" })
         pickSelector.select({ picks = picks })
-
+        -- Act
         local result = pickSelector.select({
             picks = picks,
             direction = this.nextDirection,
             eligiblePicks = { apprentice = true },
         })
-
+        -- Assert
         unitwind:expect(result).toBe(picks[1])
     end)
 
@@ -160,30 +172,32 @@ function this.run(unitwind)
         -- Regression test: breaking the last pick in the array used to leave currentIndex out of
         -- range, and cycling with no eligible picks left would never hit either exit condition,
         -- freezing the game.
+        -- Arrange
         local pickSelector = this.setup({ lastPickId = "master" })
         local picks = this.createPicks({ "apprentice" }, { "journeyman" }, { "master" })
         pickSelector.select({ picks = picks })
-
+        -- Act
         local remainingPicks = this.createPicks({ "apprentice" }, { "journeyman" })
         local result = pickSelector.select({
             picks = remainingPicks,
             direction = this.nextDirection,
             eligiblePicks = {},
         })
-
+        -- Assert
         unitwind:expect(result).NOT.toBe(nil)
     end)
 
     unitwind:test("Eligible picks persist across calls when not passed again", function ()
+        -- Arrange
         local pickSelector = this.setup()
         local picks = this.createPicks({ "apprentice" }, { "journeyman" }, { "master" })
         pickSelector.select({
             picks = picks,
             eligiblePicks = { apprentice = true, master = true },
         })
-
+        -- Act
         local result = pickSelector.select({ picks = picks, direction = this.nextDirection })
-
+        -- Assert
         unitwind:expect(result).toBe(picks[3])
     end)
 

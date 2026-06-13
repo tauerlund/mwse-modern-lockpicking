@@ -12,54 +12,58 @@ function this.run(unitwind)
     --- Sweet spot radius ---
 
     unitwind:test("Sweet spot radius follows the difficulty formula", function ()
+        -- Act
         local radius = this.formulas.sweetSpotRadius({
             quality = 1.0,
             statsModifier = 30,
             lockLevel = 50,
             difficulty = this.createDifficulty(),
         })
-
+        -- Assert
         this.expectNear(unitwind, radius, math.pi * 30 / (50 * 5))
     end)
 
     unitwind:test("Sweet spot radius clamps at maxSweetSpotRadius", function ()
+        -- Act
         local radius = this.formulas.sweetSpotRadius({
             quality = 5.0,
             statsModifier = 100,
             lockLevel = 1,
             difficulty = this.createDifficulty({ maxSweetSpotRadius = 45 }),
         })
-
+        -- Assert
         unitwind:expect(radius).toBe(math.rad(45))
     end)
 
     unitwind:test("Sweet spot radius treats lock levels below 1 as level 1", function ()
+        -- Arrange
         local params = {
             quality = 1.0,
             statsModifier = 30,
             difficulty = this.createDifficulty(),
         }
-
+        -- Act
         params.lockLevel = 0
         local unleveled = this.formulas.sweetSpotRadius(params)
         params.lockLevel = 1
         local levelOne = this.formulas.sweetSpotRadius(params)
-
+        -- Assert
         unitwind:expect(unleveled).toBe(levelOne)
     end)
 
     unitwind:test("Sweet spot radius shrinks as the lock level rises", function ()
+        -- Arrange
         local params = {
             quality = 1.0,
             statsModifier = 30,
             difficulty = this.createDifficulty(),
         }
-
+        -- Act
         params.lockLevel = 50
         local easy = this.formulas.sweetSpotRadius(params)
         params.lockLevel = 100
         local hard = this.formulas.sweetSpotRadius(params)
-
+        -- Assert
         unitwind:expect(hard < easy).toBe(true)
     end)
 
@@ -69,140 +73,157 @@ function this.run(unitwind)
     local sweetSpot = { center = 0.25, radius = 0.5, gradientWidth = 0.25 }
 
     unitwind:test("Max angle is unlimited inside the sweet spot", function ()
+        -- Act
         local maxAngle = this.formulas.maxAngle({ pickAngle = 0.25, sweetSpot = sweetSpot, targetRotation = 2.0 })
-
+        -- Assert
         unitwind:expect(maxAngle).toBe(math.huge)
     end)
 
     unitwind:test("Max angle is unlimited exactly at the sweet spot edge", function ()
+        -- Act
         local maxAngle = this.formulas.maxAngle({ pickAngle = 0.75, sweetSpot = sweetSpot, targetRotation = 2.0 })
-
+        -- Assert
         unitwind:expect(maxAngle).toBe(math.huge)
     end)
 
     unitwind:test("Max angle falls linearly across the gradient", function ()
         -- Halfway into the gradient: overshoot 0.125 of gradientWidth 0.25.
+        -- Act
         local maxAngle = this.formulas.maxAngle({ pickAngle = 0.875, sweetSpot = sweetSpot, targetRotation = 2.0 })
-
+        -- Assert
         unitwind:expect(maxAngle).toBe(1.0)
     end)
 
     unitwind:test("Max angle reaches exactly zero at the edge of the gradient", function ()
+        -- Act
         local maxAngle = this.formulas.maxAngle({ pickAngle = 1.0, sweetSpot = sweetSpot, targetRotation = 2.0 })
-
+        -- Assert
         unitwind:expect(maxAngle).toBe(0)
     end)
 
     unitwind:test("Max angle stays zero beyond the gradient", function ()
+        -- Act
         local maxAngle = this.formulas.maxAngle({ pickAngle = 3.0, sweetSpot = sweetSpot, targetRotation = 2.0 })
-
+        -- Assert
         unitwind:expect(maxAngle).toBe(0)
     end)
 
     unitwind:test("Max angle is symmetric around the sweet spot center", function ()
+        -- Act
         local clockwise = this.formulas.maxAngle({ pickAngle = 0.875, sweetSpot = sweetSpot, targetRotation = 2.0 })
         local counterclockwise = this.formulas.maxAngle({
             pickAngle = -0.375,
             sweetSpot = sweetSpot,
             targetRotation = 2.0,
         })
-
+        -- Assert
         unitwind:expect(counterclockwise).toBe(clockwise)
     end)
 
     unitwind:test("Max angle with zero gradient width is zero, not a division by zero", function ()
+        -- Arrange
         ---@type sweetSpotUpdatedEventData
         local hardSpot = { center = 0.25, radius = 0.5, gradientWidth = 0 }
-
+        -- Act
         local maxAngle = this.formulas.maxAngle({ pickAngle = 1.0, sweetSpot = hardSpot, targetRotation = 2.0 })
-
+        -- Assert
         unitwind:expect(maxAngle).toBe(0)
     end)
 
     --- Damage rate ---
 
     unitwind:test("Damage rate is the base rate when there is no sweet spot yet", function ()
+        -- Act
         local rate = this.formulas.damageRate(nil, this.createDifficulty({ baseRate = 2 }))
-
+        -- Assert
         unitwind:expect(rate).toBe(2)
     end)
 
     unitwind:test("Damage rate is the base rate at the maximum sweet spot radius", function ()
+        -- Act
         local rate = this.formulas.damageRate(math.rad(45), this.createDifficulty())
-
+        -- Assert
         unitwind:expect(rate).toBe(1)
     end)
 
     unitwind:test("Damage rate grows as the sweet spot shrinks", function ()
         -- A quarter of the max radius gives sqrt(4) = 2x the base rate.
+        -- Act
         local rate = this.formulas.damageRate(math.rad(45) / 4, this.createDifficulty())
-
+        -- Assert
         unitwind:expect(rate).toBe(2)
     end)
 
     unitwind:test("Damage rate falls back to the base rate at zero radius", function ()
+        -- Act
         local rate = this.formulas.damageRate(0, this.createDifficulty())
-
+        -- Assert
         unitwind:expect(rate).toBe(1)
     end)
 
     --- Success chance ---
 
     unitwind:test("Success chance follows the vanilla security formula", function ()
+        -- Act
         local chance = this.formulas.successChance({
             statsModifier = 61,
             quality = 1.25,
             fatigueModifier = 1.0,
             lockLevel = 50,
         })
-
+        -- Assert
         unitwind:expect(chance).toBe(61 * 1.25 - 50)
     end)
 
     unitwind:test("Success chance is zero at the eligibility boundary", function ()
+        -- Act
         local chance = this.formulas.successChance({
             statsModifier = 40,
             quality = 1.0,
             fatigueModifier = 1.25,
             lockLevel = 50,
         })
-
+        -- Assert
         unitwind:expect(chance).toBe(0)
     end)
 
     --- Camera vertical tangent ---
 
     unitwind:test("Vertical tangent of a 90 degree FOV on a square viewport is 1", function ()
+        -- Act
         local verticalTan = this.formulas.verticalTanFromHorizontalFov(90, 1000, 1000)
-
+        -- Assert
         this.expectNear(unitwind, verticalTan, 1)
     end)
 
     unitwind:test("Vertical tangent matches across aspect ratios when the vertical FOV is equal", function ()
+        -- Act
         local ultrawide = this.formulas.verticalTanFromHorizontalFov(math.deg(2 * math.atan(2)), 3200, 900)
         local widescreen = this.formulas.verticalTanFromHorizontalFov(90, 1600, 900)
-
+        -- Assert
         this.expectNear(unitwind, ultrawide, widescreen)
     end)
 
     unitwind:test("Vertical tangent from the top culling plane recovers the half-angle", function ()
+        -- Arrange
         local halfAngle = math.rad(25)
         local direction = tes3vector3.new(0.6, 0.8, 0)
         local up = tes3vector3.new(0, 0, 1)
         local plane = this.createTopPlane(direction, up, halfAngle, 1, 7)
-
+        -- Act
         local verticalTan = this.formulas.verticalTanFromCullingPlane({ plane = plane, direction = direction, up = up })
-
+        -- Assert
         this.expectNear(unitwind, verticalTan, math.tan(halfAngle))
     end)
 
     unitwind:test("Vertical tangent from the culling plane ignores normal orientation and length", function ()
+        -- Arrange
         local halfAngle = math.rad(30)
         local direction = tes3vector3.new(0, 1, 0)
         local up = tes3vector3.new(0, 0, 1)
         local inward = this.createTopPlane(direction, up, halfAngle, 1, 0)
         local outwardScaled = this.createTopPlane(direction, up, halfAngle, -3, 12)
-
+        -- Act
         local fromInward = this.formulas.verticalTanFromCullingPlane({
             plane = inward,
             direction = direction,
@@ -213,66 +234,75 @@ function this.run(unitwind)
             direction = direction,
             up = up,
         })
-
+        -- Assert
         this.expectNear(unitwind, fromInward, fromOutward)
     end)
 
     --- Lock target distance ---
 
     unitwind:test("Lock distance is the base distance at the reference tangent", function ()
+        -- Act
         local distance = this.formulas.lockTargetDistance(80, 0.5, 0.5, 1.0)
-
+        -- Assert
         unitwind:expect(distance).toBe(80)
     end)
 
     unitwind:test("Lock distance halves when the vertical tangent doubles", function ()
+        -- Act
         local distance = this.formulas.lockTargetDistance(80, 0.5, 1.0, 1.0)
-
+        -- Assert
         unitwind:expect(distance).toBe(40)
     end)
 
     unitwind:test("Lock distance scales linearly with the player's distance factor", function ()
+        -- Act
         local distance = this.formulas.lockTargetDistance(80, 0.5, 0.5, 1.5)
-
+        -- Assert
         unitwind:expect(distance).toBe(120)
     end)
 
     --- DOF focus distance ---
 
     unitwind:test("DOF focus is the lock's depth in meters", function ()
+        -- Act
         local focus = this.formulas.dofFocusDistance({ distance = 80, unitsToMeters = 0.0142 })
-
+        -- Assert
         this.expectNear(unitwind, focus, 1.136)
     end)
 
     --- Pick break animation ---
 
     unitwind:test("Random variance spans base times one plus-minus variance", function ()
+        -- Assert
         unitwind:expect(this.formulas.randomVariance({ base = -80, variance = 0.25, roll = 0 })).toBe(-80)
         unitwind:expect(this.formulas.randomVariance({ base = -80, variance = 0.25, roll = 1 })).toBe(-100)
         unitwind:expect(this.formulas.randomVariance({ base = -80, variance = 0.25, roll = -1 })).toBe(-60)
     end)
 
     unitwind:test("Random variance keeps the direction up to a variance of 1", function ()
+        -- Act
         local extreme = this.formulas.randomVariance({ base = -80, variance = 1.0, roll = -1 })
-
+        -- Assert
         unitwind:expect(extreme).toBe(0)
     end)
 
     unitwind:test("Random variance above 1 flips the direction on extreme rolls", function ()
+        -- Act
         local flipped = this.formulas.randomVariance({ base = -80, variance = 1.5, roll = -1 })
-
+        -- Assert
         unitwind:expect(flipped > 0).toBe(true)
     end)
 
     unitwind:test("Break fall offset starts at rest and lands exactly at the fall distance", function ()
+        -- Assert
         this.expectNear(unitwind, this.formulas.breakFallOffset(30, 8, 0), 0)
         this.expectNear(unitwind, this.formulas.breakFallOffset(30, 8, 1), -30)
     end)
 
     unitwind:test("Break fall offset bounces upward before falling", function ()
+        -- Act
         local early = this.formulas.breakFallOffset(30, 8, 0.25)
-
+        -- Assert
         unitwind:expect(early > 0).toBe(true)
     end)
 

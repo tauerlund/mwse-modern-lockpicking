@@ -10,75 +10,76 @@ function this.run(unitwind)
     unitwind:start("Modern Lockpicking: timerManager")
 
     unitwind:test("Started timer is active with the given duration", function ()
+        -- Arrange
         local cancel = this.eventName("duration")
-
+        -- Act
         local t = this.timerManager.start({
             durationInSeconds = 10,
             cancelOn = { cancel },
         })
-
+        -- Assert
         unitwind:expect(t.state).toBe(timer.active)
         unitwind:expect(t.duration).toBe(10)
-
+        -- Cleanup
         event.trigger(cancel)
     end)
 
     unitwind:test("Cancellation event cancels the timer", function ()
+        -- Arrange
         local cancel = this.eventName("cancel")
-
         local t = this.timerManager.start({
             durationInSeconds = 10,
             cancelOn = { cancel },
         })
-
+        -- Act
         event.trigger(cancel)
-
+        -- Assert
         unitwind:expect(t.state).toBe(timer.expired)
     end)
 
     unitwind:test("Pause event pauses the timer", function ()
+        -- Arrange
         local pause = this.eventName("pause.pause")
         local cancel = this.eventName("pause.cancel")
-
         local t = this.timerManager.start({
             durationInSeconds = 10,
             pauseOn = { pause },
             cancelOn = { cancel },
         })
-
+        -- Act
         event.trigger(pause)
-
+        -- Assert
         unitwind:expect(t.state).toBe(timer.paused)
-
+        -- Cleanup
         event.trigger(cancel)
     end)
 
     unitwind:test("Resume event resumes a paused timer", function ()
+        -- Arrange
         local pause = this.eventName("resume.pause")
         local resume = this.eventName("resume.resume")
         local cancel = this.eventName("resume.cancel")
-
         local t = this.timerManager.start({
             durationInSeconds = 10,
             pauseOn = { pause },
             resumeOn = { resume },
             cancelOn = { cancel },
         })
-
         event.trigger(pause)
+        -- Act
         event.trigger(resume)
-
+        -- Assert
         unitwind:expect(t.state).toBe(timer.active)
-
+        -- Cleanup
         event.trigger(cancel)
     end)
 
     unitwind:test("Pause only affects the timer that registered it", function ()
+        -- Arrange
         local pauseA = this.eventName("isolation.pauseA")
         local cancelA = this.eventName("isolation.cancelA")
         local pauseB = this.eventName("isolation.pauseB")
         local cancelB = this.eventName("isolation.cancelB")
-
         local a = this.timerManager.start({
             durationInSeconds = 10,
             pauseOn = { pauseA },
@@ -89,17 +90,18 @@ function this.run(unitwind)
             pauseOn = { pauseB },
             cancelOn = { cancelB },
         })
-
+        -- Act
         event.trigger(pauseA)
-
+        -- Assert
         unitwind:expect(a.state).toBe(timer.paused)
         unitwind:expect(b.state).toBe(timer.active)
-
+        -- Cleanup
         event.trigger(cancelA)
         event.trigger(cancelB)
     end)
 
     unitwind:test("Cancellation unregisters all of the timer's event handlers", function ()
+        -- Arrange
         local cancelA = this.eventName("cleanup.cancelA")
         local cancelB = this.eventName("cleanup.cancelB")
         local pause = this.eventName("cleanup.pause")
@@ -123,9 +125,9 @@ function this.run(unitwind)
         })
 
         unitwind:unmock(event, "register")
-
+        -- Act
         event.trigger(cancelA)
-
+        -- Assert
         local stillRegistered = 0
         for _, entry in ipairs(recorded) do
             if event.isRegistered(entry.evt, entry.callback) then
