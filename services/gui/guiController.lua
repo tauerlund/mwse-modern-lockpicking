@@ -60,6 +60,9 @@ this.eventHandlers = {
 	session = {},
 }
 
+---@private
+this.lockpicking = false
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
@@ -110,12 +113,14 @@ end
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
 	this.start(e)
+	this.lockpicking = true
 end
 
 ---@private
 ---@param _ lockpickingEndedEventData
 function this.onLockpickingEnded(_)
 	this.stop()
+	this.lockpicking = false
 end
 
 ---@private
@@ -408,7 +413,7 @@ function this.createPicks(activePick, picks, eligiblePicks)
 		:withFlowDirection(tes3.flowDirection.topToBottom)
 		:withAutoSize()
 		:withPadding({ all = 8 })
-		:withCallback(enums.events.settingsUpdated, function(element)
+		:withCallback(enums.events.settingsUpdated, function (element)
 			element.visible = this.settings.showPickHealth
 			if this.picks then this.picks:updateLayout() end
 		end)
@@ -538,6 +543,11 @@ end
 ---@param e uiObjectTooltipEventData
 function this.onUiObjectTooltip(e)
 	if not this.settings.enabled then
+		return
+	end
+
+	if this.lockpicking then
+		e.tooltip:destroy()
 		return
 	end
 
