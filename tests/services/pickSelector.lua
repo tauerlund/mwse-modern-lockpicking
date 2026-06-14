@@ -238,7 +238,7 @@ function this.setup(params)
 
     local services = {
         playerController = {
-            resolve = function () return playerData end,
+            data = function () return playerData end,
         },
         inventoryController = {
             tryGetEquippedPick = function () return equippedPick end,
