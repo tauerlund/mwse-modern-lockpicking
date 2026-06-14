@@ -237,7 +237,7 @@ function this.setup(params)
     local equippedPick = params.equippedPickId and { id = params.equippedPickId } or nil
 
     local services = {
-        playerDataController = {
+        playerController = {
             resolve = function () return playerData end,
         },
         inventoryController = {

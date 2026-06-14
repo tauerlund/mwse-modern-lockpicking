@@ -14,8 +14,8 @@ this.currentIndex = 1
 this.eligiblePicks = nil
 
 ---@private
----@type playerDataController
-this.playerDataController = nil
+---@type playerController
+this.playerController = nil
 
 ---@private
 ---@type inventoryController
@@ -41,7 +41,7 @@ this.eventHandlers = nil
 ---@param services serviceCollection
 ---@return boolean, string|nil
 function this.initialize(services)
-    this.playerDataController = services.playerDataController
+    this.playerController = services.playerController
     this.inventoryController = services.inventoryController
     this.settings = services.settings
     this.enums = services.enums
@@ -83,7 +83,7 @@ function this.onLockpickingEnded()
         return
     end
 
-    local data = this.playerDataController.resolve()
+    local data = this.playerController.data()
     data.lastPickId = lastPick.id
 end
 
@@ -194,7 +194,7 @@ end
 ---@private
 ---@return string|nil
 function this.tryResolveLastPickId()
-    local data = this.playerDataController.resolve()
+    local data = this.playerController.data()
     return data.lastPickId
 end
 

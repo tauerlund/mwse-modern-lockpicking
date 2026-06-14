@@ -59,6 +59,7 @@ function this.initializeMod(_)
 		services.inventoryController,
 		services.eventLogger,
 		services.debuggingRenderer,
+		services.playerController,
 	}
 
 	this.initializer.initialize(services, initializedServices)

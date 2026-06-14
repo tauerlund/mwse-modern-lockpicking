@@ -56,7 +56,7 @@ local this = {
 
     translations = require("tauer.modern-lockpicking.services.translations.translations"),
 
-    playerDataController = require("tauer.modern-lockpicking.services.player.playerDataController"),
+    playerController = require("tauer.modern-lockpicking.services.player.playerController"),
 
     ---@class enums
     enums = {
