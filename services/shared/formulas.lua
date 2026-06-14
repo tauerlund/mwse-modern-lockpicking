@@ -5,16 +5,13 @@ local this = {}
 --- Baked sweet-spot baseline
 local sweetSpotBase = math.pi / 5
 
---- Baked default weighting exponents. Each MCM weight scales its exponent and
---- defaults to 1.0, so every difficulty slider reads "1.0 = default". Lock level
---- is steeper than linear by default so high-level locks tighten the sweet spot
---- faster than skill or quality widen it.
+--- Baked weighting exponents, scaled by each MCM weight (default 1.0). Lock level
+--- is steeper than linear so high-level locks tighten the sweet spot fast.
 local qualityBaseExponent = 1.0
 local securityBaseExponent = 1.0
 local lockLevelBaseExponent = 1.5
 
---- Baked gradient baseline (formerly the gradientFactor default of 2.0), so
---- gradientFactor reads as a multiplier on the default width, defaulting to 1.0.
+--- Baked gradient baseline; gradientFactor is a multiplier on it (default 1.0).
 local gradientBase = 2.0
 
 ---@class sweetSpotRadiusParams
@@ -23,14 +20,10 @@ local gradientBase = 2.0
 ---@field public lockLevel number
 ---@field public difficulty difficultySettings
 
---- Sweet spot radius in radians, clamped between difficulty.minSweetSpotRadius and
---- difficulty.maxSweetSpotRadius (degrees). The floor keeps locks pickable even when
---- difficulty is cranked up far enough to otherwise drive the radius toward zero.
---- Quality, security skill and lock level each enter as a weighting exponent
---- scaled by its MCM weight (all weights default to 1.0). A weight on a different
---- input cannot be folded into the others, so the three knobs stay distinct.
---- Independent of successChance, which keeps the exact vanilla eligibility
---- formula untouched.
+--- Sweet spot radius in radians, clamped to [minSweetSpotRadius, maxSweetSpotRadius]
+--- (degrees); the floor keeps locks pickable at extreme difficulty. Quality, security
+--- skill and lock level each scale a distinct weighting exponent, so the three weights
+--- stay independent. Does not touch successChance (vanilla eligibility).
 ---@public
 ---@param params sweetSpotRadiusParams
 ---@return number
@@ -43,8 +36,7 @@ function this.sweetSpotRadius(params)
 	return math.clamp(radius, math.rad(difficulty.minSweetSpotRadius), math.rad(difficulty.maxSweetSpotRadius))
 end
 
---- Width of the gradient zone (in radians) outside the sweet spot. gradientFactor
---- is a multiplier on the baked default width (1.0 = default).
+--- Gradient zone width (radians) outside the sweet spot; gradientFactor multiplies the default.
 ---@public
 ---@param radius number
 ---@param difficulty difficultySettings
@@ -79,17 +71,27 @@ function this.maxAngle(params)
 	return params.targetRotation * fraction
 end
 
---- Pick damage per second; smaller sweet spots damage picks faster.
+--- Pick damage per second as a fraction (0-1) of max health (the caller multiplies by
+--- maxCondition), interpolated from minDamageRate at the largest sweet spot to
+--- maxDamageRate at the smallest. Sweet-spot size sets where in [min, max] it lands,
+--- measured as sqrt(maxRadius / radius) so tight locks ramp up faster.
 ---@public
 ---@param sweetSpotRadius number|nil
 ---@param difficulty difficultySettings
 ---@return number
 function this.damageRate(sweetSpotRadius, difficulty)
+	local minRate = difficulty.minDamageRate
 	if not sweetSpotRadius or sweetSpotRadius <= 0 then
-		return difficulty.baseRate
+		return minRate
 	end
 	local maxRadius = math.rad(difficulty.maxSweetSpotRadius)
-	return difficulty.baseRate * math.sqrt(maxRadius / sweetSpotRadius)
+	local minRadius = math.rad(difficulty.minSweetSpotRadius)
+	local span = math.sqrt(maxRadius / minRadius) - 1
+	if span <= 0 then
+		return minRate
+	end
+	local t = (math.sqrt(maxRadius / sweetSpotRadius) - 1) / span
+	return math.lerp(minRate, difficulty.maxDamageRate, math.clamp(t, 0, 1))
 end
 
 --- Tangent of a camera's vertical half-angle, derived from a horizontal

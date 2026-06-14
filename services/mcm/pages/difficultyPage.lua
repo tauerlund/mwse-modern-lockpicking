@@ -93,16 +93,28 @@ function this.initialize(template, services)
 			.mcmDifficultyCategoryPickDamage)
 	})
 
-	pickDamageCategory:createSlider({
-		label = translations.get(translationKeys.mcmDifficultyLabelBaseRate),
-		description = translations.get(translationKeys.mcmDifficultyDescBaseRate),
-		min = 0.1,
-		max = 5.0,
-		step = 0.1,
-		jump = 0.5,
-		decimalPlaces = 1,
+	pickDamageCategory:createPercentageSlider({
+		label = translations.get(translationKeys.mcmDifficultyLabelMinDamage),
+		description = translations.get(translationKeys.mcmDifficultyDescMinDamage),
+		min = 0.01,
+		max = 0.99,
+		step = 0.01,
+		jump = 0.05,
 		variable = mwse.mcm.createTableVariable({
-			id = "baseRate",
+			id = "minDamageRate",
+			table = settings.mcm.difficulty,
+		}),
+	})
+
+	pickDamageCategory:createPercentageSlider({
+		label = translations.get(translationKeys.mcmDifficultyLabelMaxDamage),
+		description = translations.get(translationKeys.mcmDifficultyDescMaxDamage),
+		min = 0.01,
+		max = 0.99,
+		step = 0.01,
+		jump = 0.05,
+		variable = mwse.mcm.createTableVariable({
+			id = "maxDamageRate",
 			table = settings.mcm.difficulty,
 		}),
 	})

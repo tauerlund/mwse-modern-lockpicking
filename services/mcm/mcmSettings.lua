@@ -30,9 +30,10 @@ this.defaults = {
         lockLevelWeight = 1.0,
         qualityWeight = 1.0,
         gradientFactor = 1.0,
-        minSweetSpotRadius = 0.5,
+        minSweetSpotRadius = 0.1,
         maxSweetSpotRadius = 45,
-        baseRate = 1.0,
+        minDamageRate = 0.50,
+        maxDamageRate = 0.90,
         damageSkeletonKey = false,
     },
     debugging = {

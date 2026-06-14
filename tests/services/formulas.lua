@@ -197,31 +197,55 @@ function this.run(unitwind)
 
     --- Damage rate ---
 
-    unitwind:test("Damage rate is the base rate when there is no sweet spot yet", function ()
+    -- minSweetSpotRadius 5, maxSweetSpotRadius 45 gives a span of sqrt(45/5) - 1 = sqrt(9) - 1 = 2.
+    local function damageDifficulty(overrides)
+        overrides = overrides or {}
+        overrides.minSweetSpotRadius = overrides.minSweetSpotRadius or 5
+        overrides.maxSweetSpotRadius = overrides.maxSweetSpotRadius or 45
+        overrides.minDamageRate = overrides.minDamageRate or 1
+        overrides.maxDamageRate = overrides.maxDamageRate or 5
+        return this.createDifficulty(overrides)
+    end
+
+    unitwind:test("Damage rate is the min rate when there is no sweet spot yet", function ()
         -- Act
-        local rate = this.formulas.damageRate(nil, this.createDifficulty({ baseRate = 2 }))
+        local rate = this.formulas.damageRate(nil, damageDifficulty({ minDamageRate = 2 }))
         -- Assert
         unitwind:expect(rate).toBe(2)
     end)
 
-    unitwind:test("Damage rate is the base rate at the maximum sweet spot radius", function ()
+    unitwind:test("Damage rate is the min rate at the largest sweet spot", function ()
         -- Act
-        local rate = this.formulas.damageRate(math.rad(45), this.createDifficulty())
+        local rate = this.formulas.damageRate(math.rad(45), damageDifficulty())
         -- Assert
         unitwind:expect(rate).toBe(1)
     end)
 
-    unitwind:test("Damage rate grows as the sweet spot shrinks", function ()
-        -- A quarter of the max radius gives sqrt(4) = 2x the base rate.
+    unitwind:test("Damage rate is the max rate at the smallest sweet spot", function ()
         -- Act
-        local rate = this.formulas.damageRate(math.rad(45) / 4, this.createDifficulty())
+        local rate = this.formulas.damageRate(math.rad(5), damageDifficulty())
         -- Assert
-        unitwind:expect(rate).toBe(2)
+        unitwind:expect(rate).toBe(5)
     end)
 
-    unitwind:test("Damage rate falls back to the base rate at zero radius", function ()
+    unitwind:test("Damage rate interpolates between min and max by sweet spot size", function ()
+        -- sqrt(45 / 11.25) = 2, so t = (2 - 1) / 2 = 0.5, landing halfway: lerp(1, 5, 0.5) = 3.
         -- Act
-        local rate = this.formulas.damageRate(0, this.createDifficulty())
+        local rate = this.formulas.damageRate(math.rad(11.25), damageDifficulty())
+        -- Assert
+        this.expectNear(unitwind, rate, 3)
+    end)
+
+    unitwind:test("Damage rate clamps to the max rate below the smallest sweet spot", function ()
+        -- Act
+        local rate = this.formulas.damageRate(math.rad(1), damageDifficulty())
+        -- Assert
+        unitwind:expect(rate).toBe(5)
+    end)
+
+    unitwind:test("Damage rate falls back to the min rate at zero radius", function ()
+        -- Act
+        local rate = this.formulas.damageRate(0, damageDifficulty())
         -- Assert
         unitwind:expect(rate).toBe(1)
     end)
@@ -387,7 +411,8 @@ function this.createDifficulty(overrides)
         gradientFactor = 1.0,
         minSweetSpotRadius = 0,
         maxSweetSpotRadius = 45,
-        baseRate = 1,
+        minDamageRate = 1,
+        maxDamageRate = 5,
         damageSkeletonKey = false,
     }
     for key, value in pairs(overrides or {}) do

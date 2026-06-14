@@ -197,8 +197,9 @@ end
 ---@param delta number
 function this.damagePick(delta)
 	local itemData = this.ensurePickItemData()
-	local rate = this.computeDamageRate()
-	this.damageAccumulator = this.damageAccumulator + rate * delta
+	local maxCondition = this.currentPick.item.object.maxCondition
+	local fractionPerSecond = this.computeDamageRate()
+	this.damageAccumulator = this.damageAccumulator + fractionPerSecond * maxCondition * delta
 
 	local intDamage = math.floor(this.damageAccumulator)
 	if intDamage >= 1 then

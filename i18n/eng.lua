@@ -50,9 +50,12 @@ return {
 	[keys.mcmDifficultyDescGradientFactor] =
 	"Width of the gradient zone outside the sweet spot. 1.0 is the default; higher values widen the forgiving zone.",
 	[keys.mcmDifficultyCategoryPickDamage] = "Pick Damage",
-	[keys.mcmDifficultyLabelBaseRate] = "Base Damage Rate",
-	[keys.mcmDifficultyDescBaseRate] =
-	"Pick damage per second when the sweet spot is at maximum size. Scales up as the sweet spot shrinks.",
+	[keys.mcmDifficultyLabelMinDamage] = "Min Pick Damage",
+	[keys.mcmDifficultyDescMinDamage] =
+	"Pick damage per second, as a percent of the pick's maximum health, at the largest sweet spot (easiest locks). Raise this if picks last too long. The rate rises toward Max as the sweet spot shrinks.",
+	[keys.mcmDifficultyLabelMaxDamage] = "Max Pick Damage",
+	[keys.mcmDifficultyDescMaxDamage] =
+	"Pick damage per second, as a percent of the pick's maximum health, at the smallest sweet spot (hardest locks). The rate is always between Min and Max; sweet-spot size decides where it lands.",
 	[keys.mcmDifficultyTextResetToDefaults] = "Reset",
 	[keys.mcmDifficultyLabelResetToDefaults] = "Reset to Defaults",
 	[keys.mcmDifficultyDescResetToDefaults] = "Reset all difficulty settings to their default values.",
