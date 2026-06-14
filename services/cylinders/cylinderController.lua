@@ -124,6 +124,10 @@ end
 ---@private
 ---@param _ enterFrameEventData
 function this.onEnterFrame(_)
+	if not this.session then
+		return
+	end
+
 	local lock = this.session.lock
 	if this.session.paused or lock.blocked or not (lock.rotatingCounterclockwise or lock.rotatingClockwise) then
 		return
@@ -171,6 +175,10 @@ end
 ---@private
 ---@param e keyDownEventData
 function this.onKeyDown(e)
+	if not this.session then
+		return
+	end
+
 	if this.rotationKeyCodeToRotationDirectionMap[e.keyCode] then
 		this.onRotationKeyDown(e)
 	end
@@ -179,6 +187,10 @@ end
 ---@private
 ---@param e keyUpEventData
 function this.onKeyUp(e)
+	if not this.session then
+		return
+	end
+
 	if this.rotationKeyCodeToRotationDirectionMap[e.keyCode] then
 		this.onRotationKeyUp(e)
 	end
