@@ -22,13 +22,13 @@ function this.initialize(template, services)
 	sweetSpotCategory:createSlider({
 		label = translations.get(translationKeys.mcmDifficultyLabelSecurityFactor),
 		description = translations.get(translationKeys.mcmDifficultyDescSecurityFactor),
-		min = 0.1,
-		max = 10.0,
+		min = 0.5,
+		max = 3.0,
 		step = 0.1,
 		jump = 0.5,
 		decimalPlaces = 1,
 		variable = mwse.mcm.createTableVariable({
-			id = "securityFactor",
+			id = "securityWeight",
 			table = settings.mcm.difficulty,
 		}),
 	})
@@ -36,13 +36,13 @@ function this.initialize(template, services)
 	sweetSpotCategory:createSlider({
 		label = translations.get(translationKeys.mcmDifficultyLabelLockLevelFactor),
 		description = translations.get(translationKeys.mcmDifficultyDescLockLevelFactor),
-		min = 0.1,
-		max = 20.0,
+		min = 0.5,
+		max = 3.0,
 		step = 0.1,
-		jump = 1.0,
+		jump = 0.5,
 		decimalPlaces = 1,
 		variable = mwse.mcm.createTableVariable({
-			id = "lockLevelFactor",
+			id = "lockLevelWeight",
 			table = settings.mcm.difficulty,
 		}),
 	})
@@ -50,13 +50,27 @@ function this.initialize(template, services)
 	sweetSpotCategory:createSlider({
 		label = translations.get(translationKeys.mcmDifficultyLabelQualityFactor),
 		description = translations.get(translationKeys.mcmDifficultyDescQualityFactor),
-		min = 0.1,
-		max = 5.0,
+		min = 0.5,
+		max = 3.0,
 		step = 0.1,
 		jump = 0.5,
 		decimalPlaces = 1,
 		variable = mwse.mcm.createTableVariable({
-			id = "qualityFactor",
+			id = "qualityWeight",
+			table = settings.mcm.difficulty,
+		}),
+	})
+
+	sweetSpotCategory:createSlider({
+		label = translations.get(translationKeys.mcmDifficultyLabelMinRadius),
+		description = translations.get(translationKeys.mcmDifficultyDescMinRadius),
+		min = 0.1,
+		max = 10.0,
+		step = 0.1,
+		jump = 1.0,
+		decimalPlaces = 1,
+		variable = mwse.mcm.createTableVariable({
+			id = "minSweetSpotRadius",
 			table = settings.mcm.difficulty,
 		}),
 	})
@@ -111,7 +125,7 @@ function this.initialize(template, services)
 		label = translations.get(translationKeys.mcmDifficultyLabelGradientFactor),
 		description = translations.get(translationKeys.mcmDifficultyDescGradientFactor),
 		min = 0.0,
-		max = 10.0,
+		max = 3.0,
 		step = 0.1,
 		jump = 0.5,
 		decimalPlaces = 1,

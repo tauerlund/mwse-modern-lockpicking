@@ -2,22 +2,55 @@
 ---@class formulas
 local this = {}
 
+--- Baked sweet-spot baseline
+local sweetSpotBase = math.pi / 5
+
+--- Baked default weighting exponents. Each MCM weight scales its exponent and
+--- defaults to 1.0, so every difficulty slider reads "1.0 = default". Lock level
+--- is steeper than linear by default so high-level locks tighten the sweet spot
+--- faster than skill or quality widen it.
+local qualityBaseExponent = 1.0
+local securityBaseExponent = 1.0
+local lockLevelBaseExponent = 1.5
+
+--- Baked gradient baseline (formerly the gradientFactor default of 2.0), so
+--- gradientFactor reads as a multiplier on the default width, defaulting to 1.0.
+local gradientBase = 2.0
+
 ---@class sweetSpotRadiusParams
 ---@field public quality number
 ---@field public statsModifier number
 ---@field public lockLevel number
 ---@field public difficulty difficultySettings
 
---- Sweet spot radius in radians, clamped to difficulty.maxSweetSpotRadius (degrees).
+--- Sweet spot radius in radians, clamped between difficulty.minSweetSpotRadius and
+--- difficulty.maxSweetSpotRadius (degrees). The floor keeps locks pickable even when
+--- difficulty is cranked up far enough to otherwise drive the radius toward zero.
+--- Quality, security skill and lock level each enter as a weighting exponent
+--- scaled by its MCM weight (all weights default to 1.0). A weight on a different
+--- input cannot be folded into the others, so the three knobs stay distinct.
+--- Independent of successChance, which keeps the exact vanilla eligibility
+--- formula untouched.
 ---@public
 ---@param params sweetSpotRadiusParams
 ---@return number
 function this.sweetSpotRadius(params)
 	local difficulty = params.difficulty
-	local radius = math.pi * params.quality ^ difficulty.qualityFactor * params.statsModifier * difficulty
-		.securityFactor /
-		(math.max(1, params.lockLevel) * difficulty.lockLevelFactor)
-	return math.min(radius, math.rad(difficulty.maxSweetSpotRadius))
+	local radius = sweetSpotBase
+		* params.quality ^ (qualityBaseExponent * difficulty.qualityWeight)
+		* params.statsModifier ^ (securityBaseExponent * difficulty.securityWeight)
+		/ math.max(1, params.lockLevel) ^ (lockLevelBaseExponent * difficulty.lockLevelWeight)
+	return math.clamp(radius, math.rad(difficulty.minSweetSpotRadius), math.rad(difficulty.maxSweetSpotRadius))
+end
+
+--- Width of the gradient zone (in radians) outside the sweet spot. gradientFactor
+--- is a multiplier on the baked default width (1.0 = default).
+---@public
+---@param radius number
+---@param difficulty difficultySettings
+---@return number
+function this.gradientWidth(radius, difficulty)
+	return radius * gradientBase * difficulty.gradientFactor
 end
 
 ---@class maxAngleParams

@@ -11,10 +11,11 @@
 ---@field public exit keyBind
 
 ---@class difficultySettings
----@field public securityFactor number
----@field public lockLevelFactor number
----@field public qualityFactor number
+---@field public securityWeight number
+---@field public lockLevelWeight number
+---@field public qualityWeight number
 ---@field public gradientFactor number
+---@field public minSweetSpotRadius number
 ---@field public maxSweetSpotRadius number
 ---@field public baseRate number
 ---@field public damageSkeletonKey boolean

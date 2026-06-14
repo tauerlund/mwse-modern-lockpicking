@@ -20,7 +20,7 @@ function this.run(unitwind)
             difficulty = this.createDifficulty(),
         })
         -- Assert
-        this.expectNear(unitwind, radius, math.pi * 30 / (50 * 5))
+        this.expectNear(unitwind, radius, (math.pi / 5) * 30 / (50 ^ 1.5))
     end)
 
     unitwind:test("Sweet spot radius clamps at maxSweetSpotRadius", function ()
@@ -33,6 +33,18 @@ function this.run(unitwind)
         })
         -- Assert
         unitwind:expect(radius).toBe(math.rad(45))
+    end)
+
+    unitwind:test("Sweet spot radius is floored at minSweetSpotRadius", function ()
+        -- Act
+        local radius = this.formulas.sweetSpotRadius({
+            quality = 1.0,
+            statsModifier = 1,
+            lockLevel = 100,
+            difficulty = this.createDifficulty({ minSweetSpotRadius = 5 }),
+        })
+        -- Assert
+        unitwind:expect(radius).toBe(math.rad(5))
     end)
 
     unitwind:test("Sweet spot radius treats lock levels below 1 as level 1", function ()
@@ -65,6 +77,59 @@ function this.run(unitwind)
         local hard = this.formulas.sweetSpotRadius(params)
         -- Assert
         unitwind:expect(hard < easy).toBe(true)
+    end)
+
+    unitwind:test("Lock level weight steepens the gap between low and high locks", function ()
+        -- A pure scalar cannot change the ratio between two lock levels; a weight on the exponent can.
+        -- Arrange
+        local function ratio(weight)
+            local params = {
+                quality = 1.0,
+                statsModifier = 10,
+                difficulty = this.createDifficulty({ lockLevelWeight = weight, maxSweetSpotRadius = 89 }),
+            }
+            params.lockLevel = 10
+            local low = this.formulas.sweetSpotRadius(params)
+            params.lockLevel = 50
+            local high = this.formulas.sweetSpotRadius(params)
+            return low / high
+        end
+        -- Act
+        local baseline = ratio(1.0)
+        local steeper = ratio(1.5)
+        -- Assert
+        unitwind:expect(steeper > baseline).toBe(true)
+    end)
+
+    unitwind:test("Security weight steepens the reward for higher skill", function ()
+        -- Arrange
+        local function ratio(weight)
+            local difficulty = this.createDifficulty({ securityWeight = weight, maxSweetSpotRadius = 89 })
+            local weak = this.formulas.sweetSpotRadius({ quality = 1.0, statsModifier = 10, lockLevel = 80, difficulty = difficulty })
+            local strong = this.formulas.sweetSpotRadius({ quality = 1.0, statsModifier = 20, lockLevel = 80, difficulty = difficulty })
+            return strong / weak
+        end
+        -- Act
+        local baseline = ratio(1.0)
+        local steeper = ratio(1.5)
+        -- Assert
+        unitwind:expect(steeper > baseline).toBe(true)
+    end)
+
+    --- Gradient width ---
+
+    unitwind:test("Gradient width is twice the radius at the default factor", function ()
+        -- Act
+        local width = this.formulas.gradientWidth(0.5, this.createDifficulty())
+        -- Assert
+        this.expectNear(unitwind, width, 1.0)
+    end)
+
+    unitwind:test("Gradient width scales linearly with the gradient factor", function ()
+        -- Act
+        local width = this.formulas.gradientWidth(0.5, this.createDifficulty({ gradientFactor = 2.0 }))
+        -- Assert
+        this.expectNear(unitwind, width, 2.0)
     end)
 
     --- Max cylinder angle ---
@@ -316,10 +381,11 @@ end
 function this.createDifficulty(overrides)
     ---@type difficultySettings
     local difficulty = {
-        securityFactor = 1.0,
-        lockLevelFactor = 5.0,
-        qualityFactor = 1.0,
-        gradientFactor = 2.0,
+        securityWeight = 1.0,
+        lockLevelWeight = 1.0,
+        qualityWeight = 1.0,
+        gradientFactor = 1.0,
+        minSweetSpotRadius = 0,
         maxSweetSpotRadius = 45,
         baseRate = 1,
         damageSkeletonKey = false,

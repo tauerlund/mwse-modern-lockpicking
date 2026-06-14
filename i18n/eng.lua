@@ -32,20 +32,23 @@ return {
 	[keys.mcmHeaderDifficulty] = "Difficulty",
 	[keys.mcmDifficultyCategorySweetSpot] = "Sweet Spot",
 	[keys.mcmDifficultyCategoryGradient] = "Gradient",
-	[keys.mcmDifficultyLabelSecurityFactor] = "Security Factor",
+	[keys.mcmDifficultyLabelSecurityFactor] = "Security Weight",
 	[keys.mcmDifficultyDescSecurityFactor] =
-	"How much the security skill contributes to the sweet spot size. Higher values reward skill more.",
-	[keys.mcmDifficultyLabelLockLevelFactor] = "Lock Level Factor",
+	"How much the security skill contributes to the sweet spot size. 1.0 is the default; higher values reward skill more.",
+	[keys.mcmDifficultyLabelLockLevelFactor] = "Lock Level Weight",
 	[keys.mcmDifficultyDescLockLevelFactor] =
-	"How much the lock level shrinks the sweet spot. Higher values make locks harder.",
-	[keys.mcmDifficultyLabelQualityFactor] = "Quality Factor",
+	"How much the lock level shrinks the sweet spot. 1.0 is the default; higher values make high-level locks much harder.",
+	[keys.mcmDifficultyLabelQualityFactor] = "Quality Weight",
 	[keys.mcmDifficultyDescQualityFactor] =
-	"How much pick quality contributes to the sweet spot size. Higher values make pick choice matter more.",
+	"How much pick quality contributes to the sweet spot size. 1.0 is the default; higher values make pick choice matter more.",
+	[keys.mcmDifficultyLabelMinRadius] = "Min Sweet Spot Radius (degrees)",
+	[keys.mcmDifficultyDescMinRadius] =
+	"Floors the sweet spot size so locks stay pickable even at high difficulty.",
 	[keys.mcmDifficultyLabelMaxRadius] = "Max Sweet Spot Radius (degrees)",
 	[keys.mcmDifficultyDescMaxRadius] = "Caps the sweet spot size regardless of skill or pick quality.",
 	[keys.mcmDifficultyLabelGradientFactor] = "Gradient Factor",
 	[keys.mcmDifficultyDescGradientFactor] =
-	"Width of the gradient zone as a multiplier of the sweet spot radius.",
+	"Width of the gradient zone outside the sweet spot. 1.0 is the default; higher values widen the forgiving zone.",
 	[keys.mcmDifficultyCategoryPickDamage] = "Pick Damage",
 	[keys.mcmDifficultyLabelBaseRate] = "Base Damage Rate",
 	[keys.mcmDifficultyDescBaseRate] =
