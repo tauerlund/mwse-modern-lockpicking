@@ -367,6 +367,13 @@ function this.endLockpicking(success)
 	}
 	event.trigger(this.enums.events.lockpickingEnded, eventData)
 	this.session = nil
+
+	if success then
+		local message = tes3.findGMST(tes3.gmst.sLockSuccess)
+		if message and message.value then
+			tes3.messageBox(message.value --[[@as string]])
+		end
+	end
 end
 
 ---@private
