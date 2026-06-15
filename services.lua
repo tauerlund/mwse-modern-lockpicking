@@ -48,6 +48,7 @@ local this = {
     skillController = require("tauer.modern-lockpicking.services.skills.skillController"),
 
     soundController = require("tauer.modern-lockpicking.services.sounds.soundController"),
+    soundDurationCalculator = require("tauer.modern-lockpicking.services.sounds.soundDurationCalculator"),
     soundFileResolver = require("tauer.modern-lockpicking.services.sounds.soundFileResolver"),
 
     strategyLoader = require("tauer.modern-lockpicking.services.strategies.strategyLoader"),

@@ -19,11 +19,16 @@ this.empty = {
 ---@type enums
 this.enums = nil
 
+---@private
+---@type soundDurationCalculator
+this.soundDurationCalculator = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
 function this.initialize(services)
     this.enums = services.enums
+    this.soundDurationCalculator = services.soundDurationCalculator
 
     local paths = services.enums.constants.sounds.paths
 
@@ -87,17 +92,8 @@ end
 ---@param path string
 ---@return number
 function this.calculateDuration(path)
-    local constants = this.enums.constants.sounds
-
-    local fileSize = lfs.attributes(string.format("%s/%s", constants.paths.sound, path), "size")
-
-    local headerSize = constants.wav.headerSize
-    local sampleRate = constants.wav.sampleRate
-    local bytesPerSample = constants.wav.bytesPerSample
-
-    local bytesPerSecond = sampleRate * bytesPerSample
-
-    return (fileSize - headerSize) / bytesPerSecond
+    local fullPath = string.format("%s/%s", this.enums.constants.sounds.paths.sound, path)
+    return this.soundDurationCalculator.getDuration(fullPath)
 end
 
 return this
