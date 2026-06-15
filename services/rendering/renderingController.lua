@@ -8,6 +8,10 @@ this.pauseRenderingInMenus = false
 this.sessionActive = false
 
 ---@private
+---@type boolean
+this.culledFirstPerson = false
+
+---@private
 ---@type mgeShaderHandle|nil
 this.depthOfField = nil
 
@@ -96,7 +100,8 @@ function this.onLockpickingStart(_)
 
     this.applyDof()
 
-    if not tes3.mobilePlayer.is3rdPerson then
+    this.culledFirstPerson = not tes3.mobilePlayer.is3rdPerson
+    if this.culledFirstPerson then
         tes3.player1stPerson.sceneNode.appCulled = true
     end
 end
@@ -111,8 +116,9 @@ function this.onLockpickingEnded(_)
         this.depthOfField.enabled = false
     end
 
-    if not tes3.mobilePlayer.is3rdPerson then
+    if this.culledFirstPerson then
         tes3.player1stPerson.sceneNode.appCulled = false
+        this.culledFirstPerson = false
     end
 end
 
