@@ -41,24 +41,31 @@ function this.onLockpickingEnded(e)
 	local activator = e.session.activator
 
 	if e.session.rotationAttempted and not tes3.hasOwnershipAccess({ target = activator }) then
-		local gmst = tes3.findGMST(tes3.gmst.iCrimeTresspass)
-		local crimeGoldAmount = gmst
-			and gmst.value ~= nil
-			and gmst.value
-			or this.enums.constants.locks.crimeGoldAmount
-
-		tes3.triggerCrime({
-			type = tes3.crimeType.trespass,
-			value = crimeGoldAmount --[[@as number]]
-		})
+		this.triggerCrime()
 	end
 
 	if e.success then
 		tes3.unlock({
 			reference = activator
 		})
-		this.activateWithDelay(activator)
+		if not activator.lockNode.trap then
+			this.activateWithDelay(activator)
+		end
 	end
+end
+
+---@private
+function this.triggerCrime()
+	local gmst = tes3.findGMST(tes3.gmst.iCrimeTresspass)
+	local crimeGoldAmount = gmst
+		and gmst.value ~= nil
+		and gmst.value
+		or this.enums.constants.locks.crimeGoldAmount
+
+	tes3.triggerCrime({
+		type = tes3.crimeType.trespass,
+		value = crimeGoldAmount --[[@as number]]
+	})
 end
 
 --- Activation needs to be delayed by 3 frames for crime detection to trigger when the activator is a door leading to another cell
