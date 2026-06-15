@@ -218,7 +218,7 @@ function this.createControls()
 			fixedFrame = true,
 			modal = true
 		})
-		:withPositionAlign({ x = 0.5, y = 0.95 })
+		:withPositionAlign({ x = 0.5, y = 0.90 })
 		:withAutoSize()
 		:build()
 
@@ -323,7 +323,7 @@ function this.createPicks(activePick, picks, eligiblePicks)
 			modal = true
 		})
 		:withFlowDirection(tes3.flowDirection.topToBottom)
-		:withPositionAlign({ x = 0.75, y = 0.25 })
+		:withPositionAlign({ x = 0.8, y = 0.25 })
 		:withAutoSize()
 		:build()
 
