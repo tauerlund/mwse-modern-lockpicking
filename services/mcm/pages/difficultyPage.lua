@@ -97,7 +97,7 @@ function this.initialize(template, services)
 		label = translations.get(translationKeys.mcmDifficultyLabelMinDamage),
 		description = translations.get(translationKeys.mcmDifficultyDescMinDamage),
 		min = 0.01,
-		max = 0.99,
+		max = 2.00,
 		step = 0.01,
 		jump = 0.05,
 		variable = mwse.mcm.createTableVariable({
@@ -110,7 +110,7 @@ function this.initialize(template, services)
 		label = translations.get(translationKeys.mcmDifficultyLabelMaxDamage),
 		description = translations.get(translationKeys.mcmDifficultyDescMaxDamage),
 		min = 0.01,
-		max = 0.99,
+		max = 2.00,
 		step = 0.01,
 		jump = 0.05,
 		variable = mwse.mcm.createTableVariable({
