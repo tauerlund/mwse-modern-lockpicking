@@ -105,8 +105,20 @@ function this.run(unitwind)
         -- Arrange
         local function ratio(weight)
             local difficulty = this.createDifficulty({ securityWeight = weight, maxSweetSpotRadius = 89 })
-            local weak = this.formulas.sweetSpotRadius({ quality = 1.0, statsModifier = 10, lockLevel = 80, difficulty = difficulty })
-            local strong = this.formulas.sweetSpotRadius({ quality = 1.0, statsModifier = 20, lockLevel = 80, difficulty = difficulty })
+            local weak = this.formulas.sweetSpotRadius({
+                quality = 1.0,
+                statsModifier = 10,
+                lockLevel = 80,
+                difficulty =
+                    difficulty
+            })
+            local strong = this.formulas.sweetSpotRadius({
+                quality = 1.0,
+                statsModifier = 20,
+                lockLevel = 80,
+                difficulty =
+                    difficulty
+            })
             return strong / weak
         end
         -- Act
@@ -414,6 +426,7 @@ function this.createDifficulty(overrides)
         minDamageRate = 1,
         maxDamageRate = 5,
         damageSkeletonKey = false,
+        pickBreakSkillGain = 0,
     }
     for key, value in pairs(overrides or {}) do
         difficulty[key] = value

@@ -14,6 +14,10 @@ this.formulas = nil
 this.eventRegistrar = nil
 
 ---@private
+---@type settings
+this.settings = nil
+
+---@private
 ---@type eventHandlers
 this.eventHandlers = nil
 
@@ -24,11 +28,13 @@ function this.initialize(services)
 	this.enums = services.enums
 	this.formulas = services.formulas
 	this.eventRegistrar = services.eventRegistrar
+	this.settings = services.settings
 
 	local events = services.enums.events
 
 	this.eventHandlers = {
 		[events.lockpickingEnded] = this.onLockpickingEnded,
+		[events.pickBroken] = this.onPickBroken,
 	}
 
 	this.eventRegistrar.register(this.eventHandlers)
@@ -80,12 +86,19 @@ function this.onLockpickingEnded(e)
 end
 
 ---@private
-function this.exerciseSkill()
+---@param _ pickBrokenEventData
+function this.onPickBroken(_)
+	this.exerciseSkill(this.settings.difficulty.pickBreakSkillGain)
+end
+
+---@private
+---@param multiplier? number
+function this.exerciseSkill(multiplier)
 	local player = tes3.player.mobile --[[@as tes3mobilePlayer]]
 	local skill = tes3.getSkill(tes3.skill.security)
 	local increase = skill.actions[this.enums.constants.skills.action.lockpicking]
 
-	player:exerciseSkill(tes3.skill.security, increase)
+	player:exerciseSkill(tes3.skill.security, increase * (multiplier or 1))
 end
 
 return this

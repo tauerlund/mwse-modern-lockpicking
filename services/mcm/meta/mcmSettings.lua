@@ -20,6 +20,7 @@
 ---@field public minDamageRate number
 ---@field public maxDamageRate number
 ---@field public damageSkeletonKey boolean
+---@field public pickBreakSkillGain number
 
 ---@class debuggingSettings
 ---@field public showSweetSpotRenderer boolean

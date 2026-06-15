@@ -56,6 +56,10 @@ return {
 	[keys.mcmDifficultyLabelMaxDamage] = "Max Pick Damage",
 	[keys.mcmDifficultyDescMaxDamage] =
 	"Pick damage per second, as a percent of the pick's maximum health, at the smallest sweet spot (hardest locks). The rate is always between Min and Max; sweet-spot size decides where it lands.",
+	[keys.mcmDifficultyCategorySkill] = "Skill",
+	[keys.mcmDifficultyLabelPickBreakSkillGain] = "Skill Gain on Pick Breaks",
+	[keys.mcmDifficultyDescPickBreakSkillGain] =
+	"How much Security skill a broken pick grants, as a percent of the skill gain from a successful pick. Set to 0% for no skill gain on breaks.",
 	[keys.mcmDifficultyTextResetToDefaults] = "Reset",
 	[keys.mcmDifficultyLabelResetToDefaults] = "Reset to Defaults",
 	[keys.mcmDifficultyDescResetToDefaults] = "Reset all difficulty settings to their default values.",

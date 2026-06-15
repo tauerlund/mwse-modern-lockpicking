@@ -37,6 +37,7 @@ this.defaults = {
         minDamageRate = 0.50,
         maxDamageRate = 2.0,
         damageSkeletonKey = false,
+        pickBreakSkillGain = 0.1,
     },
     debugging = {
         showSweetSpotRenderer = false,

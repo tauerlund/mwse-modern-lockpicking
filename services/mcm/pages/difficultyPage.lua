@@ -128,6 +128,24 @@ function this.initialize(template, services)
 		}),
 	})
 
+	local skillCategory = page:createCategory({
+		label = translations.get(translationKeys
+			.mcmDifficultyCategorySkill)
+	})
+
+	skillCategory:createPercentageSlider({
+		label = translations.get(translationKeys.mcmDifficultyLabelPickBreakSkillGain),
+		description = translations.get(translationKeys.mcmDifficultyDescPickBreakSkillGain),
+		min = 0.0,
+		max = 1.0,
+		step = 0.01,
+		jump = 0.05,
+		variable = mwse.mcm.createTableVariable({
+			id = "pickBreakSkillGain",
+			table = settings.mcm.difficulty,
+		}),
+	})
+
 	local gradientCategory = page:createCategory({
 		label = translations.get(translationKeys
 			.mcmDifficultyCategoryGradient)
