@@ -56,7 +56,26 @@ function this.spawn(lock, pickItem)
 		mesh = pick,
 		item = pickItem,
 		helper = helper,
+		itemData = this.resolveItemData(pickItem),
 	}
+end
+
+---@private
+---@param pickItem tes3itemStack
+---@return tes3itemData|nil
+function this.resolveItemData(pickItem)
+	if not pickItem.variables then
+		return nil
+	end
+
+	local data = pickItem.variables[1]
+	for _, variable in ipairs(pickItem.variables) do
+		if variable.condition < data.condition then
+			data = variable
+		end
+	end
+
+	return data
 end
 
 ---@private

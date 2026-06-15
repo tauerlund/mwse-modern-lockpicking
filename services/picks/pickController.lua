@@ -113,7 +113,7 @@ end
 function this.onLockpickingStarted(e)
 	this.session = e.session
 	this.currentPick = e.session.pick
-	this.currentPickItemData = this.tryResolvePickItemData()
+	this.currentPickItemData = e.session.pick.itemData
 	this.enable()
 end
 
@@ -298,7 +298,7 @@ function this.cyclePick(direction)
 	this.damageAccumulator = 0
 	this.session.pick.damaging = false
 	this.currentPick = pick
-	this.currentPickItemData = this.tryResolvePickItemData()
+	this.currentPickItemData = pick.itemData
 
 	---@type pickCycledEventData
 	local eventData = {
@@ -306,25 +306,6 @@ function this.cyclePick(direction)
 		pick = pick,
 	}
 	event.trigger(this.enums.events.pickCycled, eventData)
-end
-
----@private
-function this.tryResolvePickItemData()
-	local item = this.currentPick.item
-
-	if item.variables then
-		local data = item.variables[1]
-		for _, variable in ipairs(item.variables) do
-			if variable.condition < data.condition then
-				data = variable
-			end
-		end
-		this.currentPick.itemData = data
-		return data
-	end
-
-	this.currentPick.itemData = nil
-	return nil
 end
 
 ---@private
