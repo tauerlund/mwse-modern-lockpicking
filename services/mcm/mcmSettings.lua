@@ -32,7 +32,7 @@ this.defaults = {
         gradientFactor = 1.0,
         minSweetSpotRadius = 0.1,
         maxSweetSpotRadius = 45,
-        minDamageRate = 0.40,
+        minDamageRate = 0.50,
         maxDamageRate = 2.0,
         damageSkeletonKey = false,
     },
