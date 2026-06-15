@@ -92,11 +92,11 @@ function this.createPointLight()
 	local light = niPointLight.new()
 
 	light.name = this.enums.objectNames.pointLight
-	light.diffuse = niColor.new(0.3, 0.25, 0.25)
+	light.diffuse = niColor.new(0.5, 0.45, 0.4)
 	light.ambient = niColor.new(0, 0, 0)
 	light.constantAttenuation = 1
 	light.linearAttenuation = 0
-	light.quadraticAttenuation = 0.001
+	light.quadraticAttenuation = 0.0001
 
 	return light
 end
@@ -149,7 +149,7 @@ function this.onEnterFrame()
 	local viewportWidth, viewportHeight = tes3.getViewportSize()
 	local x = (cursor.x / viewportWidth) * LIGHT_AMPLITUDE
 	local z = (cursor.y / viewportHeight) * LIGHT_AMPLITUDE
-	local translation = tes3vector3.new(x, this.getTargetDistance() - 15, z)
+	local translation = tes3vector3.new(x, this.getTargetDistance() - 45, z)
 
 	this.pointLight.translation = translation
 	this.pointLight:update()
