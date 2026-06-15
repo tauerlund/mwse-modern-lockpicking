@@ -49,7 +49,7 @@ return {
 	[keys.mcmDifficultyLabelGradientFactor] = "Gradient Factor",
 	[keys.mcmDifficultyDescGradientFactor] =
 	"Width of the gradient zone outside the sweet spot. 1.0 is the default; higher values widen the forgiving zone.",
-	[keys.mcmDifficultyCategoryPickDamage] = "Pick Damage",
+	[keys.mcmDifficultyCategoryPickDamage] = "Pick Damage (per second)",
 	[keys.mcmDifficultyLabelMinDamage] = "Min Pick Damage",
 	[keys.mcmDifficultyDescMinDamage] =
 	"Pick damage per second, as a percent of the pick's maximum health, at the largest sweet spot (easiest locks). Raise this if picks last too long. The rate rises toward Max as the sweet spot shrinks.",
