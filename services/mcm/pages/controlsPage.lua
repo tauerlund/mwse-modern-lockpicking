@@ -11,6 +11,7 @@ function this.initialize(template, services)
     local translationKeys = services.enums.translationKeys
 
     local activationStrategyNames = services.enums.activationStrategyNames
+    local openOnSuccessModes = services.enums.openOnSuccessModes
 
     local controlsPage = template:createSideBarPage { label = translations.get(translationKeys.interfaceControlsHeader) }
 
@@ -110,6 +111,20 @@ function this.initialize(template, services)
         description = translations.get(translationKeys.mcmUseLockComplexityDesc),
         variable = mwse.mcm.createTableVariable({
             id = "useLockComplexity",
+            table = settings,
+        }),
+    })
+
+    activationCategory:createCycleButton({
+        label = translations.get(translationKeys.mcmOpenOnSuccessLabel),
+        description = translations.get(translationKeys.mcmOpenOnSuccessDesc),
+        options = {
+            { text = translations.get(translationKeys.mcmOpenOnSuccessAlways),    value = openOnSuccessModes.always },
+            { text = translations.get(translationKeys.mcmOpenOnSuccessUntrapped), value = openOnSuccessModes.untrapped },
+            { text = translations.get(translationKeys.mcmOpenOnSuccessNever),     value = openOnSuccessModes.never },
+        },
+        variable = mwse.mcm.createTableVariable({
+            id = "openOnSuccess",
             table = settings,
         }),
     })

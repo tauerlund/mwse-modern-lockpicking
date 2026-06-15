@@ -13,11 +13,16 @@ this.eventHandlers = nil
 ---@type enums
 this.enums = nil
 
+---@private
+---@type settings
+this.settings = nil
+
 ---@public
 ---@param services serviceCollection
 ---@return boolean,string|nil
 function this.initialize(services)
 	this.enums = services.enums
+	this.settings = services.settings
 	this.eventRegistrar = services.eventRegistrar
 
 	local events = services.enums.events
@@ -48,10 +53,28 @@ function this.onLockpickingEnded(e)
 		tes3.unlock({
 			reference = activator
 		})
-		if not activator.lockNode.trap then
+		if this.shouldOpen(activator) then
 			this.activateWithDelay(activator)
 		end
 	end
+end
+
+---@private
+---@param activator tes3reference
+---@return boolean
+function this.shouldOpen(activator)
+	local modes = this.enums.openOnSuccessModes
+	local mode = this.settings.openOnSuccess
+
+	if mode == modes.never then
+		return false
+	end
+
+	if mode == modes.untrapped then
+		return not activator.lockNode.trap
+	end
+
+	return true
 end
 
 ---@private

@@ -1,5 +1,6 @@
 local activationStrategyNames = require(
     "tauer.modern-lockpicking.services.lockpicking.activation-strategies.enums.activationStrategyNames")
+local openOnSuccessModes = require("tauer.modern-lockpicking.services.locks.enums.openOnSuccessModes")
 
 ---@class mcmSettings
 local this = {}
@@ -25,6 +26,7 @@ this.defaults = {
     showPickHealth = false,
     allowEquipPicks = true,
     useLockComplexity = true,
+    openOnSuccess = openOnSuccessModes.untrapped,
     difficulty = {
         securityWeight = 1.0,
         lockLevelWeight = 1.0,

@@ -72,6 +72,12 @@ return {
 	[keys.mcmUseLockComplexityLabel] = "Respect lock complexity",
 	[keys.mcmUseLockComplexityDesc] =
 	"Blocks the player from entering the lockpicking mini-game if the lock is too complex (based on the same formula as the vanilla game).\n Note, this will also prevent lockpicks with too low quality to be selected for complex locks.",
+	[keys.mcmOpenOnSuccessLabel] = "Open on Success",
+	[keys.mcmOpenOnSuccessDesc] =
+	"What happens when a lock is successfully picked.\n'Always' unlocks and opens the object, even if it is trapped.\n'Untrapped' unlocks and opens the object only when it is not trapped.\n'Never' only unlocks the object, leaving it for you to open manually.",
+	[keys.mcmOpenOnSuccessAlways] = "Always",
+	[keys.mcmOpenOnSuccessUntrapped] = "Untrapped",
+	[keys.mcmOpenOnSuccessNever] = "Never",
 	[keys.mcmDifficultyLabelDamageSkeletonKey] = "Damage Skeleton Key",
 	[keys.mcmDifficultyDescDamageSkeletonKey] =
 	"When enabled, the Skeleton Key can be damaged and broken like any other lockpick. When disabled, it is indestructible.",
