@@ -63,6 +63,11 @@ end
 ---@param activator tes3reference
 ---@return boolean
 function this.shouldOpen(activator)
+	local lock = activator.lockNode
+	if not lock then
+		return true
+	end
+
 	local modes = this.enums.openOnSuccessModes
 	local mode = this.settings.openOnSuccess
 
@@ -71,7 +76,7 @@ function this.shouldOpen(activator)
 	end
 
 	if mode == modes.untrapped then
-		return not activator.lockNode.trap
+		return not lock.trap
 	end
 
 	return true
