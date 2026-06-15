@@ -60,6 +60,12 @@ function this.onLockPick(e)
         return
     end
 
+    -- The engine decrements pick condition before firing this event and e.block does
+    -- not undo it, so restore the spent point.
+    if e.toolItemData then
+        e.toolItemData.condition = math.min(e.toolItemData.condition + 1, e.tool.maxCondition)
+    end
+
     e.block = true
 
     local events = this.enums.events
