@@ -6,12 +6,8 @@ local this = {}
 this.currentPick = nil
 
 ---@private
----@type nodeAnimatonKeyframe[]
-this.startAnimationKeyFrames = nil
-
----@private
----@type nodeAnimatonKeyframe[]
-this.cycleAnimationKeyFrames = nil
+---@type pickOverrideResolver
+this.pickOverrideResolver = nil
 
 ---@private
 ---@type nodeAnimator
@@ -43,42 +39,9 @@ function this.initialize(services)
 	this.timerManager = services.timerManager
 	this.enums = services.enums
 	this.eventRegistrar = services.eventRegistrar
+	this.pickOverrideResolver = services.pickOverrideResolver
 
 	local events = services.enums.events
-	local constants = services.enums.constants.picks
-
-	local depthRotation = tes3matrix33.new()
-	depthRotation:fromEulerXYZ(
-		constants.rotation.target.x,
-		constants.rotation.target.y,
-		constants.rotation.target.z
-	)
-	local depthVec = depthRotation * tes3vector3.new(0, constants.translation.depthOffset, 0)
-
-	this.startAnimationKeyFrames = {
-		{
-			time = 0,
-			translation = constants.translation.original + depthVec,
-			rotation = constants.rotation.original,
-		},
-		{
-			time = constants.animation.startAnimationDuration,
-			translation = constants.translation.target + depthVec,
-			rotation = constants.rotation.target,
-		}
-	}
-	this.cycleAnimationKeyFrames = {
-		{
-			time = 0,
-			translation = constants.translation.original + depthVec,
-			rotation = constants.rotation.original,
-		},
-		{
-			time = constants.animation.cycleAnimationDuration,
-			translation = constants.translation.target + depthVec,
-			rotation = constants.rotation.target,
-		}
-	}
 
 	this.eventHandlers = {
 		lifetime = {
@@ -100,13 +63,47 @@ end
 ---@private
 ---@param e lockpickingStartEventData
 function this.onLockpickingStart(e)
-	this.startAnimation(e.session.pick, this.startAnimationKeyFrames)
+	local constants = this.enums.constants.picks
+	local keyframes = this.buildKeyframes(e.session.pick, constants.animation.startAnimationDuration)
+	this.startAnimation(e.session.pick, keyframes)
 end
 
 ---@private
 ---@param e pickCycledEventData
 function this.onPickCycled(e)
-	this.startAnimation(e.pick, this.cycleAnimationKeyFrames)
+	local constants = this.enums.constants.picks
+	local keyframes = this.buildKeyframes(e.pick, constants.animation.cycleAnimationDuration)
+	this.startAnimation(e.pick, keyframes)
+end
+
+---@private
+---@param pick pick
+---@param duration number
+---@return nodeAnimatonKeyframe[]
+function this.buildKeyframes(pick, duration)
+	local override = this.pickOverrideResolver.resolve(pick.item.object.mesh)
+	local constants = this.enums.constants.picks
+
+	local depthRotation = tes3matrix33.new()
+	depthRotation:fromEulerXYZ(
+		override.rotationTarget.x,
+		override.rotationTarget.y,
+		override.rotationTarget.z
+	)
+	local depthVec = depthRotation * tes3vector3.new(0, override.depthOffset, 0)
+
+	return {
+		{
+			time = 0,
+			translation = constants.translation.original + depthVec,
+			rotation = constants.rotation.original,
+		},
+		{
+			time = duration,
+			translation = constants.translation.target + depthVec,
+			rotation = override.rotationTarget,
+		},
+	}
 end
 
 ---@private

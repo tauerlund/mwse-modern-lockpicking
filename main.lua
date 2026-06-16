@@ -52,6 +52,7 @@ function this.initializeMod(_)
 		services.pickController,
 		services.pickSelector,
 		services.pickSpawner,
+		services.pickOverrideResolver,
 		services.pickSpawnAnimator,
 		services.pickSessionAnimator,
 		services.skillController,

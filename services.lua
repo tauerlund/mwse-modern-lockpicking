@@ -36,6 +36,7 @@ local this = {
 
     nodeAnimator = require("tauer.modern-lockpicking.services.nodes.nodeAnimator"),
 
+    pickOverrideResolver = require("tauer.modern-lockpicking.services.picks.pickOverrideResolver"),
     pickSpawnAnimator = require("tauer.modern-lockpicking.services.picks.pickSpawnAnimator"),
     pickSessionAnimator = require("tauer.modern-lockpicking.services.picks.pickSessionAnimator"),
     pickBreakAnimator = require("tauer.modern-lockpicking.services.picks.pickBreakAnimator"),
