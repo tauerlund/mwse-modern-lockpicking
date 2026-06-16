@@ -6,23 +6,7 @@ local this = {}
 this.state = nil
 
 ---@private
----@type nodeAnimatonKeyframe[]
-this.startAnimationKeyFrames = nil
-
----@private
----@type nodeAnimatonKeyframe[]
-this.cycleAnimationKeyFrames = nil
-
----@private
 this.rotationBuffer = tes3matrix33.new()
-
----@private
----@type nodeAnimator
-this.nodeAnimator = nil
-
----@private
----@type timerManager
-this.timerManager = nil
 
 ---@private
 ---@type enums
@@ -51,39 +35,11 @@ this.eventHandlers = {
 ---@param services serviceCollection
 ---@return boolean,string|nil
 function this.initialize(services)
-	this.nodeAnimator = services.nodeAnimator
-	this.timerManager = services.timerManager
 	this.enums = services.enums
 	this.renderingStrategyController = services.renderingStrategyController
 	this.eventRegistrar = services.eventRegistrar
 
 	local events = services.enums.events
-	local constants = services.enums.constants.picks
-
-	this.startAnimationKeyFrames = {
-		{
-			time = 0,
-			translation = constants.translation.original,
-			rotation = constants.rotation.original,
-		},
-		{
-			time = constants.animation.startAnimationDuration,
-			translation = constants.translation.target,
-			rotation = constants.rotation.target,
-		}
-	}
-	this.cycleAnimationKeyFrames = {
-		{
-			time = 0,
-			translation = constants.translation.original,
-			rotation = constants.rotation.original,
-		},
-		{
-			time = constants.animation.cycleAnimationDuration,
-			translation = constants.translation.target,
-			rotation = constants.rotation.target,
-		}
-	}
 
 	this.eventHandlers = {
 		lifetime = {
@@ -91,6 +47,7 @@ function this.initialize(services)
 			[events.lockpickingEnd] = this.onLockpickingEnd,
 			[events.lockpickingEnded] = this.onLockpickingEnded,
 			[events.pickCycled] = this.onPickCycled,
+			[events.pickSpawnFinished] = this.onPickSpawnFinished,
 			[events.rotationStarted] = this.onRotationStarted,
 			[events.rotationEnded] = this.onRotationEnded,
 			[events.cylinderBlocked] = this.onCylinderBlocked,
@@ -125,7 +82,6 @@ function this.onLockpickingStart(e)
 		jigglePhase = 0,
 		jiggleOffset = 0,
 	}
-	this.start(e.session.pick, this.startAnimationKeyFrames)
 	this.enable()
 end
 
@@ -151,7 +107,20 @@ end
 ---@param e pickCycledEventData
 function this.onPickCycled(e)
 	this.state.item = e.pick.item
-	this.start(e.pick, this.cycleAnimationKeyFrames)
+	this.state.mesh = e.pick.mesh
+	this.state.blocked = true
+	this.state.jigglePhase = 0
+	this.state.jiggleOffset = 0
+end
+
+---@private
+---@param _ pickSpawnFinishedEventData
+function this.onPickSpawnFinished(_)
+	if not this.state then
+		return
+	end
+	this.state.blocked = false
+	this.state.originalPickRotation = this.state.mesh.rotation:copy()
 end
 
 ---@private
@@ -181,41 +150,6 @@ end
 ---@private
 function this.disable()
 	this.eventRegistrar.unregister(this.eventHandlers.session)
-end
-
----@private
----@param pick pick
----@param keyframes nodeAnimatonKeyframe[]
-function this.start(pick, keyframes)
-	this.state.mesh = pick.mesh
-	this.state.blocked = true
-	this.state.jigglePhase = 0
-	this.state.jiggleOffset = 0
-	pick.animating = true
-
-	local events = this.enums.events
-
-	this.nodeAnimator.start({
-		node = pick.mesh,
-		keyframes = keyframes,
-		cancelOn = { events.lockpickingEnded, events.pickCycled },
-	})
-
-	this.timerManager.start({
-		durationInSeconds = keyframes[#keyframes].time,
-		cancelOn = { events.lockpickingEnded, events.pickCycled },
-		pauseOn = { events.optionsMenuOpened },
-		resumeOn = { events.optionsMenuClosed },
-		callback = this.onStartTimerFinished,
-	})
-end
-
----@private
----@param _ mwseTimerCallbackData
-function this.onStartTimerFinished(_)
-	this.state.blocked = false
-	this.state.originalPickRotation = this.state.mesh.rotation:copy()
-	this.session.pick.animating = false
 end
 
 ---@private

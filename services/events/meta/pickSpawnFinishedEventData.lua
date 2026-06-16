@@ -1,0 +1,3 @@
+---@meta
+---@class pickSpawnFinishedEventData
+---@field public pick pick
