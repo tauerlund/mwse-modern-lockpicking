@@ -47,27 +47,35 @@ function this.initialize(services)
 	local events = services.enums.events
 	local constants = services.enums.constants.picks
 
+	local depthRotation = tes3matrix33.new()
+	depthRotation:fromEulerXYZ(
+		constants.rotation.target.x,
+		constants.rotation.target.y,
+		constants.rotation.target.z
+	)
+	local depthVec = depthRotation * tes3vector3.new(0, constants.translation.depthOffset, 0)
+
 	this.startAnimationKeyFrames = {
 		{
 			time = 0,
-			translation = constants.translation.original,
+			translation = constants.translation.original + depthVec,
 			rotation = constants.rotation.original,
 		},
 		{
 			time = constants.animation.startAnimationDuration,
-			translation = constants.translation.target,
+			translation = constants.translation.target + depthVec,
 			rotation = constants.rotation.target,
 		}
 	}
 	this.cycleAnimationKeyFrames = {
 		{
 			time = 0,
-			translation = constants.translation.original,
+			translation = constants.translation.original + depthVec,
 			rotation = constants.rotation.original,
 		},
 		{
 			time = constants.animation.cycleAnimationDuration,
-			translation = constants.translation.target,
+			translation = constants.translation.target + depthVec,
 			rotation = constants.rotation.target,
 		}
 	}
