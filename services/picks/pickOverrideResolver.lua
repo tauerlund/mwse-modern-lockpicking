@@ -71,14 +71,23 @@ end
 ---@return { [string]: resolvedPickOverride }
 function this.loadOverrides(configurations)
 	local overrides = {}
+	local priorities = {}
 	for _, configuration in ipairs(configurations) do
 		for _, entry in ipairs(configuration) do
 			for _, meshPath in ipairs(entry.pickMeshes) do
 				local key = meshPath:lower()
-				if overrides[key] then
-					this.logger:error("Pick mesh '%s' already has an override, will be overwritten", meshPath)
+				local priority = entry.priority or 0
+				local existingPriority = priorities[key]
+
+				if existingPriority ~= nil and priority < existingPriority then
+					-- skip: existing override has higher priority
+				else
+					if existingPriority ~= nil and priority == existingPriority then
+						this.logger:error("Pick mesh '%s' already has an override with equal priority, will be overwritten", meshPath)
+					end
+					overrides[key] = this.buildOverride(entry)
+					priorities[key] = priority
 				end
-				overrides[key] = this.buildOverride(entry)
 			end
 		end
 	end

@@ -4,6 +4,7 @@
 
 ---@class pickMeshOverrideEntry
 ---@field public pickMeshes string[]
+---@field public priority number|nil
 ---@field public rotationTarget { x: number, y: number, z: number }|nil
 ---@field public depthOffset number|nil
 
