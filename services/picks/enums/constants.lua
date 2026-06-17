@@ -2,7 +2,7 @@
 local enum = {
 	rotation = {
 		original = tes3vector3.new(-0.19, 1.41, 0.10),
-		target = tes3vector3.new(0.95, 0.35, -0.00),
+		target = tes3vector3.new(0.96, 0.97, -0.00),
 	},
 
 	translation = {

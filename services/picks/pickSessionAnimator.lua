@@ -75,6 +75,7 @@ function this.onLockpickingStart(e)
 		helper = e.session.pick.helper,
 		item = e.session.pick.item,
 		originalHelperRotation = e.session.pick.helper.rotation:copy(),
+		originalPickRotation = nil,
 		currentHelperAngle = 0,
 		targetHelperAngle = 0,
 		blocked = true,
@@ -115,8 +116,11 @@ end
 ---@private
 ---@param _ pickSpawnFinishedEventData
 function this.onPickSpawnFinished(_)
-	if not this.state then return end
+	if not this.state then
+		return
+	end
 	this.state.blocked = false
+	this.state.originalPickRotation = this.state.mesh.rotation:copy()
 end
 
 ---@private
@@ -189,6 +193,7 @@ function this.onEnterFrame(e)
 
 	this.updateAngle(e.delta)
 	this.rotateHelper()
+	this.rotatePick()
 end
 
 ---@private
@@ -223,6 +228,7 @@ function this.updateJiggle(delta)
 	state.jiggleOffset = wave * this.computeJiggleAmplitude()
 
 	this.rotateHelper()
+	this.rotatePick()
 end
 
 ---@private
@@ -231,8 +237,18 @@ function this.rotateHelper()
 
 	this.rotationBuffer:toRotationY(state.currentHelperAngle + state.jiggleOffset)
 
-	state.helper.rotation = state.originalHelperRotation * this.rotationBuffer
+	state.helper.rotation = this.rotationBuffer
 	state.helper:update()
+end
+
+---@private
+function this.rotatePick()
+	local state = this.state --[[@as pickSessionAnimatorState]]
+
+	this.rotationBuffer:toRotationY(state.currentHelperAngle + state.jiggleOffset)
+
+	state.mesh.rotation = state.originalPickRotation * this.rotationBuffer
+	state.mesh:update()
 end
 
 return this

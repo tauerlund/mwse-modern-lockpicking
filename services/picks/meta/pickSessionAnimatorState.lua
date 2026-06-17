@@ -4,6 +4,7 @@
 ---@field helper niNode
 ---@field item tes3itemStack
 ---@field originalHelperRotation tes3matrix33
+---@field originalPickRotation tes3matrix33|nil
 ---@field currentHelperAngle number
 ---@field targetHelperAngle number
 ---@field blocked boolean
