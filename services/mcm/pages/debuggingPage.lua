@@ -23,6 +23,14 @@ function this.initialize(template, services)
         }),
     })
 
+    page:createOnOffButton({
+        label = "Show pick debugger",
+        variable = mwse.mcm.createTableVariable({
+            id = "showPickDebugger",
+            table = settings.debugging,
+        }),
+    })
+
     page:createLogLevelOptions({
         config = settings,
         configKey = "logLevel",

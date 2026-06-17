@@ -24,6 +24,7 @@
 
 ---@class debuggingSettings
 ---@field public showSweetSpotRenderer boolean
+---@field public showPickDebugger boolean
 
 ---@class settings
 ---@field public enabled boolean

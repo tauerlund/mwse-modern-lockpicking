@@ -55,6 +55,7 @@ function this.initializeMod(_)
 		services.pickOverrideResolver,
 		services.pickSpawnAnimator,
 		services.pickSessionAnimator,
+		services.pickDebuggingAnimator,
 		services.skillController,
 		services.guiController,
 		services.renderingController,

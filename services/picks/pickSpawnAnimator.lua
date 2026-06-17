@@ -100,7 +100,7 @@ function this.buildKeyframes(pick, duration)
 		},
 		{
 			time = duration,
-			translation = constants.translation.target + depthVec,
+			translation = override.translationTarget + depthVec,
 			rotation = override.rotationTarget,
 		},
 	}

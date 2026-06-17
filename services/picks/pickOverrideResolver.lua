@@ -105,6 +105,12 @@ function this.buildOverride(entry)
 				entry.rotationTarget.y,
 				entry.rotationTarget.z
 			) or nil,
+		translationTarget = entry.translationTarget and
+			tes3vector3.new(
+				entry.translationTarget.x,
+				entry.translationTarget.y,
+				entry.translationTarget.z
+			) or nil,
 		depthOffset = entry.depthOffset,
 	}
 end
@@ -124,16 +130,18 @@ function this.resolve(meshPath)
 	local constants = this.enums.constants.picks
 
 	local rotationTarget = constants.rotation.target
+	local translationTarget = constants.translation.target
 	local depthOffset = constants.translation.depthOffset
 
 	if override then
 		rotationTarget = override.rotationTarget or rotationTarget
+		translationTarget = override.translationTarget or translationTarget
 		if override.depthOffset ~= nil then
 			depthOffset = override.depthOffset
 		end
 	end
 
-	return { rotationTarget = rotationTarget, depthOffset = depthOffset }
+	return { rotationTarget = rotationTarget, translationTarget = translationTarget, depthOffset = depthOffset }
 end
 
 return this

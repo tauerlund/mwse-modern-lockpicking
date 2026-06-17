@@ -61,6 +61,36 @@ function this.createDivider(parameters)
 	return this.create(element)
 end
 
+---@class createSliderParameters : createParameters
+---@field current number
+---@field max number
+---@field step number
+---@field jump number
+
+---@public
+---@param parameters createSliderParameters
+---@return guiBuilder
+function this.createSlider(parameters)
+	local element = parameters.parent:createSlider({
+		id = parameters.id,
+		current = parameters.current,
+		max = parameters.max,
+		step = parameters.step,
+		jump = parameters.jump,
+	})
+	return this.create(element)
+end
+
+---@public
+---@param parameters createParameters
+---@return guiBuilder
+function this.createButton(parameters)
+	local element = parameters.parent:createButton({
+		id = parameters.id,
+	})
+	return this.create(element)
+end
+
 ---@public
 ---@param text string
 ---@return guiBuilder

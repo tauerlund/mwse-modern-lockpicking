@@ -6,8 +6,10 @@
 ---@field public pickMeshes string[]
 ---@field public priority number|nil
 ---@field public rotationTarget { x: number, y: number, z: number }|nil
+---@field public translationTarget { x: number, y: number, z: number }|nil
 ---@field public depthOffset number|nil
 
 ---@class resolvedPickOverride
 ---@field public rotationTarget tes3vector3
+---@field public translationTarget tes3vector3
 ---@field public depthOffset number

@@ -11,3 +11,7 @@
 ---@field public title string
 ---@field public position { x: number, y: number }|nil
 ---@field public sliders debugSliderDef[]
+---@field public onCopy (fun(): string)|nil
+
+---@class transformSlidersOptions
+---@field public applyRotation (fun(rotation: tes3matrix33))|nil

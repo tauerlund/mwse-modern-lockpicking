@@ -41,6 +41,7 @@ this.defaults = {
     },
     debugging = {
         showSweetSpotRenderer = false,
+        showPickDebugger = false,
     },
 }
 
