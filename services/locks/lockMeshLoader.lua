@@ -3,11 +3,11 @@ local this = {}
 
 ---@private
 ---@type string
-this.fullPath = "data files\\mwse\\config\\modern-lockpicking\\meshes"
+this.fullPath = "data files\\mwse\\config\\modern-lockpicking\\locks"
 
 ---@private
 ---@type string
-this.relativePath = "modern-lockpicking\\meshes"
+this.relativePath = "modern-lockpicking\\locks"
 
 ---@private
 ---@type fileHelper
