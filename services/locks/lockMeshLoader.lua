@@ -35,7 +35,7 @@ end
 function this.loadAll()
     local files = this.fileHelper.getAllFilesInDirectory(this.fullPath, this.enums.fileTypes.json)
     if not files then
-        return nil
+        return {}
     end
 
     local configurations = this.loadConfigurations(files)
