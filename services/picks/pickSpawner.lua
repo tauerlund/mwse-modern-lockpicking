@@ -68,10 +68,12 @@ function this.resolveItemData(pickItem)
 		return nil
 	end
 
-	local data = pickItem.variables[1]
+	local data = nil
 	for _, variable in ipairs(pickItem.variables) do
-		if variable.condition < data.condition then
-			data = variable
+		if variable then
+			if not data or variable.condition < data.condition then
+				data = variable
+			end
 		end
 	end
 
