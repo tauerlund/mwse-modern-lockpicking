@@ -60,6 +60,10 @@ function this.initialize(services)
 
     this.eventRegistrar.register(this.eventHandlers)
 
+    if not mge or not mge.shaders then
+        return false, "Valid MGE API not found - please check MGE XE version"
+    end
+
     this.depthOfField = mge.shaders.load({ name = "modern-lockpicking/Bokeh" })
     if this.depthOfField then
         this.depthOfField.enabled = false
