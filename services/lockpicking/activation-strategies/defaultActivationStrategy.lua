@@ -75,9 +75,18 @@ function this.onActivate(e)
         return
     end
 
+    local lock = activator.lockNode
+    if not lock then
+        return
+    end
+
+    if lock.key and this.inventoryController.hasKey(lock.key) then
+        return
+    end
+
     e.block = true
 
-    local canPick, reason = this.canPick(activator.lockNode)
+    local canPick, reason = this.canPick(lock)
     if canPick == false then
         tes3.messageBox(reason)
         return

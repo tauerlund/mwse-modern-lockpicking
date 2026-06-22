@@ -84,6 +84,18 @@ function this.tryGetEquippedPick()
 	return nil
 end
 
+---@public
+---@param key tes3misc
+---@return boolean
+function this.hasKey(key)
+	for _, item in pairs(tes3.player.object.inventory.items) do
+		if item.object == key then
+			return true
+		end
+	end
+	return false
+end
+
 ---@private
 ---@param a tes3itemStack
 ---@param b tes3itemStack
