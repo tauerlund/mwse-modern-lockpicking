@@ -81,6 +81,8 @@ local this = {
     mcmVisualsDescLockDistance = "mcm.visuals.desc.lockDistance",
     mcmVisualsLabelShowPickHealth = "mcm.visuals.label.showPickHealth",
     mcmVisualsDescShowPickHealth = "mcm.visuals.desc.showPickHealth",
+    mcmVisualsLabelShowLockLevel = "mcm.visuals.label.showLockLevel",
+    mcmVisualsDescShowLockLevel = "mcm.visuals.desc.showLockLevel",
 }
 
 return this

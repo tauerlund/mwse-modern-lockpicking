@@ -101,4 +101,7 @@ return {
 	[keys.mcmVisualsLabelShowPickHealth] = "Show Pick Health",
 	[keys.mcmVisualsDescShowPickHealth] =
 	"When enabled, displays the active pick's current health in the lockpick list during lockpicking.",
+	[keys.mcmVisualsLabelShowLockLevel] = "Show Lock Level",
+	[keys.mcmVisualsDescShowLockLevel] =
+	"When enabled, displays the lock's level in the header during lockpicking.",
 }

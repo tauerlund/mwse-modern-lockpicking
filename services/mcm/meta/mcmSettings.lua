@@ -34,6 +34,7 @@
 ---@field public litRendering boolean
 ---@field public enableDof boolean
 ---@field public lockDistanceFactor number
+---@field public showLockLevel boolean
 ---@field public showPickHealth boolean
 ---@field public allowEquipPicks boolean
 ---@field public useLockComplexity boolean

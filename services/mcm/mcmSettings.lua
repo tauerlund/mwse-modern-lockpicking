@@ -23,6 +23,7 @@ this.defaults = {
     litRendering = true,
     enableDof = true,
     lockDistanceFactor = 1.0,
+    showLockLevel = true,
     showPickHealth = false,
     allowEquipPicks = true,
     useLockComplexity = true,

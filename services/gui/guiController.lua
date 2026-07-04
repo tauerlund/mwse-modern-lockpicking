@@ -23,6 +23,10 @@ this.header = nil
 
 ---@private
 ---@type tes3uiElement
+this.lockLevelDivider = nil
+
+---@private
+---@type tes3uiElement
 this.lockLevelLabel = nil
 
 ---@private
@@ -86,9 +90,9 @@ function this.initialize(services)
 	this.eventRegistrar        = services.eventRegistrar
 	this.locksAndTrapDetection = services.locksAndTrapDetection
 
-	local events        = this.enums.events
+	local events               = this.enums.events
 
-	this.eventHandlers  = {
+	this.eventHandlers         = {
 		lifetime = {
 			[tes3.event.uiObjectTooltip] = this.onUiObjectTooltip,
 			[tes3.event.uiActivated] = { this.uiActivated, { filter = "MenuOptions" } },
@@ -180,16 +184,36 @@ function this.createHeader(e)
 		:withColor(tes3ui.getPalette(tes3.palette.headerColor))
 		:build()
 
-	this.guiBuilder.createDivider({ parent = block })
+	this.lockLevelDivider = this.guiBuilder.createDivider({ parent = block })
 		:withProportional({ width = 1.0 })
 		:build()
 
 	this.lockLevelLabel = this.guiBuilder.createLabel({ parent = block })
 		:withText(this.resolveLockLevelText(e.session.activator))
 		:withColor(this.resolveLockLevelColor(e.session.activator))
+		:withCallback(this.enums.events.settingsUpdated, function ()
+			this.applyLockLevelVisibility()
+		end)
 		:build()
 
+	this.applyLockLevelVisibility()
+
 	return header
+end
+
+---@private
+function this.applyLockLevelVisibility()
+	if not this.lockLevelLabel or not this.lockLevelDivider then
+		return
+	end
+
+	local visible = this.settings.showLockLevel
+	this.lockLevelDivider.visible = visible
+	this.lockLevelLabel.visible = visible
+
+	if this.header then
+		this.header:updateLayout()
+	end
 end
 
 --- The header's lock level text: the Locks and Trap Detection range when the mod
@@ -493,6 +517,7 @@ function this.stop()
 	this.activePick = nil
 	this.lastPickCondition = -1
 	this.activator = nil
+	this.lockLevelDivider = nil
 	this.lockLevelLabel = nil
 
 	if this.header then

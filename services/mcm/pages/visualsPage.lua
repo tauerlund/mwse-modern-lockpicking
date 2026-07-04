@@ -33,6 +33,15 @@ function this.initialize(template, services)
 	})
 
 	page:createOnOffButton({
+		label = translations.get(translationKeys.mcmVisualsLabelShowLockLevel),
+		description = translations.get(translationKeys.mcmVisualsDescShowLockLevel),
+		variable = mwse.mcm.createTableVariable({
+			id = "showLockLevel",
+			table = settings,
+		}),
+	})
+
+	page:createOnOffButton({
 		label = translations.get(translationKeys.mcmVisualsLabelShowPickHealth),
 		description = translations.get(translationKeys.mcmVisualsDescShowPickHealth),
 		variable = mwse.mcm.createTableVariable({
