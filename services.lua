@@ -15,6 +15,8 @@ local this = {
 
     inventoryController = require("tauer.modern-lockpicking.services.inventory.inventoryController"),
 
+    locksAndTrapDetection = require("tauer.modern-lockpicking.services.interop.locksAndTrapDetection"),
+
     knifeAnimator = require("tauer.modern-lockpicking.services.knives.knifeAnimator"),
     knifeSpawner = require("tauer.modern-lockpicking.services.knives.knifeSpawner"),
 

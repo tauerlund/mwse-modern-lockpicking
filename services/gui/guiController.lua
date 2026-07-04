@@ -14,8 +14,20 @@ this.translations = nil
 this.settings = nil
 
 ---@private
+---@type locksAndTrapDetection
+this.locksAndTrapDetection = nil
+
+---@private
 ---@type tes3uiElement
 this.header = nil
+
+---@private
+---@type tes3uiElement
+this.lockLevelLabel = nil
+
+---@private
+---@type tes3reference
+this.activator = nil
 
 ---@private
 ---@type tes3uiElement
@@ -67,11 +79,12 @@ this.lockpicking = false
 ---@param services serviceCollection
 ---@return boolean,string|nil
 function this.initialize(services)
-	this.guiBuilder     = services.guiBuilder
-	this.translations   = services.translations
-	this.settings       = services.settings
-	this.enums          = services.enums
-	this.eventRegistrar = services.eventRegistrar
+	this.guiBuilder            = services.guiBuilder
+	this.translations          = services.translations
+	this.settings              = services.settings
+	this.enums                 = services.enums
+	this.eventRegistrar        = services.eventRegistrar
+	this.locksAndTrapDetection = services.locksAndTrapDetection
 
 	local events        = this.enums.events
 
@@ -127,6 +140,7 @@ end
 ---@param e lockpickingStartEventData
 function this.start(e)
 	tes3ui.enterMenuMode("ModernLockpicking")
+	this.activator = e.session.activator
 	this.header = this.createHeader(e)
 	this.controls = this.createControls()
 	this.picks = this.createPicks(e.session.pick, e.session.picks, e.session.eligiblePicks)
@@ -170,26 +184,67 @@ function this.createHeader(e)
 		:withProportional({ width = 1.0 })
 		:build()
 
-	local lockLevel = tes3.getLockLevel({
-		reference = e.session.activator --[[@as tes3reference]],
-	})
-
-	local player = tes3.player.mobile --[[@as tes3mobileActor]]
-	local securitySkill = player:getSkillValue(tes3.skill.security)
-
-	this.guiBuilder.createLabel({ parent = block })
-		:withText(this.createLockLevelText(lockLevel))
-		:withColor(this.getLockLevelColor(lockLevel, securitySkill))
+	this.lockLevelLabel = this.guiBuilder.createLabel({ parent = block })
+		:withText(this.resolveLockLevelText(e.session.activator))
+		:withColor(this.resolveLockLevelColor(e.session.activator))
 		:build()
 
 	return header
 end
 
+--- The header's lock level text: the Locks and Trap Detection range when the mod
+--- is installed, otherwise the true lock level.
 ---@private
----@param level number
+---@param activator tes3reference
+---@return string
+function this.resolveLockLevelText(activator)
+	local lockLevel = tes3.getLockLevel({
+		reference = activator --[[@as tes3reference]],
+	})
+
+	local locksAndTrapDetectionLabel = this.locksAndTrapDetection.getLockLevelLabel(activator)
+
+	return this.createLockLevelText(locksAndTrapDetectionLabel or tostring(lockLevel))
+end
+
+--- The header's lock level colour. When Locks and Trap Detection is installed the
+--- colour is based on the top of the detected range (the pessimistic estimate the
+--- player sees), otherwise on the true lock level.
+---@private
+---@param activator tes3reference
+---@return number[]
+function this.resolveLockLevelColor(activator)
+	local lockLevel = this.locksAndTrapDetection.getMaxLockLevel(activator)
+		or tes3.getLockLevel({ reference = activator --[[@as tes3reference]] })
+
+	local player = tes3.player.mobile --[[@as tes3mobileActor]]
+	local securitySkill = player:getSkillValue(tes3.skill.security)
+
+	return this.getLockLevelColor(lockLevel, securitySkill)
+end
+
+--- Re-resolve the header's lock level text so a narrowed Locks and Trap Detection
+--- range becomes visible mid-session.
+---@private
+---@param activator tes3reference
+function this.refreshLockLevelLabel(activator)
+	if not this.lockLevelLabel then
+		return
+	end
+
+	this.lockLevelLabel.text = this.resolveLockLevelText(activator)
+	this.lockLevelLabel.color = this.resolveLockLevelColor(activator)
+
+	if this.header then
+		this.header:updateLayout()
+	end
+end
+
+---@private
+---@param level string
 ---@return string
 function this.createLockLevelText(level)
-	return string.format("%s: %d", tes3.findGMST(tes3.gmst.sLockLevel).value, level)
+	return string.format("%s: %s", tes3.findGMST(tes3.gmst.sLockLevel).value, level)
 end
 
 ---@private
@@ -437,6 +492,8 @@ function this.stop()
 	this.healthLabel = nil
 	this.activePick = nil
 	this.lastPickCondition = -1
+	this.activator = nil
+	this.lockLevelLabel = nil
 
 	if this.header then
 		this.header:destroy()
@@ -516,6 +573,11 @@ end
 function this.onPickBroken(e)
 	if not this.picks then
 		return
+	end
+
+	if this.activator then
+		this.locksAndTrapDetection.narrowLockRange(this.activator)
+		this.refreshLockLevelLabel(this.activator)
 	end
 
 	local constants = this.enums.constants.gui
