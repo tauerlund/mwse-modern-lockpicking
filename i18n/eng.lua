@@ -92,6 +92,12 @@ return {
 	[keys.mcmLitRenderingDesc] =
 	"When enabled, lock meshes are lit by scene lighting. When disabled, meshes are rendered unlit.",
 	[keys.mcmHeaderVisuals] = "Visuals",
+	[keys.mcmHeaderBlacklist] = "Blacklist",
+	[keys.mcmBlacklistDesc] =
+	"Lockpicks in the blacklist are ignored by this mod entirely. Some mods use a lockpick as the base for an item that is not a lockpick at all, such as a compass or a watch; blacklist those so they stay out of the mini-game and can still be equipped and used normally.",
+	[keys.mcmBlacklistFilterLockpicks] = "Lockpicks",
+	[keys.mcmBlacklistLabelIgnored] = "Blacklisted",
+	[keys.mcmBlacklistLabelUsed] = "Used for lockpicking",
 	[keys.mcmVisualsLabelEnableDof] = "Depth of Field",
 	[keys.mcmVisualsDescEnableDof] =
 	"When enabled, a bokeh depth of field effect is applied during lockpicking.",

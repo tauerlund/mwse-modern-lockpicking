@@ -38,6 +38,7 @@
 ---@field public showPickHealth boolean
 ---@field public allowEquipPicks boolean
 ---@field public useLockComplexity boolean
+---@field public pickBlacklist table<string, boolean>
 ---@field public openOnSuccess openOnSuccessModes
 ---@field public difficulty difficultySettings
 ---@field public debugging debuggingSettings

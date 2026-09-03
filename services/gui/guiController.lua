@@ -642,6 +642,10 @@ function this.onUiObjectTooltip(e)
 		return
 	end
 
+	if this.settings.pickBlacklist[e.object.id:lower()] then
+		return
+	end
+
 	if not e.tooltip then
 		return
 	end

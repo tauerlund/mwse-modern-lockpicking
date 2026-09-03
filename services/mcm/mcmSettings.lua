@@ -27,6 +27,7 @@ this.defaults = {
     showPickHealth = false,
     allowEquipPicks = true,
     useLockComplexity = true,
+    pickBlacklist = {},
     openOnSuccess = openOnSuccessModes.untrapped,
     difficulty = {
         securityWeight = 1.0,

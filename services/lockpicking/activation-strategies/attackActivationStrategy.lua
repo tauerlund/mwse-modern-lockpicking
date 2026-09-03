@@ -56,6 +56,10 @@ function this.onLockPick(e)
         return
     end
 
+    if this.settings.pickBlacklist[e.tool.id:lower()] then
+        return
+    end
+
     if this.settings.useLockComplexity and e.chance <= 0 then
         return
     end

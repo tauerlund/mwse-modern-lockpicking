@@ -61,9 +61,11 @@ end
 function this.getLockpicks()
 	---@type tes3itemStack[]
 	local picks = {}
+	local blacklist = this.settings.pickBlacklist
 
 	for _, item in pairs(tes3.player.object.inventory.items) do
-		if item.object.objectType == tes3.objectType.lockpick then
+		local object = item.object
+		if object.objectType == tes3.objectType.lockpick and not blacklist[object.id:lower()] then
 			table.insert(picks, item)
 		end
 	end
@@ -76,9 +78,12 @@ end
 ---@public
 ---@return tes3lockpick|nil
 function this.tryGetEquippedPick()
+	local blacklist = this.settings.pickBlacklist
+
 	for _, item in ipairs(tes3.player.object.equipment) do
-		if item.object.objectType == tes3.objectType.lockpick then
-			return item.object --[[@as tes3lockpick]]
+		local object = item.object
+		if object.objectType == tes3.objectType.lockpick and not blacklist[object.id:lower()] then
+			return object --[[@as tes3lockpick]]
 		end
 	end
 	return nil
@@ -147,6 +152,11 @@ function this.onEquip(e)
 	if e.item.objectType ~= tes3.objectType.lockpick then
 		return
 	end
+
+	if this.settings.pickBlacklist[e.item.id:lower()] then
+		return
+	end
+
 	e.block = true
 end
 
