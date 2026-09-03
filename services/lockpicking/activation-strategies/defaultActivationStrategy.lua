@@ -84,6 +84,10 @@ function this.onActivate(e)
         return
     end
 
+    if not this.isPickable(lock) then
+        return
+    end
+
     e.block = true
 
     local canPick, reason = this.canPick(lock)
@@ -97,6 +101,16 @@ function this.onActivate(e)
         activator = activator
     }
     event.trigger(this.enums.events.lockpickingActivated, eventData)
+end
+
+--- A lock level of zero means the lock cannot be picked at all. The engine skips
+--- lockpicking entirely for those locks, and mods rely on that to make doors and
+--- containers permanently locked.
+---@private
+---@param lock tes3lockNode
+---@return boolean
+function this.isPickable(lock)
+    return lock.level > 0
 end
 
 ---@private
