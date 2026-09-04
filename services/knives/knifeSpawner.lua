@@ -6,6 +6,10 @@ local this = {}
 this.enums = nil
 
 ---@private
+---@type inventoryController
+this.inventoryController = nil
+
+---@private
 ---@type eventRegistrar
 this.eventRegistrar = nil
 
@@ -18,6 +22,7 @@ this.eventHandlers = nil
 ---@return boolean, string|nil
 function this.initialize(services)
 	this.enums = services.enums
+	this.inventoryController = services.inventoryController
 	this.eventRegistrar = services.eventRegistrar
 
 	local events = services.enums.events
@@ -63,10 +68,28 @@ end
 ---@public
 ---@return niNode
 function this.getMesh()
-	local mesh = tes3.loadMesh(this.enums.constants.knives.paths.daggerMesh, true):clone() --[[@as niNode]]
+	local mesh = tes3.loadMesh(this.resolveMeshPath(), true):clone() --[[@as niNode]]
 
 	mesh.name = this.enums.objectNames.knife
 	mesh:attachProperty(this.getZBufferProperty())
+
+	return mesh
+end
+
+---@private
+---@return string
+function this.resolveMeshPath()
+	local default = this.enums.constants.knives.paths.daggerMesh
+	local knife = this.inventoryController.getBestKnife()
+
+	if not knife then
+		return default
+	end
+
+	local mesh = knife.object.mesh
+	if not mesh or mesh == "" then
+		return default
+	end
 
 	return mesh
 end

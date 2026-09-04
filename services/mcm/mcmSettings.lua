@@ -1,6 +1,7 @@
 local activationStrategyNames = require(
     "tauer.modern-lockpicking.services.lockpicking.activation-strategies.enums.activationStrategyNames")
 local openOnSuccessModes = require("tauer.modern-lockpicking.services.locks.enums.openOnSuccessModes")
+local knifeSelectionModes = require("tauer.modern-lockpicking.services.knives.enums.knifeSelectionModes")
 
 ---@class mcmSettings
 local this = {}
@@ -27,7 +28,13 @@ this.defaults = {
     showPickHealth = false,
     allowEquipPicks = true,
     useLockComplexity = true,
+    requireKnife = false,
+    knifeSelection = knifeSelectionModes.highestValue,
     pickBlacklist = {},
+    knifeWhitelist = {
+        ["iron dagger"] = true,
+        ["chargen dagger"] = true,
+    },
     openOnSuccess = openOnSuccessModes.untrapped,
     difficulty = {
         securityWeight = 1.0,

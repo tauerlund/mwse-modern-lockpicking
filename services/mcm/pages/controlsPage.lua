@@ -12,6 +12,7 @@ function this.initialize(template, services)
 
     local activationStrategyNames = services.enums.activationStrategyNames
     local openOnSuccessModes = services.enums.openOnSuccessModes
+    local knifeSelectionModes = services.enums.knifeSelectionModes
 
     local controlsPage = template:createSideBarPage { label = translations.get(translationKeys.interfaceControlsHeader) }
 
@@ -111,6 +112,29 @@ function this.initialize(template, services)
         description = translations.get(translationKeys.mcmUseLockComplexityDesc),
         variable = mwse.mcm.createTableVariable({
             id = "useLockComplexity",
+            table = settings,
+        }),
+    })
+
+    activationCategory:createOnOffButton({
+        label = translations.get(translationKeys.mcmRequireKnifeLabel),
+        description = translations.get(translationKeys.mcmRequireKnifeDesc),
+        variable = mwse.mcm.createTableVariable({
+            id = "requireKnife",
+            table = settings,
+        }),
+    })
+
+    activationCategory:createCycleButton({
+        label = translations.get(translationKeys.mcmKnifeSelectionLabel),
+        description = translations.get(translationKeys.mcmKnifeSelectionDesc),
+        options = {
+            { text = translations.get(translationKeys.mcmKnifeSelectionHighestValue), value = knifeSelectionModes.highestValue },
+            { text = translations.get(translationKeys.mcmKnifeSelectionLowestValue),  value = knifeSelectionModes.lowestValue },
+            { text = translations.get(translationKeys.mcmKnifeSelectionAlphabetical), value = knifeSelectionModes.alphabetical },
+        },
+        variable = mwse.mcm.createTableVariable({
+            id = "knifeSelection",
             table = settings,
         }),
     })

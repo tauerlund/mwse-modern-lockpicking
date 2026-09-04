@@ -5,6 +5,7 @@ return {
 	[keys.messageBoxNoLockpicks] = "You have no lockpicks.",
 	[keys.messageBoxOutOfLockpicks] = "You are out of lockpicks.",
 	[keys.messageBoxPicksTooWeak] = "Your remaining lockpicks are too weak for this lock.",
+	[keys.messageBoxNoKnife] = "You have no knife.",
 	[keys.interfaceControlsHeader] = "Controls",
 	[keys.interfaceControlsRotatePick] = "Rotate Pick",
 	[keys.interfaceControlsRotateLock] = "Rotate Lock",
@@ -110,4 +111,20 @@ return {
 	[keys.mcmVisualsLabelShowLockLevel] = "Show Lock Level",
 	[keys.mcmVisualsDescShowLockLevel] =
 	"When enabled, displays the lock's level in the header during lockpicking.",
+	[keys.mcmRequireKnifeLabel] = "Require Knife",
+	[keys.mcmRequireKnifeDesc] =
+	"When enabled, a knife is required in addition to a lockpick. Choose which blades count as a knife on the Knives page.",
+	[keys.mcmHeaderKnives] = "Knives",
+	[keys.mcmKnivesDesc] =
+	"Blades that count as a knife. At least one blade must remain selected.",
+	[keys.mcmKnivesFilterShortBlades] = "Short Blades",
+	[keys.mcmKnivesLabelUsed] = "Used as knife",
+	[keys.mcmKnivesLabelIgnored] = "Not used",
+	[keys.mcmKnivesMinimumSelection] = "At least one knife must remain selected.",
+	[keys.mcmKnifeSelectionLabel] = "Knife Selection",
+	[keys.mcmKnifeSelectionDesc] =
+	"Which of your knives is shown in the mini-game when you carry more than one.",
+	[keys.mcmKnifeSelectionHighestValue] = "Highest value",
+	[keys.mcmKnifeSelectionLowestValue] = "Lowest value",
+	[keys.mcmKnifeSelectionAlphabetical] = "Alphabetical",
 }

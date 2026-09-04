@@ -74,6 +74,7 @@ local this = {
         renderingStrategyNames = require(
             "tauer.modern-lockpicking.services.rendering.rendering-strategies.enums.renderingStrategyNames"),
         openOnSuccessModes = require("tauer.modern-lockpicking.services.locks.enums.openOnSuccessModes"),
+        knifeSelectionModes = require("tauer.modern-lockpicking.services.knives.enums.knifeSelectionModes"),
         fileTypes = require("tauer.modern-lockpicking.services.files.enums.fileType"),
         translationKeys = require("tauer.modern-lockpicking.services.translations.enums.translationKeys"),
         objectNames = require("tauer.modern-lockpicking.services.nodes.enums.objectNames"),

@@ -7,7 +7,8 @@ this.pages = {
 	require("tauer.modern-lockpicking.services.mcm.pages.controlsPage"),
 	require("tauer.modern-lockpicking.services.mcm.pages.difficultyPage"),
 	require("tauer.modern-lockpicking.services.mcm.pages.visualsPage"),
-	require("tauer.modern-lockpicking.services.mcm.pages.blacklistPage"),
+	require("tauer.modern-lockpicking.services.mcm.pages.pickBlacklistPage"),
+	require("tauer.modern-lockpicking.services.mcm.pages.knifeWhitelistPage"),
 	require("tauer.modern-lockpicking.services.mcm.pages.debuggingPage")
 }
 

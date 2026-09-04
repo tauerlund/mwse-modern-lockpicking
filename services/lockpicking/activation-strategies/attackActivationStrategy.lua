@@ -14,6 +14,14 @@ this.enums = nil
 this.settings = nil
 
 ---@private
+---@type inventoryController
+this.inventoryController = nil
+
+---@private
+---@type translations
+this.translations = nil
+
+---@private
 ---@type timerManager
 this.timerManager = nil
 
@@ -31,6 +39,8 @@ function this.initialize(services)
     this.name = services.enums.activationStrategyNames.attack
     this.enums = services.enums
     this.settings = services.settings
+    this.inventoryController = services.inventoryController
+    this.translations = services.translations
     this.timerManager = services.timerManager
     this.eventRegistrar = services.eventRegistrar
 
@@ -71,6 +81,11 @@ function this.onLockPick(e)
     end
 
     e.block = true
+
+    if this.settings.requireKnife and not this.inventoryController.hasKnife() then
+        tes3.messageBox(this.translations.get(this.enums.translationKeys.messageBoxNoKnife))
+        return
+    end
 
     local events = this.enums.events
 

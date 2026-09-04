@@ -122,6 +122,10 @@ function this.canPick(lock)
         return false, this.translations.get(this.enums.translationKeys.messageBoxNoLockpicks)
     end
 
+    if this.settings.requireKnife and not this.inventoryController.hasKnife() then
+        return false, this.translations.get(this.enums.translationKeys.messageBoxNoKnife)
+    end
+
     if not this.settings.useLockComplexity then
         return true, ""
     end

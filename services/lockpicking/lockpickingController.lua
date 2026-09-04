@@ -206,6 +206,11 @@ function this.createSession(activator)
 		return nil
 	end
 
+	if this.settings.requireKnife and not this.inventoryController.hasKnife() then
+		tes3.messageBox(this.translations.get(this.enums.translationKeys.messageBoxNoKnife))
+		return nil
+	end
+
 	local lock = this.lockSpawner.spawn(activator)
 	local knife = this.knifeSpawner.spawn(lock)
 	local eligiblePicks, _ = this.computeEligiblePicks(picks, activator)

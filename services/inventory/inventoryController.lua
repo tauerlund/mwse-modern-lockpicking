@@ -6,6 +6,10 @@ local this = {}
 this.settings = nil
 
 ---@private
+---@type enums
+this.enums = nil
+
+---@private
 ---@type eventRegistrar
 this.eventRegistrar = nil
 
@@ -21,6 +25,7 @@ this.eventHandlers = {
 ---@return boolean, string|nil
 function this.initialize(services)
 	this.settings = services.settings
+	this.enums = services.enums
 	this.eventRegistrar = services.eventRegistrar
 
 	local events = services.enums.events
@@ -76,6 +81,41 @@ function this.getLockpicks()
 end
 
 ---@public
+---@return tes3itemStack[]
+function this.getKnives()
+	---@type tes3itemStack[]
+	local knives = {}
+	local whitelist = this.settings.knifeWhitelist
+
+	for _, item in pairs(tes3.player.object.inventory.items) do
+		if whitelist[item.object.id:lower()] then
+			table.insert(knives, item)
+		end
+	end
+
+	table.sort(knives, this.getKnifeComparer())
+
+	return knives
+end
+
+---@public
+---@return tes3itemStack|nil
+function this.getBestKnife()
+	local knives = this.getKnives()
+	if #knives == 0 then
+		return nil
+	end
+
+	return knives[1]
+end
+
+---@public
+---@return boolean
+function this.hasKnife()
+	return this.getBestKnife() ~= nil
+end
+
+---@public
 ---@return tes3lockpick|nil
 function this.tryGetEquippedPick()
 	local blacklist = this.settings.pickBlacklist
@@ -99,6 +139,50 @@ function this.hasKey(key)
 		end
 	end
 	return false
+end
+
+---@private
+---@return fun(a: tes3itemStack, b: tes3itemStack): boolean
+function this.getKnifeComparer()
+	local modes = this.enums.knifeSelectionModes
+	local mode = this.settings.knifeSelection
+
+	if mode == modes.lowestValue then
+		return this.sortByLowestValue
+	end
+
+	if mode == modes.alphabetical then
+		return this.sortAlphabetically
+	end
+
+	return this.sortByHighestValue
+end
+
+---@private
+---@param a tes3itemStack
+---@param b tes3itemStack
+function this.sortByHighestValue(a, b)
+	if a.object.value == b.object.value then
+		return a.object.id:lower() < b.object.id:lower()
+	end
+	return a.object.value > b.object.value
+end
+
+---@private
+---@param a tes3itemStack
+---@param b tes3itemStack
+function this.sortByLowestValue(a, b)
+	if a.object.value == b.object.value then
+		return a.object.id:lower() < b.object.id:lower()
+	end
+	return a.object.value < b.object.value
+end
+
+---@private
+---@param a tes3itemStack
+---@param b tes3itemStack
+function this.sortAlphabetically(a, b)
+	return a.object.id:lower() < b.object.id:lower()
 end
 
 ---@private

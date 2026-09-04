@@ -1,4 +1,4 @@
----@class blacklistPage : mcmPage
+---@class pickBlacklistPage : mcmPage
 local this = {}
 
 ---@public

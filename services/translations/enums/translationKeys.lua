@@ -4,6 +4,7 @@ local this = {
     messageBoxNoLockpicks = "messageBox.noLockpicks",
     messageBoxOutOfLockpicks = "messageBox.outOfLockpicks",
     messageBoxPicksTooWeak = "messageBox.picksTooWeak",
+    messageBoxNoKnife = "messageBox.noKnife",
     interfaceControlsHeader = "interface.controls.header",
     interfaceControlsRotatePick = "interface.controls.rotatePick",
     interfaceControlsRotateLock = "interface.controls.rotateLock",
@@ -88,6 +89,19 @@ local this = {
     mcmVisualsDescShowPickHealth = "mcm.visuals.desc.showPickHealth",
     mcmVisualsLabelShowLockLevel = "mcm.visuals.label.showLockLevel",
     mcmVisualsDescShowLockLevel = "mcm.visuals.desc.showLockLevel",
+    mcmRequireKnifeLabel = "mcm.requireKnife.label",
+    mcmRequireKnifeDesc = "mcm.requireKnife.desc",
+    mcmHeaderKnives = "mcm.header.knives",
+    mcmKnivesDesc = "mcm.knives.desc",
+    mcmKnivesFilterShortBlades = "mcm.knives.filter.shortBlades",
+    mcmKnivesLabelUsed = "mcm.knives.label.used",
+    mcmKnivesLabelIgnored = "mcm.knives.label.ignored",
+    mcmKnivesMinimumSelection = "mcm.knives.minimumSelection",
+    mcmKnifeSelectionLabel = "mcm.knifeSelection.label",
+    mcmKnifeSelectionDesc = "mcm.knifeSelection.desc",
+    mcmKnifeSelectionHighestValue = "mcm.knifeSelection.highestValue",
+    mcmKnifeSelectionLowestValue = "mcm.knifeSelection.lowestValue",
+    mcmKnifeSelectionAlphabetical = "mcm.knifeSelection.alphabetical",
 }
 
 return this
